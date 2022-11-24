@@ -6,7 +6,7 @@ using Npgsql;
 
 namespace BugTrackerMVC.Data
 {
-    public class DataUtility
+    public static class DataUtility
     {
         private static int company1Id;
         private static int company2Id;

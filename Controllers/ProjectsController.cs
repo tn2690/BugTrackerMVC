@@ -7,23 +7,46 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BugTrackerMVC.Data;
 using BugTrackerMVC.Models;
+using Microsoft.AspNetCore.Identity;
+using BugTrackerMVC.Services.Interfaces;
 
 namespace BugTrackerMVC.Controllers
 {
     public class ProjectsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<BTUser> _userManager;
+        private readonly IImageService _imageService;
+        private readonly IBugTrackerService _bugTrackerService;
 
-        public ProjectsController(ApplicationDbContext context)
+        public ProjectsController(ApplicationDbContext context,
+                                  UserManager<BTUser> userManager,
+                                  IImageService imageService,
+                                  IBugTrackerService bugTrackerService)
         {
             _context = context;
+            _userManager = userManager;
+            _imageService = imageService;
+            _bugTrackerService = bugTrackerService;
         }
 
         // GET: Projects
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Projects.Include(p => p.Company).Include(p => p.ProjectPriority);
-            return View(await applicationDbContext.ToListAsync());
+            // get logged in user
+            BTUser btUserId = await _userManager.GetUserAsync(User);
+
+            // assign user's company id
+            int companyId = btUserId.CompanyId;
+
+            // show projects for specific company
+            List<Project> projects = (await _bugTrackerService.GetProjectsAsync(companyId)).ToList();
+
+            return View(projects);
+                                                    
+            //var applicationDbContext = _context.Projects.Include(p => p.Company).Include(p => p.ProjectPriority);
+
+            //return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: Projects/Details/5
@@ -34,10 +57,11 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            var project = await _context.Projects
+            Project? project = await _context.Projects
                 .Include(p => p.Company)
                 .Include(p => p.ProjectPriority)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (project == null)
             {
                 return NotFound();
@@ -47,11 +71,21 @@ namespace BugTrackerMVC.Controllers
         }
 
         // GET: Projects/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name");
+            // get logged in user
+            BTUser btUserId = await _userManager.GetUserAsync(User);
+
+            // assign user's company id
+            int companyId = btUserId.CompanyId;
+
+            // match to project
+            List<Company> company = (await _bugTrackerService.GetCompanyAsync(companyId)).ToList();
+
+            ViewData["CompanyId"] = new SelectList(company, "Id", "Name");
             ViewData["ProjectPriorityId"] = new SelectList(_context.ProjectPriorities, "Id", "Name");
-            return View();
+
+            return View(new Project());
         }
 
         // POST: Projects/Create
@@ -59,16 +93,47 @@ namespace BugTrackerMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CompanyId,Name,Description,Created,StartDate,EndDate,ProjectPriorityId,ImageFileData,ImageFileType,Archived")] Project project)
+        public async Task<IActionResult> Create([Bind("Id,CompanyId,Name,Description,StartDate,EndDate,ProjectPriorityId,Archived,ImageFormFile")] Project project)
         {
             if (ModelState.IsValid)
             {
+                // set dates for Created, StartDate, EndDate
+                project.Created = DateTime.UtcNow;
+
+                if (project.StartDate != null && project.EndDate != null)
+                {
+                    project.StartDate = DateTime.SpecifyKind(project.StartDate.Value, DateTimeKind.Utc);
+                    project.EndDate = DateTime.SpecifyKind(project.EndDate.Value, DateTimeKind.Utc);
+                }
+
+                // set image
+                // check whether an image has been uploaded
+                if (project.ImageFormFile != null)
+                {
+                    // convert file to byte array
+                    project.ImageFileData = await _imageService.ConvertFileToByteArrayAsync(project.ImageFormFile);
+
+                    // use file extension as the file
+                    project.ImageFileType = project.ImageFormFile.ContentType;
+                }
+
                 _context.Add(project);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", project.CompanyId);
+
+            // get logged in user
+            BTUser btUserId = await _userManager.GetUserAsync(User);
+
+            // assign user's company id
+            int companyId = btUserId.CompanyId;
+
+            // match to project
+            List<Company> company = (await _bugTrackerService.GetCompanyAsync(companyId)).ToList();
+
+            ViewData["CompanyId"] = new SelectList(company, "Id", "Name", project.CompanyId);
             ViewData["ProjectPriorityId"] = new SelectList(_context.ProjectPriorities, "Id", "Name", project.ProjectPriorityId);
+
             return View(project);
         }
 
@@ -80,13 +145,25 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            var project = await _context.Projects.FindAsync(id);
+            Project? project = await _context.Projects.FindAsync(id);
+
             if (project == null)
             {
                 return NotFound();
             }
-            ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", project.CompanyId);
+
+            // get logged in user
+            BTUser btUserId = await _userManager.GetUserAsync(User);
+
+            // assign user's company id
+            int companyId = btUserId.CompanyId;
+
+            // match to project
+            List<Company> company = (await _bugTrackerService.GetCompanyAsync(companyId)).ToList();
+
+            ViewData["CompanyId"] = new SelectList(company, "Id", "Name", companyId);
             ViewData["ProjectPriorityId"] = new SelectList(_context.ProjectPriorities, "Id", "Name", project.ProjectPriorityId);
+
             return View(project);
         }
 
@@ -95,7 +172,7 @@ namespace BugTrackerMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CompanyId,Name,Description,Created,StartDate,EndDate,ProjectPriorityId,ImageFileData,ImageFileType,Archived")] Project project)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,CompanyId,Name,Description,Created,StartDate,EndDate,ProjectPriorityId,ImageFormFile,ImageFileData,ImageFileType,Archived")] Project project)
         {
             if (id != project.Id)
             {
@@ -106,6 +183,26 @@ namespace BugTrackerMVC.Controllers
             {
                 try
                 {
+                    // set dates for Created, StartDate, EndDate
+                    project.Created = DateTime.SpecifyKind(project.Created, DateTimeKind.Utc);
+
+                    if (project.StartDate != null && project.EndDate != null)
+                    {
+                        project.StartDate = DateTime.SpecifyKind(project.StartDate.Value, DateTimeKind.Utc);
+                        project.EndDate = DateTime.SpecifyKind(project.EndDate.Value, DateTimeKind.Utc);
+                    }
+
+                    // set image
+                    // check whether an image has been uploaded
+                    if (project.ImageFormFile != null)
+                    {
+                        // convert file to byte array
+                        project.ImageFileData = await _imageService.ConvertFileToByteArrayAsync(project.ImageFormFile);
+
+                        // use file extension as the file
+                        project.ImageFileType = project.ImageFormFile.ContentType;
+                    }
+
                     _context.Update(project);
                     await _context.SaveChangesAsync();
                 }
@@ -122,8 +219,10 @@ namespace BugTrackerMVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["CompanyId"] = new SelectList(_context.Companies, "Id", "Name", project.CompanyId);
             ViewData["ProjectPriorityId"] = new SelectList(_context.ProjectPriorities, "Id", "Name", project.ProjectPriorityId);
+
             return View(project);
         }
 
@@ -135,10 +234,11 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            var project = await _context.Projects
+            Project? project = await _context.Projects
                 .Include(p => p.Company)
                 .Include(p => p.ProjectPriority)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (project == null)
             {
                 return NotFound();
@@ -156,7 +256,9 @@ namespace BugTrackerMVC.Controllers
             {
                 return Problem("Entity set 'ApplicationDbContext.Projects'  is null.");
             }
-            var project = await _context.Projects.FindAsync(id);
+
+            Project? project = await _context.Projects.FindAsync(id);
+
             if (project != null)
             {
                 _context.Projects.Remove(project);
