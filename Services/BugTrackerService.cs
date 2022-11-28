@@ -34,6 +34,40 @@ namespace BugTrackerMVC.Services
             }
         }
 
+        public async Task<List<Project>> GetArchivedProjectsAsync(int companyId)
+        {
+            try
+            {
+                List<Project> projects = await _context.Projects
+                                                .Where(p => p.Archived == true && p.CompanyId == companyId)
+                                                .Include(p => p.Company)
+                                                .Include(p => p.ProjectPriority)
+                                                .ToListAsync();
+
+                return projects;
+
+            } catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        //public async Task<List<Project>> GetProjectsUserAsync(int userId)
+        //{
+        //    try
+        //    {
+        //        List<Project> projects = await _context.Projects
+        //                                        .Where(p => p.Members == userId)
+        //                                        .ToListAsync();
+
+        //        return projects;
+
+        //    } catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
+
         public async Task<List<Company>> GetCompanyAsync(int companyId)
         {
             List<Company> company = new List<Company>();
@@ -52,7 +86,6 @@ namespace BugTrackerMVC.Services
             }
         }
 
-
-
+        
     }
 }

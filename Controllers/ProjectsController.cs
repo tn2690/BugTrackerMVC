@@ -49,6 +49,22 @@ namespace BugTrackerMVC.Controllers
             //return View(await applicationDbContext.ToListAsync());
         }
 
+        // GET: Projects/ArchivedProjects
+        // for Admin and Project Managers to view
+        public async Task<IActionResult> ArchivedProjects()
+        {
+            // get logged in user
+            BTUser btUserId = await _userManager.GetUserAsync(User);
+
+            // assign user's company id
+            int companyId = btUserId.CompanyId;
+
+            // show archived projects for specific company
+            List<Project> projects = (await _bugTrackerService.GetArchivedProjectsAsync(companyId)).ToList();
+
+            return View(projects);
+        }
+
         // GET: Projects/Details/5
         public async Task<IActionResult> Details(int? id)
         {
