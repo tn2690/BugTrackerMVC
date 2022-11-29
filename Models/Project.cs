@@ -22,15 +22,15 @@ namespace BugTrackerMVC.Models
         [StringLength(2500)]
         public string? Description { get; set; }
 
-        [DataType(DataType.DateTime)]
+        [DataType(DataType.Date)]
         [Display(Name = "Date Created")]
         public DateTime Created { get; set; }
 
-        [DataType(DataType.DateTime)]
+        [DataType(DataType.Date)]
         [Display(Name = "Start Date")]
         public DateTime? StartDate { get; set; }
 
-        [DataType(DataType.DateTime)]
+        [DataType(DataType.Date)]
         [Display(Name = "End Date")]
         public DateTime? EndDate { get; set; }
 

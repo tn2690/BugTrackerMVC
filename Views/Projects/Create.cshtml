@@ -1,6 +1,7 @@
 ﻿@model BugTrackerMVC.Models.Project
 @using BugTrackerMVC.Services.Interfaces
-@inject IImageService _ImageService
+@using BugTrackerMVC.Enums
+@inject IFileService _ImageService
 
 @{
     ViewData["Title"] = "Create";
@@ -13,9 +14,11 @@
             <form asp-action="Create" method="post" asp-controller="Projects" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
+                <input type="hidden" asp-for="CompanyId" />
                 <input type="hidden" asp-for="Created" />
                 <input type="hidden" asp-for="ImageFileData" />
                 <input type="hidden" asp-for="ImageFileType" />
+                <input type="hidden" asp-for="Archived" />
 
                 <h1>Create a Project</h1>
                 <hr />
@@ -23,13 +26,9 @@
                 <!-- add image upload -->
                 <div class="form-group">
                         <label asp-for="ImageFormFile" class="control-label">Upload an Image for the Project</label>
-                        <img id="projectImage" class="img-fluid border rounded-3 m-2" style="max-height: 250px;" src="@_ImageService.ConvertByteArrayToFile(Model.ImageFileData!, Model.ImageFileType!)" alt="project image">
+                        <img id="projectImage" class="img-fluid border rounded-3 m-2" style="max-height: 250px;" src="@_ImageService.ConvertByteArrayToFile(Model.ImageFileData!, Model.ImageFileType!, (int)DefaultImg.ProjectImg)" alt="project image">
                         <input asp-for="ImageFormFile" type="file" class="form-control mt-3 pt-2" accept=".png,.jpg,.jpeg,.gif"
                                onchange="document.getElementById('projectImage').src=window.URL.createObjectURL(this.files[0])" />
-                </div>
-                <div class="form-group">
-                    <label asp-for="CompanyId" class="control-label"></label>
-                    <select asp-for="CompanyId" class ="form-control" asp-items="ViewBag.CompanyId"></select>
                 </div>
                 <div class="form-group">
                     <label asp-for="Name" class="control-label"></label>
@@ -54,11 +53,6 @@
                 <div class="">
                     <label asp-for="ProjectPriorityId" class="control-label"></label>
                     <select asp-for="ProjectPriorityId" class ="form-control" asp-items="ViewBag.ProjectPriorityId"></select>
-                </div>
-                <div class="form-group form-check my-2">
-                    <label class="form-check-label">
-                        <input class="form-check-input" asp-for="Archived" />&nbsp; Archive?
-                    </label>
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Create" class="btn btn-primary rounded-pill my-2" />

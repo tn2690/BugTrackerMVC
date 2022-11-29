@@ -3,15 +3,25 @@
 namespace BugTrackerMVC.Services
 {
     // actions for the image
-    public class ImageService : IImageService
+    public class FileService : IFileService
     {
-        private readonly string defaultImg = "/img/DefaultImg.png";
+        private readonly string _defaultBTUserImgSrc = "/img/DefaultProjImg.png";
+        private readonly string _defaultCompanyImgSrc = "/img/DefaultProjImg.png";
+        private readonly string _defaultProjectImgSrc = "/img/DefaultProjImg.png";
 
-        public string ConvertByteArrayToFile(byte[] fileData, string extension)
+        public string ConvertByteArrayToFile(byte[] fileData, string extension, int defaultImage)
         {
-            if (fileData == null)
+            if (fileData == null || fileData.Length == 0)
             {
-                return defaultImg;
+                switch (defaultImage)
+                {
+                    case 1:
+                        return _defaultBTUserImgSrc;
+                    case 2:
+                        return _defaultCompanyImgSrc;
+                    case 3:
+                        return _defaultProjectImgSrc;
+                }
             }
 
             try

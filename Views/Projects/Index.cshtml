@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<BugTrackerMVC.Models.Project>
 @using BugTrackerMVC.Services.Interfaces
-@inject IImageService _ImageService
+@using BugTrackerMVC.Enums
+@inject IFileService _ImageService
 
 @{
     ViewData["Title"] = "Index";
@@ -66,7 +67,7 @@
                     @Html.DisplayFor(modelItem => item.EndDate)
                 </td>
                 <td>
-                    <img src="@_ImageService.ConvertByteArrayToFile(item.ImageFileData!, item.ImageFileType!)" class="img-fluid" style="max-height: 200px;" alt="project image" />
+                    <img src="@_ImageService.ConvertByteArrayToFile(item.ImageFileData!, item.ImageFileType!, (int)DefaultImg.ProjectImg)" class="img-fluid" style="max-height: 200px;" alt="project image" />
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Archived)
@@ -80,7 +81,7 @@
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    <a asp-action="Archive" asp-route-id="@item.Id">Archive</a>
                 </td>
             </tr>
     }

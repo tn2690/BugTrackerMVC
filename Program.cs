@@ -25,8 +25,8 @@ builder.Services.AddIdentity<BTUser, IdentityRole>(options => options.SignIn.Req
 builder.Services.AddMvc();
 
 // custom services
-builder.Services.AddScoped<IImageService, ImageService>();
-builder.Services.AddScoped<IBugTrackerService, BugTrackerService>();
+builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IBTProjectService, BTProjectService>();
 
 var app = builder.Build();
 
