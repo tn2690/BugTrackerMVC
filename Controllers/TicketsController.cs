@@ -7,23 +7,35 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BugTrackerMVC.Data;
 using BugTrackerMVC.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace BugTrackerMVC.Controllers
 {
     public class TicketsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<BTUser> _userManager;
 
-        public TicketsController(ApplicationDbContext context)
+        public TicketsController(ApplicationDbContext context,
+                                UserManager<BTUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Tickets
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Tickets.Include(t => t.DeveloperUser).Include(t => t.Project).Include(t => t.SubmitterUser).Include(t => t.TicketPriority).Include(t => t.TicketStatus).Include(t => t.TicketType);
-            return View(await applicationDbContext.ToListAsync());
+            List<Ticket> tickets = await _context.Tickets
+                                                  .Include(t => t.DeveloperUser)
+                                                  .Include(t => t.Project)
+                                                  .Include(t => t.SubmitterUser)
+                                                  .Include(t => t.TicketPriority)
+                                                  .Include(t => t.TicketStatus)
+                                                  .Include(t => t.TicketType)
+                                                  .ToListAsync();
+            
+            return View(tickets);
         }
 
         // GET: Tickets/Details/5
@@ -34,7 +46,7 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets
+            Ticket? ticket = await _context.Tickets
                 .Include(t => t.DeveloperUser)
                 .Include(t => t.Project)
                 .Include(t => t.SubmitterUser)
@@ -42,6 +54,7 @@ namespace BugTrackerMVC.Controllers
                 .Include(t => t.TicketStatus)
                 .Include(t => t.TicketType)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (ticket == null)
             {
                 return NotFound();
@@ -53,13 +66,14 @@ namespace BugTrackerMVC.Controllers
         // GET: Tickets/Create
         public IActionResult Create()
         {
-            ViewData["DeveloperUserId"] = new SelectList(_context.Users, "Id", "Id");
-            ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Description");
-            ViewData["SubmitterUserId"] = new SelectList(_context.Users, "Id", "Id");
+            ViewData["DeveloperUserId"] = new SelectList(_context.Users, "Id", "FullName");
+            ViewData["ProjectId"] = new SelectList(_context.Projects, "Id", "Name");
+            ViewData["SubmitterUserId"] = new SelectList(_context.Users, "Id", "FullName");
             ViewData["TicketPriorityId"] = new SelectList(_context.TicketPriorities, "Id", "Name");
             ViewData["TicketStatusId"] = new SelectList(_context.TicketStatuses, "Id", "Name");
             ViewData["TicketTypeId"] = new SelectList(_context.TicketTypes, "Id", "Name");
-            return View();
+            
+            return View(new Ticket());
         }
 
         // POST: Tickets/Create
@@ -67,10 +81,29 @@ namespace BugTrackerMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,Created,Updated,Archived,ArchivedByProject,ProjectId,TicketTypeId,TicketStatusId,TicketPriorityId,DeveloperUserId,SubmitterUserId")] Ticket ticket)
+        public async Task<IActionResult> Create([Bind("Id,Title,Description,Updated,ProjectId,TicketTypeId,TicketStatusId,TicketPriorityId,DeveloperUserId,SubmitterUserId")] Ticket ticket)
         {
+            ModelState.Remove("DeveloperUserId");
+            ModelState.Remove("SubmitterUserId");
+
             if (ModelState.IsValid)
             {
+                // ticket is initially unassigned when created
+
+                // set submitter user id
+                string submitterUserId = _userManager.GetUserId(User);
+
+                // set developer user id
+                //string developerUserId = _userManager.GetUserId(User);
+
+                // set date created, date updated
+                ticket.Created = DateTime.UtcNow;
+
+                if (ticket.Updated != null)
+                {
+                    ticket.Updated = DateTime.SpecifyKind(ticket.Updated.Value, DateTimeKind.Utc);
+                }
+
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -92,7 +125,8 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets.FindAsync(id);
+            Ticket? ticket = await _context.Tickets.FindAsync(id);
+
             if (ticket == null)
             {
                 return NotFound();
@@ -111,7 +145,7 @@ namespace BugTrackerMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Created,Updated,Archived,ArchivedByProject,ProjectId,TicketTypeId,TicketStatusId,TicketPriorityId,DeveloperUserId,SubmitterUserId")] Ticket ticket)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Created,Updated,ProjectId,TicketTypeId,TicketStatusId,TicketPriorityId,DeveloperUserId,SubmitterUserId")] Ticket ticket)
         {
             if (id != ticket.Id)
             {
@@ -122,6 +156,14 @@ namespace BugTrackerMVC.Controllers
             {
                 try
                 {
+                    // set date created, date updated
+                    ticket.Created = DateTime.SpecifyKind(ticket.Created, DateTimeKind.Utc);
+
+                    if (ticket.Updated != null)
+                    {
+                        ticket.Updated = DateTime.SpecifyKind(ticket.Updated.Value, DateTimeKind.Utc);
+                    }
+
                     _context.Update(ticket);
                     await _context.SaveChangesAsync();
                 }
@@ -155,7 +197,7 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets
+            Ticket? ticket = await _context.Tickets
                 .Include(t => t.DeveloperUser)
                 .Include(t => t.Project)
                 .Include(t => t.SubmitterUser)
@@ -163,6 +205,7 @@ namespace BugTrackerMVC.Controllers
                 .Include(t => t.TicketStatus)
                 .Include(t => t.TicketType)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (ticket == null)
             {
                 return NotFound();
@@ -180,7 +223,9 @@ namespace BugTrackerMVC.Controllers
             {
                 return Problem("Entity set 'ApplicationDbContext.Tickets'  is null.");
             }
-            var ticket = await _context.Tickets.FindAsync(id);
+
+            Ticket? ticket = await _context.Tickets.FindAsync(id);
+
             if (ticket != null)
             {
                 _context.Tickets.Remove(ticket);

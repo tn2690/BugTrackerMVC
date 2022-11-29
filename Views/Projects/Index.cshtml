@@ -43,6 +43,12 @@
                     @Html.DisplayNameFor(model => model.Company)
                 </th>
                 <th>
+                    @Html.DisplayNameFor(model => model.Members)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Tickets)
+                </th>
+                <th>
                     @Html.DisplayNameFor(model => model.ProjectPriority)
                 </th>
                 <th></th>
@@ -75,6 +81,12 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Company!.Name)
                 </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Members)
+                </td>
+                @*<td>
+                    @Html.DisplayFor(modelItem => item.Tickets!.Title)
+                </td>*@
                 <td>
                     @Html.DisplayFor(modelItem => item.ProjectPriority!.Name)
                 </td>

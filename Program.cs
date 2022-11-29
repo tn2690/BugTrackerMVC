@@ -26,7 +26,9 @@ builder.Services.AddMvc();
 
 // custom services
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IBTRolesService, BTRolesService>();
 builder.Services.AddScoped<IBTProjectService, BTProjectService>();
+builder.Services.AddScoped<IBTTicketService, BTTicketService>();
 
 var app = builder.Build();
 
