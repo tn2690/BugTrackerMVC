@@ -4,31 +4,31 @@ namespace BugTrackerMVC.Services.Interfaces
 {
     public interface IBTTicketService
     {
-        // get all projects for specific company
-        //public Task<List<Project>> GetAllProjectsByCompanyIdAsync(int companyId);
-
-        // get archived projects for specific company
-        //public Task<List<Project>> GetArchivedProjectsByCompanyIdAsync(int companyId);
-
-        // get details for a project
-        //public Task<Project> GetProjectDetailsByIdAsync(int? id);
+        // get all tickets for specific company
+        public Task<List<Ticket>> GetAllTicketsByCompanyIdAsync(int companyId);
 
         // add ticket to db
         public Task AddTicketAsync(Ticket ticket);
 
-        // get project by id
-        //public Task<Project> GetProjectByIdAsync(int? projectId);
+        // get ticket by id
+        public Task<Ticket> GetTicketByIdAsync(int projectId);
 
         // update ticket to db
         public Task UpdateTicketAsync(Ticket ticket);
 
-        // archive ticket
-        public Task ArchiveTicketAsync(Ticket ticket);
-
-        // restore ticket
-        public Task RestoreTicketAsync(Ticket ticket);
-
         // get ticket priority list
-        public Task<List<TicketPriority>> GetTicketPrioritiesAsync();
+        public Task<IEnumerable<TicketPriority>> GetTicketPrioritiesAsync();
+        
+        // get ticket status list
+        public Task<IEnumerable<TicketStatus>> GetTicketStatusesAsync();
+        
+        // get ticket type list
+        public Task<IEnumerable<TicketType>> GetTicketTypesAsync();
+
+        // get list of projects
+        public Task<IEnumerable<Project>> GetProjectsAsync();
+
+        // get list of users
+        public Task<List<BTUser>> GetUsersAsync();
     }
 }

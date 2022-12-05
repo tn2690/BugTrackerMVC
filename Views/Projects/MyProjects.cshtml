@@ -4,15 +4,20 @@
 @inject IFileService _ImageService
 
 @{
-    ViewData["Title"] = "Archived Projects - Index";
+    ViewData["Title"] = "My Projects";
 }
 
 <div class="container mt-5">
+
     <div class="card mb-3">
         <div class="row g-0">
             <div class="col-md-12">
                 <div class="card-body">
-                    <h1>Projects, Archived</h1>
+                    <h1>Your Projects</h1>
+
+                    <p>
+                        <a asp-action="Create">Create New</a>
+                    </p>
 
                     <table class="table">
                         <thead>
@@ -41,10 +46,10 @@
                                 <th>
                                     @Html.DisplayNameFor(model => model.Company)
                                 </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.Members)
-                                </th>
                                 @*<th>
+                                @Html.DisplayNameFor(model => model.Members)
+                                </th>
+                                <th>
                                 @Html.DisplayNameFor(model => model.Tickets)
                                 </th>*@
                                 <th>
@@ -82,16 +87,18 @@
                                         @Html.DisplayFor(modelItem => item.Company!.Name)
                                     </td>
                                     @*<td>
-                                        @Html.DisplayFor(modelItem => item.Members)
-                                    </td>*@
+                                @Html.DisplayFor(modelItem => item.Members)
+                                </td>*@
                                     @*<td>
-                                        @Html.DisplayFor(modelItem => item.Tickets!.Title)
-                                    </td>*@
+                                @Html.DisplayFor(modelItem => item.Tickets!.Title)
+                                </td>*@
                                     <td>
                                         @Html.DisplayFor(modelItem => item.ProjectPriority!.Name)
                                     </td>
                                     <td>
-                                        <a asp-action="Restore" asp-route-id="@item.Id">Restore</a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                                        <a asp-action="Archive" asp-route-id="@item.Id">Archive</a>
                                     </td>
                                 </tr>
                             }
