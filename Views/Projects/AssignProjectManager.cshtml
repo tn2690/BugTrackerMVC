@@ -1,7 +1,5 @@
-﻿@model BugTrackerMVC.Models.Project
-@using BugTrackerMVC.Services.Interfaces
-@using BugTrackerMVC.Enums
-@inject IFileService _ImageService
+﻿@model AssignPMViewModel
+@using BugTrackerMVC.Models.ViewModels
 
 @{
     ViewData["Title"] = "Assign Project Manager";
@@ -9,53 +7,24 @@
 
 <div class="container mt-5">
 
-    <div class="row">
-        <div class="col-md-4">
-            <form asp-action="Create" method="post" asp-controller="Projects" enctype="multipart/form-data">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="hidden" asp-for="Id" />
-                <input type="hidden" asp-for="CompanyId" />
-                <input type="hidden" asp-for="Created" />
-                <input type="hidden" asp-for="ImageFileData" />
-                <input type="hidden" asp-for="ImageFileType" />
-                <input type="hidden" asp-for="Archived" />
+<div class="d-flex justify-content-center mt-5 flex-column align-items-center">
 
-                <h1>Assign Project Manager</h1>
-                <hr />
-
-                <div class="form-group">
-                    <label asp-for="Name" class="control-label"></label>
-                    <input asp-for="Name" disabled class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Description" class="control-label"></label>
-                    <input asp-for="Description" disabled class="form-control" />
-                    <span asp-validation-for="Description" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="StartDate" class="control-label"></label>
-                    <input asp-for="StartDate" disabled class="form-control" />
-                    <span asp-validation-for="StartDate" class="text-danger"></span>
-                </div>
-                <div class="">
-                    <label asp-for="EndDate" class="control-label"></label>
-                    <input asp-for="EndDate" disabled class="form-control" />
-                    <span asp-validation-for="EndDate" class="text-danger"></span>
-                </div>
-                <div class="">
-                    <label asp-for="ProjectPriorityId" class="control-label">Priority</label>
-                    <select asp-for="ProjectPriorityId" disabled class ="form-control" asp-items="ViewBag.ProjectPriorityId"></select>
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-primary rounded-pill my-2" />
-                </div>
-            </form>
+        <h3 class="my-5">Assign Project Manager</h3>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">@Model.Project!.Name</div>
+            </div>
+            <div class="card-body">
+                <form asp-action="AssignProjectManager" method="post" class="d-flex flex-column">
+                    <input type="hidden" asp-for="Project!.Id" />
+                    <select asp-items="Model.PMList" asp-for="PMId">
+                        <option value="">Unassigned</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary my-3">Save</button>
+                    <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-secondary my-3">Cancel</a>
+                </form>
+            </div>
         </div>
-    </div>
-
-    <div class="my-2">
-        <a asp-action="AllProjects">Back to List</a>
     </div>
 
 </div>

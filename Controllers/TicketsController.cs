@@ -51,6 +51,16 @@ namespace BugTrackerMVC.Controllers
             return View(tickets);
         }
 
+        // GET: Tickets/UnassignedTickets
+        public async Task<IActionResult> UnassignedTickets()
+        {
+            int companyId = User.Identity!.GetCompanyId();
+
+            List<Ticket> tickets = (await _btTicketService.GetAllTicketsByCompanyIdAsync(companyId)).ToList();
+
+            return View(tickets);
+        }
+
         // get submitted tickets
         // get the tickets by the user logged in
         // GET: Tickets/MyTickets

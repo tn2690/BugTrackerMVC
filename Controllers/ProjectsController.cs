@@ -12,6 +12,8 @@ using BugTrackerMVC.Services.Interfaces;
 using BugTrackerMVC.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using BugTrackerMVC.Extensions;
+using BugTrackerMVC.Models.ViewModels;
+using BugTrackerMVC.Enums;
 
 namespace BugTrackerMVC.Controllers
 {
@@ -22,16 +24,19 @@ namespace BugTrackerMVC.Controllers
         private readonly UserManager<BTUser> _userManager;
         private readonly IFileService _fileService;
         private readonly IBTProjectService _btProjectService;
+        private readonly IBTRolesService _rolesService;
 
         public ProjectsController(ApplicationDbContext context,
                                   UserManager<BTUser> userManager,
                                   IFileService fileService,
-                                  IBTProjectService btProjectService)
+                                  IBTProjectService btProjectService,
+                                  IBTRolesService rolesService)
         {
             _context = context;
             _userManager = userManager;
             _fileService = fileService;
             _btProjectService = btProjectService;
+            _rolesService = rolesService;
         }
 
         // GET: Projects/AllProjects
@@ -40,23 +45,8 @@ namespace BugTrackerMVC.Controllers
             // assign user's company id to logged in user
             int companyId = User.Identity!.GetCompanyId();
 
-            //BTUser member = await _userManager.GetUserAsync(User);
-
-            //string projManagerId = _userManager.GetUserId(User);
-
             // show projects for specific company
             List<Project> projects = (await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId)).ToList();
-
-            // assign a member to each project
-            //foreach (Project project in projects)
-            //{
-            //    await _btProjectService.RemoveMemberFromProjectAsync(member, project.Id);
-            //}
-
-            //foreach (Project project in projects)
-            //{
-            //    await _btProjectService.RemoveProjectManagerAsync(project.Id);
-            //}
 
             return View(projects);
         }
@@ -71,6 +61,20 @@ namespace BugTrackerMVC.Controllers
 
             // show archived projects for specific company
             List<Project> projects = (await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId)).Where(p => p.Archived == true).ToList();
+
+            return View(projects);
+        }
+        
+        //  GET: Projects/UnassignedProjects
+        //  for Admin and Project Managers to view
+        [Authorize(Roles = "Admin,ProjectManager")]
+        public async Task<IActionResult> UnassignedProjects()
+        {
+            // assign user's company id to logged in user
+            int companyId = User.Identity!.GetCompanyId();
+
+            // show archived projects for specific company
+            List<Project> projects = (await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId)).ToList();
 
             return View(projects);
         }
@@ -99,7 +103,9 @@ namespace BugTrackerMVC.Controllers
             return View(projects);
         }
 
-        //[Authorize(Roles = "Admin")]
+
+        [HttpGet]
+        [Authorize(Roles = nameof(BTRoles.Admin))]
         public async Task<IActionResult> AssignProjectManager(int? id)
         {
             // validate id
@@ -108,60 +114,47 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            // create/instantiate PMViewModel
-            PMViewModel model = new();
-
             // get company id
             int companyId = User.Identity!.GetCompanyId();
 
-            //string userId = await _userManager.GetUserIdAsync(User);
+            List<BTUser> projectManagers = await _rolesService.GetUsersInRoleAsync(nameof(BTRoles.ProjectManager), User.Identity!.GetCompanyId());
 
+            BTUser? currentPM = await _btProjectService.GetProjectManagerAsync(id.Value);
+
+            // create/instantiate PMViewModel
             // get and assign Project property of view model
-            Project? project = await _btProjectService.GetProjectByIdAsync(id.Value, companyId);
+            AssignPMViewModel viewModel = new()
+            {
+                Project = await _btProjectService.GetProjectByIdAsync(id.Value, companyId),
+                PMList = new SelectList(projectManagers, "Id", "FullName", currentPM?.Id), // create SelectList of company's PMs (highlight current PM if one is assigned)
+                PMId = currentPM?.Id
+            };
 
-            model.Project = project;
-
-            // find current PM if one is assigned
-            //if (model.Project.Members == await _btProjectService.GetUserProjectsAsync()
-
-            // create SelectList of company's PMs (highlight current PM if one is assigned)
-            //ViewData["ProjectManager"] = new SelectList(await _btProjectService.GetUserProjectsAsync(id), "Id", "Name");
-
-            // return View() using PMViewModel
-            return View(model);
+            // return View() using AssignPMViewModel
+            return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AssignProjectManager(PMViewModel model)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AssignProjectManager(AssignPMViewModel viewModel)
         {
-            string userId = model.Project!.Members.ToString();
+            if (viewModel.Project?.Id != null)
+            {
+                if (!string.IsNullOrEmpty(viewModel.PMId))
+                {
+                    await _btProjectService.AddProjectManagerAsync(viewModel.PMId, viewModel.Project.Id);
+                }
+                else
+                {
+                    await _btProjectService.RemoveProjectManagerAsync(viewModel.Project.Id);
+                }
 
-            // validate PM id of viewModel - if (isNullOrEmpty())
-            //if (pmId.isNullOrEmpty())
-            //{
+                return RedirectToAction(nameof(Details), new { id = viewModel.Project?.Id });
+            }
 
-            //}
-            //else {
-            //    // if not call service method to AddProjectManagerAsync(string, id)
-            //    await _btProjectService.AddProjectManagerAsync(userId, id);
-            //}
-            // else reset page (error message), allow user to retry
-
-            // get company id
-            int companyId = User.Identity!.GetCompanyId();
-
-            // get and assign Project property of view model
-            
-
-            // find current PM if one is assigned
-
-            // create SelectList of company's PMs (highlight current PM if one is assigned)
-            //ViewData["ProjectManager"] = new SelectList(await _btProjectService.GetUserProjectsAsync(id), "Id", "Name");
-
-            // return View() using PMViewModel
-            return View(model);
+            // return View() using AssignPMViewModel
+            return View(viewModel);
         }
 
         // GET: Projects/Details/5

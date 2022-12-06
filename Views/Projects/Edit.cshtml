@@ -1,7 +1,7 @@
 ﻿@model BugTrackerMVC.Models.Project
 @using BugTrackerMVC.Services.Interfaces
 @using BugTrackerMVC.Enums
-@inject IFileService _ImageService
+@inject IFileService _FileService
 
 @{
     ViewData["Title"] = "Edit";
@@ -26,7 +26,7 @@
                 <!-- add image upload -->
                 <div class="form-group">
                     <label asp-for="ImageFormFile" class="control-label">Upload an Image for the Project</label>
-                    <img id="projectImage" class="img-fluid border rounded-3 m-2" style="max-height: 250px;" src="@_ImageService.ConvertByteArrayToFile(Model.ImageFileData!, Model.ImageFileType!, (int)DefaultImg.ProjectImg)" alt="project image">
+                    <img id="projectImage" class="img-fluid border rounded-3 m-2" style="max-height: 250px;" src="@_FileService.ConvertByteArrayToFile(Model.ImageFileData!, Model.ImageFileType!, (int)DefaultImg.ProjectImg)" alt="project image">
                     <input asp-for="ImageFormFile" type="file" class="form-control mt-3 pt-2" accept=".png,.jpg,.jpeg,.gif"
                            onchange="document.getElementById('projectImage').src=window.URL.createObjectURL(this.files[0])" />
                 </div>

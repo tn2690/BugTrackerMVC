@@ -9,10 +9,13 @@ namespace BugTrackerMVC.Services
     public class BTTicketService : IBTTicketService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IBTRolesService _rolesService;
 
-        public BTTicketService(ApplicationDbContext context)
+        public BTTicketService(ApplicationDbContext context, 
+                               IBTRolesService rolesService)
         {
             _context = context;
+            _rolesService = rolesService;
         }
 
         public async Task<List<Ticket>> GetAllTicketsByCompanyIdAsync(int companyId)
@@ -159,5 +162,99 @@ namespace BugTrackerMVC.Services
                 throw;
             }
         }
+
+        //public async Task<BTUser> GetDeveloperAsync(int ticketId)
+        //{
+        //    try
+        //    {
+        //        Ticket? ticket = await _context.Tickets
+        //                                        .Include(t => t.Project)
+        //                                            .ThenInclude(t => t!.Members)
+        //                                        .FirstOrDefaultAsync(t => t.Id == ticketId);
+
+        //        foreach(BTUser member in ticket!.Project!.Members)
+        //        {
+        //            if (await _rolesService.IsUserInRoleAsync(member, nameof(BTRoles.Developer)))
+        //            {
+        //                return member;
+        //            }
+        //        }
+
+        //        return null!;
+
+        //    } catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+        //public async Task<bool> AssignDeveloperAsync(string userId, BTUser member, int ticketId)
+        //{
+        //    try
+        //    {
+        //        BTUser? currentDev = await GetDeveloperAsync(ticketId);
+        //        BTUser? selectedDev = await _context.Users.FindAsync(userId);
+
+        //        Ticket? ticket = await GetTicketByIdAsync(ticketId);
+
+        //        bool IsOnTicket = ticket.Project!.Members.Any(m => m.Id == member.Id);
+
+        //        // remove current dev
+        //        if (currentDev != null)
+        //        {
+        //            //await RemoveDeveloperAsync(ticketId);
+        //        }
+
+        //        // add new dev
+        //        try
+        //        {
+        //            if (!IsOnTicket)
+        //            {
+        //                ticket.Project.Members.Add(member);
+
+        //                await _context.SaveChangesAsync();
+
+        //                return true;
+        //            }
+
+        //            return false;
+
+        //        } catch (Exception)
+        //        {
+        //            throw;
+        //        }
+
+        //        return true;
+
+        //    } catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
+
+        //public async Task RemoveDeveloperAsync(BTUser member, int ticketId)
+        //{
+        //    try
+        //    {
+        //        Ticket? ticket = await GetTicketByIdAsync(ticketId);
+
+        //        bool IsOnTicket = ticket.Project!.Members.Any(m => m.Id == member.Id);
+
+        //        if (IsOnTicket)
+        //        {
+        //            ticket.Project!.Members.Remove(member);
+
+        //            await _context.SaveChangesAsync();
+
+        //            return true;
+        //        }
+
+        //        return false;
+
+        //    } catch (Exception)
+        //    {
+        //        throw;
+        //    }
+        //}
     }
 }

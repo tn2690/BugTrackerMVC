@@ -1,7 +1,7 @@
 ﻿@model BugTrackerMVC.Models.Project
 @using BugTrackerMVC.Services.Interfaces
 @using BugTrackerMVC.Enums
-@inject IFileService _ImageService
+@inject IFileService _FileService
 
 @{
     ViewData["Title"] = "Details";
@@ -47,7 +47,7 @@
             @Html.DisplayNameFor(model => model.ImageFormFile)
         </dt>
         <dd class = "col-sm-10">
-            <img src="@_ImageService.ConvertByteArrayToFile(Model.ImageFileData!, Model.ImageFileType!, (int)DefaultImg.ProjectImg)" class="img-fluid" style="max-height: 200px;" alt="project image" />
+            <img src="@_FileService.ConvertByteArrayToFile(Model.ImageFileData!, Model.ImageFileType!, (int)DefaultImg.ProjectImg)" class="img-fluid" style="max-height: 200px;" alt="project image" />
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Archived)
@@ -67,12 +67,12 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Members)
         </dd>
-        <dt class = "col-sm-2">
+        @*<dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Tickets)
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Tickets)
-        </dd>
+        </dd>*@
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.ProjectPriority)
         </dt>
