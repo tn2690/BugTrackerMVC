@@ -3,11 +3,13 @@
 namespace BugTrackerMVC.Services
 {
     // actions for the image
-    public class FileService : IFileService
+    public class BTFileService : IBTFileService
     {
         private readonly string _defaultBTUserImgSrc = "/img/DefaultProjImg.png";
         private readonly string _defaultCompanyImgSrc = "/img/DefaultProjImg.png";
         private readonly string _defaultProjectImgSrc = "/img/DefaultProjImg.png";
+
+        private readonly string[] suffixes = { "Bytes", "KB", "MB", "GB", "TB", "PB " };
 
         public string ConvertByteArrayToFile(byte[] fileData, string extension, int defaultImage)
         {
@@ -55,6 +57,27 @@ namespace BugTrackerMVC.Services
             {
                 throw;
             }
+        }
+
+        public string FormatFileSize(long bytes)
+        {
+            int counter = 0;
+            decimal number = bytes;
+
+            while (Math.Round(number / 1024) >= 1)
+            {
+                number /= 1024;
+                counter++;
+            }
+
+            return string.Format("{0:n1}{1}", number, suffixes[counter]);
+        }
+
+        public string GetFileIcon(string file)
+        {
+            string ext = Path.GetExtension(file).Replace(".", "");
+
+            return $"/img/contenttype/{ext}.png";
         }
     }
 }

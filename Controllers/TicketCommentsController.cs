@@ -7,23 +7,32 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BugTrackerMVC.Data;
 using BugTrackerMVC.Models;
+using Microsoft.AspNetCore.Identity;
+using BugTrackerMVC.Services.Interfaces;
 
 namespace BugTrackerMVC.Controllers
 {
     public class TicketCommentsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<BTUser> _userManager;
+        private readonly IBTTicketService _btTicketService;
 
-        public TicketCommentsController(ApplicationDbContext context)
+        public TicketCommentsController(ApplicationDbContext context,
+                                        UserManager<BTUser> userManager,
+                                        IBTTicketService btTicketService)
         {
             _context = context;
+            _userManager = userManager;
+            _btTicketService = btTicketService;
         }
 
         // GET: TicketComments
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.TicketComments.Include(t => t.BTUser).Include(t => t.Ticket);
-            return View(await applicationDbContext.ToListAsync());
+            List<TicketComment> ticketComments = await _context.TicketComments.Include(t => t.BTUser).Include(t => t.Ticket).ToListAsync();
+
+            return View(ticketComments);
         }
 
         // GET: TicketComments/Details/5
@@ -34,10 +43,11 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            var ticketComment = await _context.TicketComments
+            TicketComment? ticketComment = await _context.TicketComments
                 .Include(t => t.BTUser)
                 .Include(t => t.Ticket)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (ticketComment == null)
             {
                 return NotFound();
@@ -51,6 +61,7 @@ namespace BugTrackerMVC.Controllers
         {
             ViewData["BTUserId"] = new SelectList(_context.Users, "Id", "Id");
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description");
+
             return View();
         }
 
@@ -59,16 +70,27 @@ namespace BugTrackerMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Comment,Created,TicketId,BTUserId")] TicketComment ticketComment)
+        public async Task<IActionResult> Create([Bind("Id,Comment,TicketId")] TicketComment ticketComment)
         {
+            // remove BT user id
+            ModelState.Remove("BTUserId");
+
             if (ModelState.IsValid)
             {
-                _context.Add(ticketComment);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                // assign author of comment to BTUserId
+                ticketComment.BTUserId = _userManager.GetUserId(User);
+
+                // set date creation of comment
+                ticketComment.Created = DateTime.UtcNow;
+
+                await _btTicketService.AddCommentAsync(ticketComment);
+
+                return RedirectToAction("Details", "Tickets", new { id = ticketComment.TicketId });
             }
+
             ViewData["BTUserId"] = new SelectList(_context.Users, "Id", "Id", ticketComment.BTUserId);
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description", ticketComment.TicketId);
+            
             return View(ticketComment);
         }
 
@@ -80,13 +102,16 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            var ticketComment = await _context.TicketComments.FindAsync(id);
+            TicketComment? ticketComment = await _context.TicketComments.FindAsync(id);
+
             if (ticketComment == null)
             {
                 return NotFound();
             }
+
             ViewData["BTUserId"] = new SelectList(_context.Users, "Id", "Id", ticketComment.BTUserId);
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description", ticketComment.TicketId);
+
             return View(ticketComment);
         }
 
@@ -122,8 +147,10 @@ namespace BugTrackerMVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["BTUserId"] = new SelectList(_context.Users, "Id", "Id", ticketComment.BTUserId);
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description", ticketComment.TicketId);
+
             return View(ticketComment);
         }
 
@@ -135,10 +162,11 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            var ticketComment = await _context.TicketComments
+            TicketComment? ticketComment = await _context.TicketComments
                 .Include(t => t.BTUser)
                 .Include(t => t.Ticket)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (ticketComment == null)
             {
                 return NotFound();
@@ -156,7 +184,9 @@ namespace BugTrackerMVC.Controllers
             {
                 return Problem("Entity set 'ApplicationDbContext.TicketComments'  is null.");
             }
-            var ticketComment = await _context.TicketComments.FindAsync(id);
+
+            TicketComment? ticketComment = await _context.TicketComments.FindAsync(id);
+
             if (ticketComment != null)
             {
                 _context.TicketComments.Remove(ticketComment);

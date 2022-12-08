@@ -12,6 +12,8 @@ using BugTrackerMVC.Enums;
 using BugTrackerMVC.Helpers;
 using BugTrackerMVC.Services.Interfaces;
 using BugTrackerMVC.Extensions;
+using BugTrackerMVC.Models.ViewModels;
+using BugTrackerMVC.Services;
 
 namespace BugTrackerMVC.Controllers
 {
@@ -20,14 +22,20 @@ namespace BugTrackerMVC.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<BTUser> _userManager;
         private readonly IBTTicketService _btTicketService;
+        private readonly IBTRolesService _btRolesService;
+        private readonly IBTFileService _btFileService;
 
         public TicketsController(ApplicationDbContext context,
                                 UserManager<BTUser> userManager,
-                                IBTTicketService btTicketService)
+                                IBTTicketService btTicketService,
+                                IBTRolesService btRolesService,
+                                IBTFileService btFileService)
         {
             _context = context;
             _userManager = userManager;
             _btTicketService = btTicketService;
+            _btRolesService = btRolesService;
+            _btFileService = btFileService;
         }
 
         // GET: Tickets/AllTickets
@@ -56,7 +64,7 @@ namespace BugTrackerMVC.Controllers
         {
             int companyId = User.Identity!.GetCompanyId();
 
-            List<Ticket> tickets = (await _btTicketService.GetAllTicketsByCompanyIdAsync(companyId)).ToList();
+            List<Ticket> tickets = (await _btTicketService.GetAllTicketsByCompanyIdAsync(companyId)).Where(t => t.DeveloperUserId == null).ToList();
 
             return View(tickets);
         }
@@ -68,10 +76,102 @@ namespace BugTrackerMVC.Controllers
         {
             int companyId = User.Identity!.GetCompanyId();
 
+            // get user logged in
+            string userId =_userManager.GetUserId(User);
+
             // call service
-            List<Ticket> tickets = (await _btTicketService.GetAllTicketsByCompanyIdAsync(companyId)).ToList();
+            List<Ticket> tickets = (await _btTicketService.GetAllTicketsByCompanyIdAsync(companyId)).Where(t => t.DeveloperUserId == userId).ToList();
 
             return View(tickets);
+        }
+
+        // GET: Tickets/AssignDeveloper/5
+        [HttpGet]
+        public async Task<IActionResult> AssignDeveloper(int? id)
+        {
+            // validate id
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            int companyId = User.Identity!.GetCompanyId();
+
+            List<BTUser> developers = await _btRolesService.GetUsersInRoleAsync(nameof(BTRoles.Developer), companyId);
+
+            BTUser? currentDev = await _btTicketService.GetDeveloperAsync(id.Value);
+
+            // create/instantiate DevViewModel
+            // get and assign Ticket property of view model
+            AssignDevViewModel viewModel = new()
+            {
+                Ticket = await _btTicketService.GetTicketByIdAsync(id.Value),
+                DevList = new SelectList(developers, "Id", "FullName", currentDev?.Id), // create SelectList of company's Devs (highlight current Dev if one is assigned)
+                DevId = currentDev?.Id
+            };
+
+            // return View() using AssignPMViewModel
+            return View(viewModel);
+        }
+
+        // POST: Tickets/AssignDeveloper/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignDeveloper(AssignDevViewModel viewModel)
+        {
+            if (viewModel.Ticket?.Id != null)
+            {
+                // validate Dev id of viewModel
+                if (!string.IsNullOrEmpty(viewModel.DevId))
+                {
+
+                    // call service to add Dev
+                    await _btTicketService.AssignDeveloperAsync(viewModel.Ticket.Id, viewModel.DevId);
+                }
+            }
+
+            return RedirectToAction("Details", new { id = viewModel.Ticket!.Id });
+        }
+
+        // POST: Tickets/AddTicketAttachment
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddTicketAttachment([Bind("Id,FormFile,Description,TicketId")] TicketAttachment ticketAttachment)
+        {
+            // remove BTUserId
+            ModelState.Remove("BTUserId");
+
+            string statusMessage;
+
+            if (ModelState.IsValid && ticketAttachment.FormFile != null)
+            {
+                ticketAttachment.FileData = await _btFileService.ConvertFileToByteArrayAsync(ticketAttachment.FormFile);
+                ticketAttachment.FileName = ticketAttachment.FormFile.FileName;
+                ticketAttachment.FileType = ticketAttachment.FormFile.ContentType;
+
+                ticketAttachment.Created = DateTime.UtcNow;
+                ticketAttachment.BTUserId = _userManager.GetUserId(User);
+
+                await _btTicketService.AddTicketAttachmentAsync(ticketAttachment);
+                statusMessage = "Success! New Attachment added to Ticket.";
+            }
+            else
+            {
+                statusMessage = "Error: Invalid data.";
+            }
+
+            return RedirectToAction("Details", new { id = ticketAttachment.TicketId, message = statusMessage });
+        }
+
+        public async Task<IActionResult> ShowFile(int id)
+        {
+            TicketAttachment ticketAttachment = await _btTicketService.GetTicketAttachmentsByIdAsync(id);
+            string fileName = ticketAttachment.FileName!;
+            byte[] fileData = ticketAttachment.FileData!;
+            string ext = Path.GetExtension(fileName!).Replace(".", "");
+
+            Response.Headers.Add("Content-Disposition", $"inline; filename={fileName}");
+            return File(fileData!, $"application/{ext}");
         }
 
         // GET: Tickets/Details/5

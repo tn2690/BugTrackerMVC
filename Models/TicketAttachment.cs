@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BugTrackerMVC.Models
@@ -14,10 +15,13 @@ namespace BugTrackerMVC.Models
 
         [DataType(DataType.DateTime)]
         [Display(Name = "Date Added")]
-        public DateTime Created { get; set; }
+        public DateTimeOffset Created { get; set; }
 
         [NotMapped]
+        [DisplayName("Select a File")]
         [DataType(DataType.Upload)]
+        [MaxFileSize(1024 * 1024)]
+        [AllowedExtensions(new string[] { ".jpg", ".png", ".doc", ".docx", ".xls", ".xlsx", ".pdf" } )]
         public IFormFile? FormFile { get; set; }
 
         [Display(Name = "Ticket Files")]

@@ -9,5 +9,9 @@ namespace BugTrackerMVC.Models.ViewModels
         public SelectList? PMList { get; set; }
 
         public string? PMId { get; set; }
+
+        public SelectList? SubList { get; set; }
+
+        public string? SubId { get; set; }
     }
 }

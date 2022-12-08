@@ -9,13 +9,16 @@ namespace BugTrackerMVC.Services
     public class BTTicketService : IBTTicketService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IBTRolesService _rolesService;
+        private readonly IBTRolesService _btRolesService;
+        private readonly IBTProjectService _btProjectService;
 
         public BTTicketService(ApplicationDbContext context, 
-                               IBTRolesService rolesService)
+                               IBTRolesService btRolesService,
+                               IBTProjectService btProjectService)
         {
             _context = context;
-            _rolesService = rolesService;
+            _btRolesService = btRolesService;
+            _btProjectService = btProjectService;
         }
 
         public async Task<List<Ticket>> GetAllTicketsByCompanyIdAsync(int companyId)
@@ -24,16 +27,17 @@ namespace BugTrackerMVC.Services
             {
                 List<Ticket> tickets = await _context.Tickets
                                                      .Where(t => t.Project!.CompanyId == companyId)
-                                                     .Include(t => t.DeveloperUser)
                                                      .Include(t => t.Project)
                                                         .ThenInclude(t => t.Company)
-                                                     .Include(t => t.SubmitterUser)
                                                      .Include(t => t.TicketPriority)
-                                                     .Include(t => t.TicketStatus)
                                                      .Include(t => t.TicketType)
+                                                     .Include(t => t.TicketStatus)
+                                                     .Include(t => t.DeveloperUser)
+                                                     .Include(t => t.SubmitterUser)
                                                      .ToListAsync();
 
                 return tickets;
+
             }
             catch (Exception)
             {
@@ -47,6 +51,7 @@ namespace BugTrackerMVC.Services
             {
                 _context.Add(ticket);
                 await _context.SaveChangesAsync();
+
             }
             catch (Exception)
             {
@@ -59,15 +64,19 @@ namespace BugTrackerMVC.Services
             try
             {
                 Ticket? ticket = await _context.Tickets
-                                               .Include(t => t.DeveloperUser)
                                                .Include(t => t.Project)
-                                               .Include(t => t.SubmitterUser)
                                                .Include(t => t.TicketPriority)
-                                               .Include(t => t.TicketStatus)
                                                .Include(t => t.TicketType)
+                                               .Include(t => t.TicketStatus)
+                                               .Include(t => t.Comments)
+                                               .Include(t => t.Attachments)
+                                               .Include(t => t.History)
+                                               .Include(t => t.DeveloperUser)
+                                               .Include(t => t.SubmitterUser)
                                                .FirstOrDefaultAsync(t => t.Id == ticketId);
 
                 return ticket!;
+
             }
             catch (Exception)
             {
@@ -81,6 +90,7 @@ namespace BugTrackerMVC.Services
             {
                 _context.Update(ticket);
                 await _context.SaveChangesAsync();
+
             }
             catch (Exception)
             {
@@ -111,6 +121,7 @@ namespace BugTrackerMVC.Services
                                                                         .ToListAsync();
 
                 return ticketStatus;
+
             }
             catch (Exception)
             {
@@ -126,6 +137,7 @@ namespace BugTrackerMVC.Services
                                                                         .ToListAsync();
 
                 return ticketTypes;
+
             }
             catch (Exception)
             {
@@ -141,6 +153,7 @@ namespace BugTrackerMVC.Services
                                                               .ToListAsync();
 
                 return projects;
+
             }
             catch (Exception)
             {
@@ -163,98 +176,136 @@ namespace BugTrackerMVC.Services
             }
         }
 
-        //public async Task<BTUser> GetDeveloperAsync(int ticketId)
-        //{
-        //    try
-        //    {
-        //        Ticket? ticket = await _context.Tickets
-        //                                        .Include(t => t.Project)
-        //                                            .ThenInclude(t => t!.Members)
-        //                                        .FirstOrDefaultAsync(t => t.Id == ticketId);
+        public async Task<BTUser> GetDeveloperAsync(int ticketId)
+        {
+            try
+            {
+                Ticket? ticket = await _context.Tickets
+                                                .Include(t => t.Project)
+                                                    .ThenInclude(t => t!.Members)
+                                                .FirstOrDefaultAsync(t => t.Id == ticketId);
 
-        //        foreach(BTUser member in ticket!.Project!.Members)
-        //        {
-        //            if (await _rolesService.IsUserInRoleAsync(member, nameof(BTRoles.Developer)))
-        //            {
-        //                return member;
-        //            }
-        //        }
+                foreach (BTUser member in ticket!.Project!.Members)
+                {
+                    if (await _btRolesService.IsUserInRoleAsync(member, nameof(BTRoles.Developer)))
+                    {
+                        return member;
+                    }
+                }
 
-        //        return null!;
+                return null!;
 
-        //    } catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //}
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
-        //public async Task<bool> AssignDeveloperAsync(string userId, BTUser member, int ticketId)
-        //{
-        //    try
-        //    {
-        //        BTUser? currentDev = await GetDeveloperAsync(ticketId);
-        //        BTUser? selectedDev = await _context.Users.FindAsync(userId);
+        public async Task AssignDeveloperAsync(int ticketId, string userId)
+        {
+            try
+            {
+                Ticket? ticket = await GetTicketByIdAsync(ticketId);
 
-        //        Ticket? ticket = await GetTicketByIdAsync(ticketId);
+                ticket.DeveloperUserId = userId;
 
-        //        bool IsOnTicket = ticket.Project!.Members.Any(m => m.Id == member.Id);
+                _context.Update(ticket);
 
-        //        // remove current dev
-        //        if (currentDev != null)
-        //        {
-        //            //await RemoveDeveloperAsync(ticketId);
-        //        }
+                await _context.SaveChangesAsync();
 
-        //        // add new dev
-        //        try
-        //        {
-        //            if (!IsOnTicket)
-        //            {
-        //                ticket.Project.Members.Add(member);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
-        //                await _context.SaveChangesAsync();
+        public async Task AddTicketAttachmentAsync(TicketAttachment ticketAttachment)
+        {
+            try
+            {
+                await _context.AddAsync(ticketAttachment);
+                await _context.SaveChangesAsync();
 
-        //                return true;
-        //            }
+            } catch (Exception)
+            {
+                throw;
+            }
+        }
 
-        //            return false;
+        public async Task<TicketAttachment> GetTicketAttachmentsByIdAsync(int ticketAttachmentId)
+        {
+            try
+            {
+                TicketAttachment? ticketAttachment = await _context.TicketAttachments
+                                                                  .Include(t => t.BTUser)
+                                                                  .FirstOrDefaultAsync(t => t.Id == ticketAttachmentId);
 
-        //        } catch (Exception)
-        //        {
-        //            throw;
-        //        }
+                return ticketAttachment!;
 
-        //        return true;
+            } catch (Exception)
+            {
+                throw;
+            }
+        }
 
-        //    } catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //}
+        public async Task AddCommentAsync(TicketComment ticketComment)
+        {
+            try
+            {
+                _context.Add(ticketComment);
+                await _context.SaveChangesAsync();
 
-        //public async Task RemoveDeveloperAsync(BTUser member, int ticketId)
-        //{
-        //    try
-        //    {
-        //        Ticket? ticket = await GetTicketByIdAsync(ticketId);
+            } catch (Exception)
+            {
+                throw;
+            }
+        }
 
-        //        bool IsOnTicket = ticket.Project!.Members.Any(m => m.Id == member.Id);
+        public async Task<List<Ticket>> GetTicketsByUserIdAsync(string userId, int companyId)
+        {
+            BTUser? btUser = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            List<Ticket>? tickets = (await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId))
+                                                            .Where(p => p.Archived == false)
+                                                            .SelectMany(p => p.Tickets!)
+                                                            .Where(t => t.Archived == false)
+                                                            .ToList();
 
-        //        if (IsOnTicket)
-        //        {
-        //            ticket.Project!.Members.Remove(member);
+            try
+            {
+                if (await _btRolesService.IsUserInRoleAsync(btUser!, nameof(BTRoles.Admin)))
+                {
+                    return tickets;
+                }
+                else if (await _btRolesService.IsUserInRoleAsync(btUser!, nameof(BTRoles.Developer)))
+                {
+                    return tickets.Where(t => t.DeveloperUserId == userId || t.SubmitterUserId == userId)
+                                  .ToList();
+                }
+                else if (await _btRolesService.IsUserInRoleAsync(btUser!, nameof(BTRoles.Submitter)))
+                {
+                    return tickets.Where(t => t.SubmitterUserId == userId)
+                                  .ToList();
+                }
+                else if (await _btRolesService.IsUserInRoleAsync(btUser!, nameof(BTRoles.ProjectManager)))
+                {
+                    List<Ticket>? projectTickets = (await _btProjectService.GetUserProjectsAsync(userId))!.SelectMany(t => t.Tickets!)
+                                                                                                          .Where(t => t.Archived == false)
+                                                                                                          .ToList();
+                    List<Ticket>? submittedTickets = tickets.Where(t => t.SubmitterUserId == userId)
+                                                            .ToList();
 
-        //            await _context.SaveChangesAsync();
+                    tickets = projectTickets.Concat(submittedTickets).ToList();
+                }
 
-        //            return true;
-        //        }
+                return tickets;
 
-        //        return false;
-
-        //    } catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //}
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

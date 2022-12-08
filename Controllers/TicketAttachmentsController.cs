@@ -22,8 +22,12 @@ namespace BugTrackerMVC.Controllers
         // GET: TicketAttachments
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.TicketAttachments.Include(t => t.BTUser).Include(t => t.Ticket);
-            return View(await applicationDbContext.ToListAsync());
+            List<TicketAttachment> ticketAttachments = await _context.TicketAttachments
+                                                                        .Include(t => t.BTUser)
+                                                                        .Include(t => t.Ticket)
+                                                                        .ToListAsync();
+
+            return View(ticketAttachments);
         }
 
         // GET: TicketAttachments/Details/5
@@ -34,10 +38,11 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            var ticketAttachment = await _context.TicketAttachments
+            TicketAttachment? ticketAttachment = await _context.TicketAttachments
                 .Include(t => t.BTUser)
                 .Include(t => t.Ticket)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (ticketAttachment == null)
             {
                 return NotFound();
@@ -51,6 +56,7 @@ namespace BugTrackerMVC.Controllers
         {
             ViewData["BTUserId"] = new SelectList(_context.Users, "Id", "Id");
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description");
+
             return View();
         }
 
@@ -65,10 +71,12 @@ namespace BugTrackerMVC.Controllers
             {
                 _context.Add(ticketAttachment);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
             ViewData["BTUserId"] = new SelectList(_context.Users, "Id", "Id", ticketAttachment.BTUserId);
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description", ticketAttachment.TicketId);
+
             return View(ticketAttachment);
         }
 
@@ -80,13 +88,16 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            var ticketAttachment = await _context.TicketAttachments.FindAsync(id);
+            TicketAttachment? ticketAttachment = await _context.TicketAttachments.FindAsync(id);
+
             if (ticketAttachment == null)
             {
                 return NotFound();
             }
+
             ViewData["BTUserId"] = new SelectList(_context.Users, "Id", "Id", ticketAttachment.BTUserId);
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description", ticketAttachment.TicketId);
+
             return View(ticketAttachment);
         }
 
@@ -122,8 +133,10 @@ namespace BugTrackerMVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["BTUserId"] = new SelectList(_context.Users, "Id", "Id", ticketAttachment.BTUserId);
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description", ticketAttachment.TicketId);
+
             return View(ticketAttachment);
         }
 
@@ -135,10 +148,11 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            var ticketAttachment = await _context.TicketAttachments
+            TicketAttachment? ticketAttachment = await _context.TicketAttachments
                 .Include(t => t.BTUser)
                 .Include(t => t.Ticket)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (ticketAttachment == null)
             {
                 return NotFound();
@@ -156,7 +170,9 @@ namespace BugTrackerMVC.Controllers
             {
                 return Problem("Entity set 'ApplicationDbContext.TicketAttachments'  is null.");
             }
-            var ticketAttachment = await _context.TicketAttachments.FindAsync(id);
+
+            TicketAttachment? ticketAttachment = await _context.TicketAttachments.FindAsync(id);
+
             if (ticketAttachment != null)
             {
                 _context.TicketAttachments.Remove(ticketAttachment);

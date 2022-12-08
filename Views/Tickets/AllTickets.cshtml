@@ -1,4 +1,7 @@
 ﻿@model IEnumerable<BugTrackerMVC.Models.Ticket>
+@using BugTrackerMVC.Enums
+@using BugTrackerMVC.Services.Interfaces
+@inject IBTTicketService _BTTicketService
 
 @{
     ViewData["Title"] = "All Tickets";
@@ -60,7 +63,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                    @foreach (var item in Model) {
+                    @foreach (var item in Model.OrderBy(i => i.Id)) {
                             <tr>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Project!.Company!.Name)
@@ -68,6 +71,18 @@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Title)
                                 </td>
+                                    <td>
+
+                                        @if (item.DeveloperUser is null && User.IsInRole(nameof(BTRoles.Admin)))
+                                        {
+                                            <a class="btn btn-sm btn-outline-info" asp-action="AssignDeveloper" asp-route-id="@item.Id">Assign Dev</a>
+                                        }
+                                        else
+                                        {
+                                            <text>@(item.DeveloperUser?.FullName ?? "Unassigned")</text>
+                                        }
+                                    </td>
+                                    <td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Description)
                                 </td>
@@ -95,9 +110,9 @@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.TicketStatus!.Name)
                                 </td>
-                                <td>
+                                @*<td>
                                     @Html.DisplayFor(modelItem => item.DeveloperUser!.FullName)
-                                </td>
+                                </td>*@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.SubmitterUser!.FullName)
                                 </td>

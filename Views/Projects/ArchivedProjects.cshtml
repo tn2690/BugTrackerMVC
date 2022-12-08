@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<BugTrackerMVC.Models.Project>
 @using BugTrackerMVC.Services.Interfaces
 @using BugTrackerMVC.Enums
-@inject IFileService _FileService
+@inject IBTFileService _BTFileService
 
 @{
     ViewData["Title"] = "Archived Projects - Index";
@@ -73,7 +73,7 @@
                                         @Html.DisplayFor(modelItem => item.EndDate)
                                     </td>
                                     <td>
-                                        <img src="@_FileService.ConvertByteArrayToFile(item.ImageFileData!, item.ImageFileType!, (int)DefaultImg.ProjectImg)" class="img-fluid" style="max-height: 200px;" alt="project image" />
+                                        <img src="@_BTFileService.ConvertByteArrayToFile(item.ImageFileData!, item.ImageFileType!, (int)DefaultImg.ProjectImg)" class="img-fluid" style="max-height: 200px;" alt="project image" />
                                     </td>
                                     <td>
                                         @Html.DisplayFor(modelItem => item.Archived)

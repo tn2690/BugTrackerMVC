@@ -22,21 +22,21 @@ namespace BugTrackerMVC.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<BTUser> _userManager;
-        private readonly IFileService _fileService;
+        private readonly IBTFileService _btFileService;
         private readonly IBTProjectService _btProjectService;
-        private readonly IBTRolesService _rolesService;
+        private readonly IBTRolesService _btRolesService;
 
         public ProjectsController(ApplicationDbContext context,
                                   UserManager<BTUser> userManager,
-                                  IFileService fileService,
+                                  IBTFileService btFileService,
                                   IBTProjectService btProjectService,
-                                  IBTRolesService rolesService)
+                                  IBTRolesService btRolesService)
         {
             _context = context;
             _userManager = userManager;
-            _fileService = fileService;
+            _btFileService = btFileService;
             _btProjectService = btProjectService;
-            _rolesService = rolesService;
+            _btRolesService = btRolesService;
         }
 
         // GET: Projects/AllProjects
@@ -73,8 +73,8 @@ namespace BugTrackerMVC.Controllers
             // assign user's company id to logged in user
             int companyId = User.Identity!.GetCompanyId();
 
-            // show archived projects for specific company
-            List<Project> projects = (await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId)).ToList();
+            // show unassigned projects
+            List<Project> projects = (await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId)).Where(p => p.Members != null).ToList();
 
             return View(projects);
         }
@@ -103,7 +103,7 @@ namespace BugTrackerMVC.Controllers
             return View(projects);
         }
 
-
+        // GET: Projects/AssignProjectManager/5
         [HttpGet]
         [Authorize(Roles = nameof(BTRoles.Admin))]
         public async Task<IActionResult> AssignProjectManager(int? id)
@@ -117,7 +117,7 @@ namespace BugTrackerMVC.Controllers
             // get company id
             int companyId = User.Identity!.GetCompanyId();
 
-            List<BTUser> projectManagers = await _rolesService.GetUsersInRoleAsync(nameof(BTRoles.ProjectManager), User.Identity!.GetCompanyId());
+            List<BTUser> projectManagers = await _btRolesService.GetUsersInRoleAsync(nameof(BTRoles.ProjectManager), companyId);
 
             BTUser? currentPM = await _btProjectService.GetProjectManagerAsync(id.Value);
 
@@ -134,6 +134,7 @@ namespace BugTrackerMVC.Controllers
             return View(viewModel);
         }
 
+        // POST: Projects/AssignProjectManager/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
@@ -141,12 +142,15 @@ namespace BugTrackerMVC.Controllers
         {
             if (viewModel.Project?.Id != null)
             {
+                // validate PM id of viewModel
                 if (!string.IsNullOrEmpty(viewModel.PMId))
                 {
+                    // call service to add PM
                     await _btProjectService.AddProjectManagerAsync(viewModel.PMId, viewModel.Project.Id);
                 }
                 else
                 {
+                    // call service to remove PM
                     await _btProjectService.RemoveProjectManagerAsync(viewModel.Project.Id);
                 }
 
@@ -222,7 +226,7 @@ namespace BugTrackerMVC.Controllers
                 if (project.ImageFormFile != null)
                 {
                     // convert file to byte array
-                    project.ImageFileData = await _fileService.ConvertFileToByteArrayAsync(project.ImageFormFile);
+                    project.ImageFileData = await _btFileService.ConvertFileToByteArrayAsync(project.ImageFormFile);
 
                     // use file extension as the file
                     project.ImageFileType = project.ImageFormFile.ContentType;
@@ -296,7 +300,7 @@ namespace BugTrackerMVC.Controllers
                     if (project.ImageFormFile != null)
                     {
                         // convert file to byte array
-                        project.ImageFileData = await _fileService.ConvertFileToByteArrayAsync(project.ImageFormFile);
+                        project.ImageFileData = await _btFileService.ConvertFileToByteArrayAsync(project.ImageFormFile);
 
                         // use file extension as the file
                         project.ImageFileType = project.ImageFormFile.ContentType;

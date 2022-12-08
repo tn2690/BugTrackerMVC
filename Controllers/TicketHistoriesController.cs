@@ -22,8 +22,12 @@ namespace BugTrackerMVC.Controllers
         // GET: TicketHistories
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.TicketHistories.Include(t => t.BTUser).Include(t => t.Ticket);
-            return View(await applicationDbContext.ToListAsync());
+            List<TicketHistory> ticketHistories = await _context.TicketHistories
+                                                                    .Include(t => t.BTUser)
+                                                                    .Include(t => t.Ticket)
+                                                                    .ToListAsync();
+
+            return View(ticketHistories);
         }
 
         // GET: TicketHistories/Details/5
@@ -38,6 +42,7 @@ namespace BugTrackerMVC.Controllers
                 .Include(t => t.BTUser)
                 .Include(t => t.Ticket)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (ticketHistory == null)
             {
                 return NotFound();
@@ -51,6 +56,7 @@ namespace BugTrackerMVC.Controllers
         {
             ViewData["BTUserId"] = new SelectList(_context.Users, "Id", "Id");
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description");
+
             return View();
         }
 
@@ -67,8 +73,10 @@ namespace BugTrackerMVC.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["BTUserId"] = new SelectList(_context.Users, "Id", "Id", ticketHistory.BTUserId);
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description", ticketHistory.TicketId);
+
             return View(ticketHistory);
         }
 
@@ -81,12 +89,15 @@ namespace BugTrackerMVC.Controllers
             }
 
             var ticketHistory = await _context.TicketHistories.FindAsync(id);
+
             if (ticketHistory == null)
             {
                 return NotFound();
             }
+
             ViewData["BTUserId"] = new SelectList(_context.Users, "Id", "Id", ticketHistory.BTUserId);
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description", ticketHistory.TicketId);
+
             return View(ticketHistory);
         }
 
@@ -122,8 +133,10 @@ namespace BugTrackerMVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["BTUserId"] = new SelectList(_context.Users, "Id", "Id", ticketHistory.BTUserId);
             ViewData["TicketId"] = new SelectList(_context.Tickets, "Id", "Description", ticketHistory.TicketId);
+
             return View(ticketHistory);
         }
 
@@ -139,6 +152,7 @@ namespace BugTrackerMVC.Controllers
                 .Include(t => t.BTUser)
                 .Include(t => t.Ticket)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (ticketHistory == null)
             {
                 return NotFound();
@@ -156,7 +170,9 @@ namespace BugTrackerMVC.Controllers
             {
                 return Problem("Entity set 'ApplicationDbContext.TicketHistories'  is null.");
             }
+
             var ticketHistory = await _context.TicketHistories.FindAsync(id);
+
             if (ticketHistory != null)
             {
                 _context.TicketHistories.Remove(ticketHistory);
