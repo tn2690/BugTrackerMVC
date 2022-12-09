@@ -1,4 +1,4 @@
-﻿using BugTrackerMVC.Enums;
+﻿using BugTrackerMVC.Models.Enums;
 using BugTrackerMVC.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

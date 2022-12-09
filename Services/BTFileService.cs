@@ -5,8 +5,8 @@ namespace BugTrackerMVC.Services
     // actions for the image
     public class BTFileService : IBTFileService
     {
-        private readonly string _defaultBTUserImgSrc = "/img/DefaultProjImg.png";
-        private readonly string _defaultCompanyImgSrc = "/img/DefaultProjImg.png";
+        private readonly string _defaultBTUserImgSrc = "/img/DefaultUserImg.png";
+        private readonly string _defaultCompanyImgSrc = "/img/DefaultCompanyImg.png";
         private readonly string _defaultProjectImgSrc = "/img/DefaultProjImg.png";
 
         private readonly string[] suffixes = { "Bytes", "KB", "MB", "GB", "TB", "PB " };
@@ -28,7 +28,7 @@ namespace BugTrackerMVC.Services
 
             try
             {
-                string imageBase64Data = Convert.ToBase64String(fileData);
+                string imageBase64Data = Convert.ToBase64String(fileData!);
 
                 string imageSrcString = string.Format($"data:{extension};base64, {imageBase64Data}");
 

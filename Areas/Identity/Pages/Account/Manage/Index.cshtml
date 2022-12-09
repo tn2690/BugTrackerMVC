@@ -1,5 +1,9 @@
 ﻿@page
 @model IndexModel
+@using BugTrackerMVC.Services.Interfaces
+@using BugTrackerMVC.Models.Enums
+@inject IBTFileService _BTFileService
+
 @{
     ViewData["Title"] = "Profile";
     ViewData["ActivePage"] = ManageNavPages.Index;
@@ -15,12 +19,33 @@
                 <input asp-for="Username" class="form-control" disabled />
                 <label asp-for="Username" class="form-label"></label>
             </div>
-            <div class="form-floating">
+            <div class="form-floating my-2">
+                <input asp-for="Input.FirstName" class="form-control" aria-required="true" />
+                <label asp-for="Input.FirstName"></label>
+                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-floating my-2">
+                <input asp-for="Input.LastName" class="form-control" aria-required="true" />
+                <label asp-for="Input.LastName"></label>
+                <span asp-validation-for="Input.LastName" class="text-danger"></span>
+            </div>
+            <div class="form-floating my-2">
                 <input asp-for="Input.PhoneNumber" class="form-control" />
                 <label asp-for="Input.PhoneNumber" class="form-label"></label>
                 <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
             </div>
-            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+            <div class="form-group">
+                <label asp-for="Input.ImageFileData" style="width: 100%;">Upload a Profile Image</label>
+
+                <img id="userImage" class="img-fluid img-thumbnail rounded" src="@_BTFileService.ConvertByteArrayToFile(Model.Input.ImageFileData!, Model.Input.ImageFileType!, (int)DefaultImg.BTUserImg)" alt="bt user picture">
+
+                <input asp-for="Input.ImageFormFile" type="file" class="form-control" accept=".png,.jpg,.jpeg,.gif"
+                       style="border:0px!important;padding: 0px;padding-top: 10px;padding-bottom: 30px;"
+                       onchange="document.getElementById('userImage').src=window.URL.createObjectURL(this.files[0])" />
+
+                <span asp-validation-for="Input.ImageFormFile" class="text-danger"></span>
+            </div>
+            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary rounded-pill my-2">Save</button>
         </form>
     </div>
 </div>

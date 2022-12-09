@@ -1,4 +1,4 @@
-﻿namespace BugTrackerMVC.Enums
+﻿namespace BugTrackerMVC.Models.Enums
 {
     public enum BTProjectPriorities
     {

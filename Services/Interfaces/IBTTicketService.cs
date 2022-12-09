@@ -31,10 +31,6 @@ namespace BugTrackerMVC.Services.Interfaces
         // get list of users
         public Task<List<BTUser>> GetUsersAsync();
 
-        // get developer
-        // may not be needed
-        public Task<BTUser> GetDeveloperAsync(int ticketId);
-
         // assign a Developer to ticket
         public Task AssignDeveloperAsync(int ticketId, string userId);
 

@@ -6,14 +6,14 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - BugTrackerMVC</title>
+    <title>@ViewData["Title"] - Insect Crusher</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
 
     <!-------------------------------------------- Gogi stylesheets start ------------------------------------------------->
-    <!-- Favicon -->
+    @*<!-- Favicon -->
     <link rel="shortcut icon" href="../../assets/media/image/favicon.png" />
 
     <!-- Main css -->
@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="../../vendors/dataTable/datatables.min.css" type="text/css">
 
     <!-- App css -->
-    <link rel="stylesheet" href="../../assets/css/app.min.css" type="text/css">
+    <link rel="stylesheet" href="../../assets/css/app.min.css" type="text/css">*@
     <!-------------------------------------------- Gogi stylesheets end --------------------------------------------------->
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/site.css" />
@@ -108,8 +108,9 @@
             <div class="col-12 col-sm-3 col-xl-2 px-sm-2 px-0 bg-dark d-flex sticky-top">
                 <div class="d-flex flex-sm-column flex-row flex-grow-1 align-items-center align-items-sm-start px-3 pt-2 text-white">
                     <a href="/" class="d-flex align-items-center pb-sm-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                        <span class="fs-5">B<span class="d-none d-sm-inline">ug Squasher</span></span>
+                        <span class="fs-5">I<span class="d-none d-sm-inline">nsect Crusher</span></span>
                     </a>
+
                     <partial name="_LoginPartial" />
 
                     @if (SignInManager.IsSignedIn(User))
@@ -138,7 +139,7 @@
                                 <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown">
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="Create">New project...</a></li>
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="AllProjects">All Projects</a></li>
-                                    <li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="UnassignedProjects">Unassigned Projects</a></li>
+                                    @*<li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="UnassignedProjects">Unassigned Projects</a></li>*@
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="MyProjects">My Projects</a></li>
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="ArchivedProjects">Archived Projects</a></li>
                                 </ul>
@@ -173,10 +174,10 @@
                 <footer class="border-top footer container-fluid">
                     <div class="row align-items-center">
                         <div class="col-12 col-md-4 order-last order-md-first text-center text-md-start">
-                            <div class="copyright textLight">All Rights Reserved &copy; 2022 Tom Nguyen</div>
+                            <div class="copyright">All Rights Reserved &copy; 2022 Tom Nguyen</div>
                         </div>
                         <div class="col-12 col-md-4 d-flex justify-content-center order-0 order-md-2">
-                            <img src="~/img/ContactsDexLogoOnly_250.png" height="50" />
+                            <img src="~/img/MBDLogoOnly_500_edited.png" height="50" />
                         </div>
                         <div class="col-12 col-md-4 d-flex justify-content-center justify-content-md-end order-3">
                             <a href="https://www.linkedin.com/in/txn9517"><i class="bi bi-linkedin px-2 socialIcons"></i></a>

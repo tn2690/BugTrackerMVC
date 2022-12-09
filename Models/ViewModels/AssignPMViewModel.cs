@@ -12,6 +12,10 @@ namespace BugTrackerMVC.Models.ViewModels
 
         public MultiSelectList? DevList { get; set; }
 
+        public List<string> SelectedDevelopers { get; set; } = new();
+
+        public List<string> SelectedSubmitters { get; set; } = new();
+
         public string? DevId { get; set; }
 
         public MultiSelectList? SubList { get; set; }

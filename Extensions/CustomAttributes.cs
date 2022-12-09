@@ -23,7 +23,7 @@ public class MaxFileSizeAttribute : ValidationAttribute
             }
         }
 
-        return ValidationResult.Success;
+        return ValidationResult.Success!;
     }
 
     public string GetErrorMessage()
@@ -57,7 +57,7 @@ public class AllowedExtensionsAttribute : ValidationAttribute
             }
         }
 
-        return ValidationResult.Success;
+        return ValidationResult.Success!;
     }
 
     public string GetErrorMessage(string ext)

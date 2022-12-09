@@ -1,5 +1,5 @@
 ﻿using BugTrackerMVC.Data;
-using BugTrackerMVC.Enums;
+using BugTrackerMVC.Models.Enums;
 using BugTrackerMVC.Models;
 using BugTrackerMVC.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +28,7 @@ namespace BugTrackerMVC.Services
                 List<Ticket> tickets = await _context.Tickets
                                                      .Where(t => t.Project!.CompanyId == companyId)
                                                      .Include(t => t.Project)
-                                                        .ThenInclude(t => t.Company)
+                                                        .ThenInclude(t => t!.Company)
                                                      .Include(t => t.TicketPriority)
                                                      .Include(t => t.TicketType)
                                                      .Include(t => t.TicketStatus)
@@ -172,32 +172,6 @@ namespace BugTrackerMVC.Services
                 return users;
 
             } catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task<BTUser> GetDeveloperAsync(int ticketId)
-        {
-            try
-            {
-                Ticket? ticket = await _context.Tickets
-                                                .Include(t => t.Project)
-                                                    .ThenInclude(t => t!.Members)
-                                                .FirstOrDefaultAsync(t => t.Id == ticketId);
-
-                foreach (BTUser member in ticket!.Project!.Members)
-                {
-                    if (await _btRolesService.IsUserInRoleAsync(member, nameof(BTRoles.Developer)))
-                    {
-                        return member;
-                    }
-                }
-
-                return null!;
-
-            }
-            catch (Exception)
             {
                 throw;
             }

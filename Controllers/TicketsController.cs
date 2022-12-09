@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using BugTrackerMVC.Data;
 using BugTrackerMVC.Models;
 using Microsoft.AspNetCore.Identity;
-using BugTrackerMVC.Enums;
+using BugTrackerMVC.Models.Enums;
 using BugTrackerMVC.Helpers;
 using BugTrackerMVC.Services.Interfaces;
 using BugTrackerMVC.Extensions;
@@ -99,19 +99,19 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
+            Ticket? ticket = await _btTicketService.GetTicketByIdAsync(id.Value);
+
             int companyId = User.Identity!.GetCompanyId();
 
             List<BTUser> developers = await _btRolesService.GetUsersInRoleAsync(nameof(BTRoles.Developer), companyId);
-
-            BTUser? currentDev = await _btTicketService.GetDeveloperAsync(id.Value);
 
             // create/instantiate DevViewModel
             // get and assign Ticket property of view model
             AssignDevViewModel viewModel = new()
             {
-                Ticket = await _btTicketService.GetTicketByIdAsync(id.Value),
-                DevList = new SelectList(developers, "Id", "FullName", currentDev?.Id), // create SelectList of company's Devs (highlight current Dev if one is assigned)
-                DevId = currentDev?.Id
+                Ticket = ticket,
+                DevList = new SelectList(developers, "Id", "FullName", ticket.DeveloperUserId), // create SelectList of company's Devs (highlight current Dev if one is assigned)
+                DevId = ticket.DeveloperUserId
             };
 
             // return View() using AssignPMViewModel

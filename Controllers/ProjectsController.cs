@@ -13,7 +13,8 @@ using BugTrackerMVC.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using BugTrackerMVC.Extensions;
 using BugTrackerMVC.Models.ViewModels;
-using BugTrackerMVC.Enums;
+using BugTrackerMVC.Models.Enums;
+using BugTrackerMVC.Services;
 
 namespace BugTrackerMVC.Controllers
 {
@@ -67,17 +68,17 @@ namespace BugTrackerMVC.Controllers
         
         //  GET: Projects/UnassignedProjects
         //  for Admin and Project Managers to view
-        [Authorize(Roles = "Admin,ProjectManager")]
-        public async Task<IActionResult> UnassignedProjects()
-        {
-            // assign user's company id to logged in user
-            int companyId = User.Identity!.GetCompanyId();
+        //[Authorize(Roles = "Admin,ProjectManager")]
+        //public async Task<IActionResult> UnassignedProjects()
+        //{
+        //    // assign user's company id to logged in user
+        //    int companyId = User.Identity!.GetCompanyId();
 
-            // show unassigned projects
-            List<Project> projects = (await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId)).Where(p => p.Members != null).ToList();
+        //    // show unassigned projects
+        //    List<Project> projects = (await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId)).Where(p => p.Members != null).ToList();
 
-            return View(projects);
-        }
+        //    return View(projects);
+        //}
 
         // GET: Projects/MyProjects
         public async Task<IActionResult> MyProjects()
@@ -103,11 +104,10 @@ namespace BugTrackerMVC.Controllers
             return View(projects);
         }
 
-        // GET: Projects/AssignMembers/5
+        // GET: Projects/AddMembers/5
         [HttpGet]
         public async Task<IActionResult> AddMembers(int? id)
         {
-
             // validate id
             if (id == null)
             {
@@ -117,36 +117,74 @@ namespace BugTrackerMVC.Controllers
             // get company id
             int companyId = User.Identity!.GetCompanyId();
 
+            Project? project = await _btProjectService.GetProjectByIdAsync(id.Value, companyId);
+
+            // get developers and submitters from project
+            List<BTUser> projectDevelopers = new List<BTUser>();
+            List<BTUser> projectSubmitters = new List<BTUser>();
+
+            foreach (BTUser member in project.Members)
+            {
+                if (await _btRolesService.IsUserInRoleAsync(member, nameof(BTRoles.Submitter)))
+                {
+                    projectSubmitters.Add(member);
+                }
+                else if (await _btRolesService.IsUserInRoleAsync(member, nameof(BTRoles.Developer)))
+                {
+                    projectDevelopers.Add(member);
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
             // list of developers
             List<BTUser> developers = await _btRolesService.GetUsersInRoleAsync(nameof(BTRoles.Developer), companyId);
 
-            BTUser? member = await _userManager.GetUserAsync(User);
-
             // list of submitters
-            //List<BTUser> submitters = await _btRolesService.GetUsersInRoleAsync(nameof(BTRoles.Submitter), companyId);
+            List<BTUser> submitters = await _btRolesService.GetUsersInRoleAsync(nameof(BTRoles.Submitter), companyId);
 
             // get and assign Project property of view model
             // need member and project id
             AssignPMViewModel viewModel = new()
             {
                 Project = await _btProjectService.GetProjectByIdAsync(id.Value, companyId),
-                DevList = new MultiSelectList(developers, "Id", "FullName"), // create MultiSelectList of company's Devs
-                DevId = member.Id
+                DevList = new MultiSelectList(developers, "Id", "FullName", projectDevelopers.Select(u => u.Id)), // create MultiSelectList of company's Devs
+                SubList = new MultiSelectList(submitters, "Id", "FullName", projectSubmitters.Select(u => u.Id)),
+                SelectedDevelopers = projectDevelopers.Select(u => u.Id).ToList(),
+                SelectedSubmitters = projectSubmitters.Select(u => u.Id).ToList()
             };
 
             return View(viewModel);
         }
 
-        // POST: Projects/AssignMembers/5
+        // POST: Projects/AddMembers/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddMembers(AssignPMViewModel viewModel)
-        {
-            if (viewModel.Project?.Id != null)
+        public async Task<IActionResult> AddMembers(AssignPMViewModel model)
+        { 
+            // check if project exists
+            if (model.Project?.Id != null)
             {
-                foreach (BTUser member in viewModel.Project.Members)
+                Project? project = await _btProjectService.GetProjectByIdAsync(model.Project.Id, User.Identity!.GetCompanyId());
+
+                // remove all current members
+                foreach (BTUser member in project.Members)
                 {
-                    await _btProjectService.AddMemberToProjectAsync(member, viewModel.Project.Id);
+                    if (await _btRolesService.IsUserInRoleAsync(member, nameof(BTRoles.ProjectManager))) continue;
+                    else await _btProjectService.RemoveMemberFromProjectAsync(member, project.Id);
+                }
+
+                // combine developers and submitters
+                List<string> selectedMembers = model.SelectedDevelopers;
+                selectedMembers.AddRange(model.SelectedSubmitters);
+
+                // add them back to the project
+                foreach (string memberId in selectedMembers)
+                {
+                    BTUser member = await _userManager.FindByIdAsync(memberId);
+                    await _btProjectService.AddMemberToProjectAsync(member, project.Id);
                 }
 
                 //// validate dev id of viewModel
@@ -161,10 +199,10 @@ namespace BugTrackerMVC.Controllers
                 //    await _btProjectService.RemoveMemberFromProjectAsync(member, viewModel.Project.Id);
                 //}
 
-                return RedirectToAction(nameof(Details), new { id = viewModel.Project?.Id });
+                return RedirectToAction(nameof(Details), new { id = model.Project?.Id });
             }
 
-            return View(viewModel);
+            return View(model);
         }
 
         // GET: Projects/AssignProjectManager/5

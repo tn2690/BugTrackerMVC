@@ -16,9 +16,9 @@
     <div class="form-wrapper">
 
         <!-- logo -->
-        <div id="logo">
+        @*<div id="logo">
             <img src="../../assets/media/image/dark-logo.png" alt="image">
-        </div>
+        </div>*@
         <!-- ./ logo -->
 
 
@@ -35,7 +35,7 @@
                     <label asp-for="Input.Email" class="form-label"></label>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
-                <div class="form-floating">
+                <div class="form-floating my-2">
                     <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" />
                     <label asp-for="Input.Password" class="form-label"></label>
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
@@ -49,7 +49,7 @@
                     </div>
                 </div>
                 <div>
-                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                    <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary rounded-pill">Log in</button>
                 </div>
                 <div>
                     <p>

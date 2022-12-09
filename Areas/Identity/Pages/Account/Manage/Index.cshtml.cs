@@ -4,9 +4,11 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using BugTrackerMVC.Models;
+using BugTrackerMVC.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,13 +19,16 @@ namespace BugTrackerMVC.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<BTUser> _userManager;
         private readonly SignInManager<BTUser> _signInManager;
+        private readonly IBTFileService _btFileService;
 
         public IndexModel(
             UserManager<BTUser> userManager,
-            SignInManager<BTUser> signInManager)
+            SignInManager<BTUser> signInManager,
+            IBTFileService btFileService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _btFileService = btFileService;
         }
 
         /// <summary>
@@ -56,6 +61,25 @@ namespace BugTrackerMVC.Areas.Identity.Pages.Account.Manage
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
+
+            [Required]
+            [Display(Name = "First Name")]
+            [StringLength(50, ErrorMessage = "The {0} must be at least {2} and max {1} characters long.", MinimumLength = 2)]
+            public string FirstName { get; set; }
+
+            [Required]
+            [Display(Name = "Last Name")]
+            [StringLength(50, ErrorMessage = "The {0} must be at least {2} and max {1} characters long.", MinimumLength = 2)]
+            public string LastName { get; set; }
+
+            [NotMapped]
+            [DataType(DataType.Upload)]
+            public IFormFile ImageFormFile { get; set; }
+
+            public byte[] ImageFileData { get; set; }
+
+            public string ImageFileType { get; set; }
+
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
@@ -70,7 +94,10 @@ namespace BugTrackerMVC.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                ImageFileData = user.ImageFileData
             };
         }
 
@@ -89,6 +116,10 @@ namespace BugTrackerMVC.Areas.Identity.Pages.Account.Manage
         public async Task<IActionResult> OnPostAsync()
         {
             var user = await _userManager.GetUserAsync(User);
+
+            user.FirstName = Input.FirstName;
+            user.LastName = Input.LastName;
+
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -98,6 +129,15 @@ namespace BugTrackerMVC.Areas.Identity.Pages.Account.Manage
             {
                 await LoadAsync(user);
                 return Page();
+            }
+
+            // set the ImageFileData and ImageFileType of image file being uploaded
+            if (Input.ImageFormFile != null)
+            {
+                // convert file to a byte array
+                user.ImageFileData = await _btFileService.ConvertFileToByteArrayAsync(Input.ImageFormFile);
+                // get the raw Content-Type header of the uploaded file
+                user.ImageFileType = Input.ImageFormFile.ContentType;
             }
 
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);

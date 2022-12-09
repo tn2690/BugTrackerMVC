@@ -102,3 +102,11 @@ footer {
     height: 60px;
     width: 60px;
 }
+
+.textPul {
+    color: red;
+}
+
+.textInsect {
+    color: green;
+}

@@ -3,7 +3,7 @@ using BugTrackerMVC.Models;
 using BugTrackerMVC.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using BugTrackerMVC.Enums;
+using BugTrackerMVC.Models.Enums;
 
 namespace BugTrackerMVC.Services
 {
@@ -124,6 +124,10 @@ namespace BugTrackerMVC.Services
                                                     .ThenInclude(t => t.Attachments)
                                                  .Include(p => p.Tickets)
                                                     .ThenInclude(t => t.History)
+                                                 .Include(p => p.Tickets)
+                                                    .ThenInclude(t => t.DeveloperUser)
+                                                 .Include(p => p.Tickets)
+                                                    .ThenInclude(t => t.SubmitterUser)
                                                  .FirstOrDefaultAsync(p => p.Id == projectId && p.CompanyId == companyId);
 
                 return project!;

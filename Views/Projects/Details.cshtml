@@ -1,6 +1,6 @@
 ﻿@model BugTrackerMVC.Models.Project
 @using BugTrackerMVC.Services.Interfaces
-@using BugTrackerMVC.Enums
+@using BugTrackerMVC.Models.Enums
 @using Microsoft.AspNetCore.Identity
 @inject IBTFileService _BTFileService
 @inject IBTProjectService _BTProjectService
@@ -100,7 +100,7 @@
                         </div>
                         <div class="body" style="overflow-y:auto;height:300px;background-color:antiquewhite">
                             @* Project Activity loop *@
-                            @foreach (TicketHistory history in (await _BTTicketHistoryService.GetProjectTicketsHistoriesAsync(Model.Id, Model.CompanyId)).OrderBy(h => h.Created)) 
+                            @foreach (TicketHistory history in (await _BTTicketHistoryService.GetProjectTicketsHistoriesAsync(Model.Id, Model.CompanyId)).OrderByDescending(h => h.Created)) 
                             {
                                 <div class="">
                                     <span class="date" style="font-weight:bold">@history.Created.ToString("dd MMM yyyy")</span>
@@ -165,7 +165,7 @@
                                                     {
                                                         if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
                                                         {
-                                                            <a class="btn btn-xs btn-info" asp-action="AssignDeveloper" asp-controller="Home" asp-route-ticketId="@ticket.Id">Assign Dev</a>
+                                                            <a class="btn btn-xs btn-info" asp-action="AssignDeveloper" asp-controller="Tickets" asp-route-ticketId="@ticket.Id">Assign Dev</a>
                                                         }
 
                                                     }
