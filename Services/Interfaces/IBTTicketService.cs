@@ -49,5 +49,8 @@ namespace BugTrackerMVC.Services.Interfaces
 
         // get ticket by user id
         public Task<List<Ticket>> GetTicketsByUserIdAsync(string userId, int companyId);
+
+        // get ticket with no tracking history
+        public Task<Ticket> GetTicketAsNoTrackingAsync(int ticketId, int companyId);
     }
 }

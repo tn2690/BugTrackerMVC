@@ -67,7 +67,7 @@
                                         <!-- Start Comment Respond  -->
                                         <div class="">
                                             <h4 class="title">Leave a comment</h4>
-                                            <form asp-action="Create" method="post" asp-controller="TicketComments">
+                                            <form asp-action="AddComment" method="post" asp-controller="Tickets">
                                                 <input type="hidden" asp-for="Id" name="TicketId">
                                                 <div class="row row--10">
                                                     <div class="col-12">
@@ -96,9 +96,9 @@
                                             <li class="">
                                                 <div class="">
                                                     <div class="">
-                                                        @*<div class="comment-img">
-                                                            <img src="@ImageService.ConvertByteArrayToFile(comment.Author?.ImageData!, comment.Author?.ImageType!, (int)DefaultImage.BlogUserImage)" class="img-fluid authorCommentImg" alt="author picture">
-                                                        </div>*@
+                                                        <div class="comment-img">
+                                                            <img src="@_BTFileService.ConvertByteArrayToFile(comment.BTUser?.ImageFileData!, comment.BTUser?.ImageFileType!, (int)DefaultImg.BTUserImg)" class="img-fluid BTUserCommentImg" alt="author picture">
+                                                        </div>
                                                         <div class="">
                                                             <h6 class="">
                                                                 <a class="" href="#">

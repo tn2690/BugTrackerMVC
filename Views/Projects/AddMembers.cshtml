@@ -1,0 +1,58 @@
+﻿@model AssignPMViewModel
+@using BugTrackerMVC.Models.ViewModels
+
+@{
+    ViewData["Title"] = "Add Members";
+}
+
+<div class="container mt-5">
+
+    <div class="d-flex justify-content-start mt-5 flex-column align-items-center">
+
+        <h3 class="my-5">Add Developer</h3>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">@Model.Project!.Name</div>
+            </div>
+            <div class="card-body">
+                <div class="col-12 col-lg-12 mt-3">
+                    <form asp-action="AddMembers" method="post" class="d-flex flex-column">
+                        <label asp-for="DevId" class="control-label">Developers</label>
+                        <select asp-items="Model.DevList" class="form-select" multiple asp-items="ViewBag.DevList">
+                        </select>
+                        <button type="submit" class="btn btn-primary my-2">Save</button>
+                        <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-secondary my-2">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="my-2">
+            <a asp-action="AllProjects">Back to List</a>
+        </div>
+    </div>
+
+    @*<div class="d-flex justify-content-center mt-5 flex-column align-items-center">
+
+        <h3 class="my-5">Add Submitter</h3>
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">@Model.Project!.Name</div>
+            </div>
+            <div class="card-body">
+                <form asp-action="AddMembers" method="post" class="d-flex flex-column">
+                    <input type="hidden" asp-for="Project!.Id" />
+                    <select asp-items="Model.SubList" asp-for="SubId">
+                        <option value="">Unassigned</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary my-3">Save</button>
+                    <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-secondary my-3">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>*@
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -79,7 +79,7 @@ namespace BugTrackerMVC.Services
                                                             .ThenInclude(p => p.Tickets)
                                                                 .ThenInclude(t => t.SubmitterUser)
                                                         .FirstOrDefaultAsync(u => u.Id == userId))?
-                                                        .Projects
+                                                        .Projects.Where(p => p.Archived == false)
                                                         .ToList();
 
                 return projects;

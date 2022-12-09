@@ -14,6 +14,7 @@ using BugTrackerMVC.Services.Interfaces;
 using BugTrackerMVC.Extensions;
 using BugTrackerMVC.Models.ViewModels;
 using BugTrackerMVC.Services;
+using System.ComponentModel.Design;
 
 namespace BugTrackerMVC.Controllers
 {
@@ -24,18 +25,21 @@ namespace BugTrackerMVC.Controllers
         private readonly IBTTicketService _btTicketService;
         private readonly IBTRolesService _btRolesService;
         private readonly IBTFileService _btFileService;
+        private readonly IBTTicketHistoryService _btTicketHistoryService;
 
         public TicketsController(ApplicationDbContext context,
                                 UserManager<BTUser> userManager,
                                 IBTTicketService btTicketService,
                                 IBTRolesService btRolesService,
-                                IBTFileService btFileService)
+                                IBTFileService btFileService,
+                                IBTTicketHistoryService btTicketHistoryService)
         {
             _context = context;
             _userManager = userManager;
             _btTicketService = btTicketService;
             _btRolesService = btRolesService;
             _btFileService = btFileService;
+            _btTicketHistoryService = btTicketHistoryService;
         }
 
         // GET: Tickets/AllTickets
@@ -133,6 +137,28 @@ namespace BugTrackerMVC.Controllers
             return RedirectToAction("Details", new { id = viewModel.Ticket!.Id });
         }
 
+        // POST: Tickets/AddComment
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddComment([Bind("Id,Comment,TicketId")] TicketComment ticketComment)
+        {
+            // remove BT user id
+            ModelState.Remove("BtUserId");
+
+            if (ModelState.IsValid)
+            {
+                // assign author of comment to BTUserId
+                ticketComment.BTUserId = _userManager.GetUserId(User);
+
+                // set date creation of comment
+                ticketComment.Created = DateTime.UtcNow;
+
+                await _btTicketService.AddCommentAsync(ticketComment);
+            }
+
+            return RedirectToAction("Details", "Tickets", new { id = ticketComment.TicketId });
+        }
+
         // POST: Tickets/AddTicketAttachment
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -217,6 +243,8 @@ namespace BugTrackerMVC.Controllers
 
             if (ModelState.IsValid)
             {
+                string userId = _userManager.GetUserId(User);
+
                 // ticket is initially unassigned when created
                 ticket.TicketStatusId = (await _context.TicketStatuses.FirstOrDefaultAsync(s => s.Name == nameof(BTTicketStatuses.New)))!.Id;
 
@@ -230,6 +258,13 @@ namespace BugTrackerMVC.Controllers
 
                 // call service
                 await _btTicketService.AddTicketAsync(ticket);
+
+                int companyId = User.Identity!.GetCompanyId();
+
+                // TODO: add ticket history record
+                Ticket newTicket = await _btTicketService.GetTicketAsNoTrackingAsync(ticket.Id, companyId);
+
+                await _btTicketHistoryService.AddHistoryAsync(null!, newTicket, userId);
 
                 return RedirectToAction(nameof(AllTickets));
             }
@@ -285,6 +320,14 @@ namespace BugTrackerMVC.Controllers
 
             if (ModelState.IsValid)
             {
+                // get company id
+                int companyId = User.Identity!.GetCompanyId();
+
+                // get logged in user id
+                string userId = _userManager.GetUserId(User);
+
+                Ticket? oldTicket = await _btTicketService.GetTicketAsNoTrackingAsync(ticket.Id, companyId);
+
                 try
                 {
                     // set date created, date updated
@@ -309,6 +352,12 @@ namespace BugTrackerMVC.Controllers
                         throw;
                     }
                 }
+
+                // add history
+                Ticket? newTicket = await _btTicketService.GetTicketAsNoTrackingAsync(ticket.Id, companyId);
+
+                await _btTicketHistoryService.AddHistoryAsync(oldTicket, newTicket, userId);
+
                 return RedirectToAction(nameof(AllTickets));
             }
 

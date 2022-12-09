@@ -32,6 +32,8 @@ builder.Services.AddScoped<IBTFileService, BTFileService>();
 builder.Services.AddScoped<IBTRolesService, BTRolesService>();
 builder.Services.AddScoped<IBTProjectService, BTProjectService>();
 builder.Services.AddScoped<IBTTicketService, BTTicketService>();
+builder.Services.AddScoped<IBTTicketHistoryService, BTTicketHistoryService>();
+builder.Services.AddScoped<IBTCompanyService, BTCompanyService>();
 
 var app = builder.Build();
 

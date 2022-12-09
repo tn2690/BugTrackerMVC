@@ -65,6 +65,7 @@ namespace BugTrackerMVC.Services
             {
                 Ticket? ticket = await _context.Tickets
                                                .Include(t => t.Project)
+                                                    .ThenInclude(p => p!.Company)
                                                .Include(t => t.TicketPriority)
                                                .Include(t => t.TicketType)
                                                .Include(t => t.TicketStatus)
@@ -269,7 +270,7 @@ namespace BugTrackerMVC.Services
             List<Ticket>? tickets = (await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId))
                                                             .Where(p => p.Archived == false)
                                                             .SelectMany(p => p.Tickets!)
-                                                            .Where(t => t.Archived == false)
+                                                            .Where(t => t.Archived | t.ArchivedByProject)
                                                             .ToList();
 
             try
@@ -291,7 +292,7 @@ namespace BugTrackerMVC.Services
                 else if (await _btRolesService.IsUserInRoleAsync(btUser!, nameof(BTRoles.ProjectManager)))
                 {
                     List<Ticket>? projectTickets = (await _btProjectService.GetUserProjectsAsync(userId))!.SelectMany(t => t.Tickets!)
-                                                                                                          .Where(t => t.Archived == false)
+                                                                                                          .Where(t => t.Archived | t.ArchivedByProject)
                                                                                                           .ToList();
                     List<Ticket>? submittedTickets = tickets.Where(t => t.SubmitterUserId == userId)
                                                             .ToList();
@@ -306,6 +307,25 @@ namespace BugTrackerMVC.Services
             {
                 throw;
             }
+        }
+
+        public async Task<Ticket> GetTicketAsNoTrackingAsync(int ticketId, int companyId)
+        {
+            Ticket? ticket = await _context.Tickets
+                                               .Include(t => t.Project)
+                                                    .ThenInclude(p => p!.Company)
+                                               .Include(t => t.TicketPriority)
+                                               .Include(t => t.TicketType)
+                                               .Include(t => t.TicketStatus)
+                                               .Include(t => t.Comments)
+                                               .Include(t => t.Attachments)
+                                               .Include(t => t.History)
+                                               .Include(t => t.DeveloperUser)
+                                               .Include(t => t.SubmitterUser)
+                                               .AsNoTracking()
+                                               .FirstOrDefaultAsync(t => t.Id == ticketId && t.Project!.CompanyId == companyId && t.Archived == false);
+
+            return ticket!;
         }
     }
 }

@@ -6,6 +6,7 @@
 @inject IBTProjectService _BTProjectService
 @inject UserManager<BTUser> _UserManager
 @inject IBTRolesService _BTRolesService
+@inject IBTTicketHistoryService _BTTicketHistoryService
 
 @{
     ViewData["Title"] = "Details";
@@ -81,6 +82,7 @@
 
                                 @foreach (BTUser member in Model.Members) {
                                     <li>@member.FullName</li>
+                                    <li>@string.Join(",", await _UserManager.GetRolesAsync(member))</li>
                                 }
                                 @* Logic for avatars *@
                             </ul>
@@ -98,8 +100,30 @@
                         </div>
                         <div class="body" style="overflow-y:auto;height:300px;background-color:antiquewhite">
                             @* Project Activity loop *@
-                            @foreach (Ticket item in Model.Tickets) {
-                                @item.Comments
+                            @foreach (TicketHistory history in (await _BTTicketHistoryService.GetProjectTicketsHistoriesAsync(Model.Id, Model.CompanyId)).OrderBy(h => h.Created)) 
+                            {
+                                <div class="">
+                                    <span class="date" style="font-weight:bold">@history.Created.ToString("dd MMM yyyy")</span>
+                                    <h6>@history.Description</h6>
+                                    <span>By: <a href="" title="@history.BTUser!.FullName">@history.BTUser.FullName</a></span>
+                                    <div class="">
+                                        @if (history.Description!.Contains("New Ticket Created"))
+                                        {
+                                            <p>A ticket was added.</p>
+                                        }
+                                        else if (history.PropertyName!.Equals("TicketComment") || history.PropertyName.Equals("TicketAttachment"))
+                                        {
+                                            <p>A <b>@history.PropertyName</b>  was added.</p>
+                                        }
+                                        else
+                                        {
+                                            <p>The ticket <b>@history.PropertyName</b>  was edited</p>
+                                            <p>@($"Previous {history.PropertyName}:  ") <span style="color:red">@history.OldValue</span></p>
+                                            <p>@($"Current {history.PropertyName}:  ") <span style="color:green">@history.NewValue</span></p>
+                                        }
+                                    </div>
+                                </div>
+                                <hr />
                             }
                         </div>
 

@@ -103,6 +103,70 @@ namespace BugTrackerMVC.Controllers
             return View(projects);
         }
 
+        // GET: Projects/AssignMembers/5
+        [HttpGet]
+        public async Task<IActionResult> AddMembers(int? id)
+        {
+
+            // validate id
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            // get company id
+            int companyId = User.Identity!.GetCompanyId();
+
+            // list of developers
+            List<BTUser> developers = await _btRolesService.GetUsersInRoleAsync(nameof(BTRoles.Developer), companyId);
+
+            BTUser? member = await _userManager.GetUserAsync(User);
+
+            // list of submitters
+            //List<BTUser> submitters = await _btRolesService.GetUsersInRoleAsync(nameof(BTRoles.Submitter), companyId);
+
+            // get and assign Project property of view model
+            // need member and project id
+            AssignPMViewModel viewModel = new()
+            {
+                Project = await _btProjectService.GetProjectByIdAsync(id.Value, companyId),
+                DevList = new MultiSelectList(developers, "Id", "FullName"), // create MultiSelectList of company's Devs
+                DevId = member.Id
+            };
+
+            return View(viewModel);
+        }
+
+        // POST: Projects/AssignMembers/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddMembers(AssignPMViewModel viewModel)
+        {
+            if (viewModel.Project?.Id != null)
+            {
+                foreach (BTUser member in viewModel.Project.Members)
+                {
+                    await _btProjectService.AddMemberToProjectAsync(member, viewModel.Project.Id);
+                }
+
+                //// validate dev id of viewModel
+                //if (!string.IsNullOrEmpty(viewModel.DevId))
+                //{
+                //    // call service to add member
+                //    await _btProjectService.AddMemberToProjectAsync(member, viewModel.Project.Id);
+                //}
+                //else
+                //{
+                //    // call service to remove member
+                //    await _btProjectService.RemoveMemberFromProjectAsync(member, viewModel.Project.Id);
+                //}
+
+                return RedirectToAction(nameof(Details), new { id = viewModel.Project?.Id });
+            }
+
+            return View(viewModel);
+        }
+
         // GET: Projects/AssignProjectManager/5
         [HttpGet]
         [Authorize(Roles = nameof(BTRoles.Admin))]
