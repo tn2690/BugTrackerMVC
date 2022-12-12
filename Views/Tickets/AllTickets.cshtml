@@ -64,25 +64,24 @@
                         </thead>
                         <tbody>
                     @foreach (var item in Model.OrderBy(i => i.Id)) {
-                            <tr>
+                                <tr class="@(item.Archived ? "border border-2 border-danger" : "")">
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Project!.Company!.Name)
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Title)
                                 </td>
-                                    <td>
-
-                                        @if (item.DeveloperUser is null && User.IsInRole(nameof(BTRoles.Admin)))
-                                        {
-                                            <a class="btn btn-sm btn-outline-info" asp-action="AssignDeveloper" asp-route-id="@item.Id">Assign Dev</a>
-                                        }
-                                        else
-                                        {
-                                            <text>@(item.DeveloperUser?.FullName ?? "Unassigned")</text>
-                                        }
-                                    </td>
-                                    <td>
+                                <td>
+                                    @if (item.DeveloperUser is null && User.IsInRole(nameof(BTRoles.Admin)))
+                                    {
+                                        <a class="btn btn-sm btn-outline-info" asp-action="AssignDeveloper" asp-route-id="@item.Id">Assign Dev</a>
+                                    }
+                                    else
+                                    {
+                                        <text>@(item.DeveloperUser?.FullName ?? "Unassigned")</text>
+                                        <a class="btn btn-sm btn-outline-success" asp-action="AssignDeveloper" asp-route-id="@item.Id">Manage Dev</a>
+                                    }
+                                </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Description)
                                 </td>

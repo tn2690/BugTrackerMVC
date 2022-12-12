@@ -235,7 +235,7 @@ namespace BugTrackerMVC.Services
                 // remove current PM
                 if (currentPM != null)
                 {
-                    await RemoveProjectManagerAsync(projectId);
+                    await RemoveMemberFromProjectAsync(currentPM, projectId);
 
                     await _context.SaveChangesAsync();
                 }

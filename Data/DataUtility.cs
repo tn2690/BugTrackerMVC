@@ -963,8 +963,8 @@ namespace BugTrackerMVC.Data
             try
             {
                 IList<NotificationType> notificationTypes = new List<NotificationType>() {
-                     new NotificationType() { Name = BTNotificationType.Project.ToString() },
-                     new NotificationType() { Name = BTNotificationType.Ticket.ToString() }
+                     new NotificationType() { Name = BTNotificationTypes.Project.ToString() },
+                     new NotificationType() { Name = BTNotificationTypes.Ticket.ToString() }
                 };
 
                 var dbNotificationTypes = context.NotificationTypes.Select(c => c.Name).ToList();

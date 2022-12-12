@@ -76,6 +76,7 @@
                                         }
                                         else {
                                             <text>@(projectManager?.FullName ?? "Unassigned")</text>
+                                            <a class="btn btn-sm btn-outline-success" asp-action="AssignProjectManager" asp-route-id="@item.Id">Manage PM</a>
                                         }
                                     </td>
                                     <td>

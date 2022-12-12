@@ -1,11 +1,56 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using BugTrackerMVC.Services.Interfaces
+@using BugTrackerMVC.Models.Enums
 @inject SignInManager<BTUser> SignInManager
 @inject UserManager<BTUser> UserManager
+@inject IBTFileService _BTFileService
+
 @{
     BTUser btUser = await UserManager.GetUserAsync(User);
 }
 
-<div class="header-body-right">
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item dropdown">
+        <a href="#" class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="User menu" data-toggle="dropdown">
+            <figure class="avatar avatar-sm">
+                <img src="@_BTFileService.ConvertByteArrayToFile(btUser.ImageFileData!, btUser.ImageFileType!, (int)DefaultImg.BTUserImg)" style="max-height: 75px;"
+                 class="rounded-circle"
+                 alt="user iamge" />
+            </figure>
+            <span class="ml-2 d-sm-inline d-none">@btUser.FullName</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right dropdown-menu-big">
+            <div class="text-center py-4">
+                <figure class="avatar avatar-lg mb-3 border-0">
+                    <img src="@_BTFileService.ConvertByteArrayToFile(btUser.ImageFileData!, btUser.ImageFileType!, (int)DefaultImg.BTUserImg)" style="max-height: 75px;"
+                     class="rounded-circle"
+                     alt="user iamge" />
+                </figure>
+                <h5 class="text-center">@btUser.FullName</h5>
+                <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-outline-light btn-rounded">Manage Your Account</a>
+            </div>
+            <div class="list-group">
+                @*<a href="profile.html" class="list-group-item">View Profile</a>*@
+                <a class="dropdown-item list-group-item text-danger" href="javascript:document.getElementById('logoutForm').submit()"
+                data-sidebar-target="#settings">Sign Out!</a>
+            </div>
+        </div>
+    </li>
+}
+else
+{
+    <li>
+        <a class="textLight" asp-area="Identity" asp-page="/Account/Register">Register</a>
+    </li>
+    <li>
+        <a class="textLight" asp-area="Identity" asp-page="/Account/Login">Login</a>
+    </li>
+}
+<form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+</form>
+
+@*<div class="header-body-right">
     @if (SignInManager.IsSignedIn(User))
     {
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -37,7 +82,7 @@
     }
 </div>
 <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-</form>
+</form>*@
 
 @*<div class="dropdown py-sm-4 ms-auto ms-sm-0 flex-shrink-1">
 

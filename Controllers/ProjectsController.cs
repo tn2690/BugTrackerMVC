@@ -313,15 +313,9 @@ namespace BugTrackerMVC.Controllers
                 // set dates for Created, StartDate, EndDate
                 project.Created = DateTime.UtcNow;
 
-                if (project.StartDate != null)
-                {
-                    project.StartDate = DateTime.SpecifyKind(project.StartDate.Value, DateTimeKind.Utc); 
-                }
+                project.StartDate = PostgresDate.Format(project.StartDate);
 
-                if (project.EndDate != null)
-                {
-                    project.EndDate = DateTime.SpecifyKind(project.EndDate.Value, DateTimeKind.Utc);
-                }
+                project.EndDate = PostgresDate.Format(project.EndDate);
 
                 // set image
                 // check whether an image has been uploaded
@@ -386,16 +380,10 @@ namespace BugTrackerMVC.Controllers
                 {
                     // set dates for Created, StartDate, EndDate
                     project.Created = DateTime.SpecifyKind(project.Created, DateTimeKind.Utc);
+                    
+                    project.StartDate = DateTime.SpecifyKind(project.StartDate, DateTimeKind.Utc);
 
-                    if (project.StartDate != null)
-                    {
-                        project.StartDate = DateTime.SpecifyKind(project.StartDate.Value, DateTimeKind.Utc);
-                    }
-
-                    if (project.EndDate != null)
-                    {
-                        project.EndDate = DateTime.SpecifyKind(project.EndDate.Value, DateTimeKind.Utc);
-                    }
+                    project.EndDate = DateTime.SpecifyKind(project.EndDate, DateTimeKind.Utc);
 
                     // set image
                     // check whether an image has been uploaded

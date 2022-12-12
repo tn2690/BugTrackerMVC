@@ -28,11 +28,11 @@ namespace BugTrackerMVC.Models
 
         [DataType(DataType.DateTime)]
         [Display(Name = "Start Date")]
-        public DateTime? StartDate { get; set; }
+        public DateTime StartDate { get; set; }
 
         [DataType(DataType.DateTime)]
         [Display(Name = "End Date")]
-        public DateTime? EndDate { get; set; }
+        public DateTime EndDate { get; set; }
 
         // foreign key
         public int ProjectPriorityId { get; set; }
