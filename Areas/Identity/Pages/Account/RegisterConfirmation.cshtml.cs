@@ -46,9 +46,11 @@ namespace BugTrackerMVC.Areas.Identity.Pages.Account
             {
                 return RedirectToPage("/Index");
             }
+
             returnUrl = returnUrl ?? Url.Content("~/");
 
             var user = await _userManager.FindByEmailAsync(email);
+
             if (user == null)
             {
                 return NotFound($"Unable to load user with email '{email}'.");

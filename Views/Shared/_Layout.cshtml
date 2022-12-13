@@ -14,22 +14,22 @@
 
     <!-------------------------------------------- Gogi stylesheets start ------------------------------------------------->
     <!-- Favicon -->
-    <link rel="shortcut icon" href="../../assets/media/image/favicon.png" />
+    <link rel="shortcut icon" href="~/assets/media/image/favicon.png" />
 
     <!-- Main css -->
-    <link rel="stylesheet" href="../../vendors/bundle.css" type="text/css">
+    <link rel="stylesheet" href="~/vendors/bundle.css" type="text/css">
 
     <!-- Google font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Daterangepicker -->
-    <link rel="stylesheet" href="../../vendors/datepicker/daterangepicker.css" type="text/css">
+    <link rel="stylesheet" href="~/vendors/datepicker/daterangepicker.css" type="text/css">
 
     <!-- DataTable -->
-    <link rel="stylesheet" href="../../vendors/dataTable/datatables.min.css" type="text/css">
+    <link rel="stylesheet" href="~/vendors/dataTable/datatables.min.css" type="text/css">
 
     <!-- App css -->
-    <link rel="stylesheet" href="../../assets/css/app.min.css" type="text/css">
+    <link rel="stylesheet" href="~/assets/css/app.min.css" type="text/css">
     <!-------------------------------------------- Gogi stylesheets end --------------------------------------------------->
 
     <!-- Custom CSS -->
@@ -373,7 +373,7 @@
                             <span class="nav-link-icon">
                                 <i data-feather="shopping-cart"></i>
                             </span>
-                            <span>E-commerce</span>
+                            <span>Projects</span>
                             </a>
                             <ul>
                                 <li>
@@ -1710,6 +1710,13 @@
     </ul>
     }
     </li>
+    @if (User.IsInRole("Admin"))
+    {
+    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown">
+    <li><a class="dropdown-item" asp-area="" asp-controller="Invites" asp-action="Create">Company Invite</a></li>
+    </ul>
+    <a asp-action="Create" asp-controller="Invites">Company Invite</a>
+    }
     <li class="dropdown">
     <a asp-area="" asp-controller="Projects" asp-action="Index" class="nav-link dropdown-toggle px-sm-0 px-2" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
     <i class="fs-5 bi-file-earmark-ppt"></i><span class="ms-1 d-none d-sm-inline">Projects</span>

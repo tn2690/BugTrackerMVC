@@ -1,6 +1,6 @@
 ﻿namespace BugTrackerMVC.Helpers
 {
-    public class SetDate
+    public static class SetDate
     {
         public static DateTime Format(DateTime datetime)
         {
