@@ -34,8 +34,8 @@
                                 <div class="progress">
                                     @* Razor code block *@
                                     @{
-                                        var start = Model.StartDate;
-                                        var end = Model.EndDate;
+                                        var start = Model.StartDate!.Value;
+                                        var end = Model.EndDate!.Value;
                                         var today = DateTime.Now;
                                         var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
                                     }

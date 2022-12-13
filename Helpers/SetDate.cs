@@ -1,6 +1,6 @@
 ﻿namespace BugTrackerMVC.Helpers
 {
-    public class PostgresDate
+    public class SetDate
     {
         public static DateTime Format(DateTime datetime)
         {

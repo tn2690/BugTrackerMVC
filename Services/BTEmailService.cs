@@ -21,7 +21,7 @@ namespace BugTrackerMVC.Services
             MimeMessage newEmail = new();
             newEmail.Sender = MailboxAddress.Parse(emailSender);
 
-            foreach (string emailAddress in email.Split(";"))
+            foreach (string? emailAddress in email.Split(";"))
             {
                 newEmail.To.Add(MailboxAddress.Parse(emailAddress));
             }

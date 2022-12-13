@@ -6,7 +6,7 @@
 }
 
 <!-- Layout wrapper -->
-    <div class="layout-wrapper">
+@*    <div class="layout-wrapper">
 
         <!-- Header -->
         <div class="header d-print-none">
@@ -205,9 +205,9 @@
         </div>
         <!-- ./ Header -->
 
-</div>
+</div>*@
 
-@*<h3>@ViewData["Title"]</h3>
+<h3>@ViewData["Title"]</h3>
 <partial name="_StatusMessage" for="StatusMessage" />
 <div class="row">
     <div class="col-md-6">
@@ -239,7 +239,7 @@
             <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="w-100 btn btn-lg btn-primary rounded-pill my-2">Change email</button>
         </form>
     </div>
-</div>*@
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -49,8 +49,11 @@ namespace BugTrackerMVC.Controllers
         }
 
         // GET: Tickets/AllTickets
-        public async Task<IActionResult> AllTickets()
+        public async Task<IActionResult> AllTickets(string? swalMessage = null)
         {
+            // sweet alert message
+            ViewData["SwalMessage"] = swalMessage;
+
             int companyId = User.Identity!.GetCompanyId();
 
             // call service
@@ -148,7 +151,7 @@ namespace BugTrackerMVC.Controllers
                 TicketId = viewModel.Ticket!.Id,
                 Title = "Ticket Assignment",
                 Message = $"Ticket : {viewModel.Ticket.Title}, was assigned by {btUser.FullName}",
-                Created = PostgresDate.Format(DateTime.Now),
+                Created = SetDate.Format(DateTime.Now),
                 SenderId = btUser.Id,
                 RecipientId = viewModel.DevId
             };
@@ -277,7 +280,7 @@ namespace BugTrackerMVC.Controllers
                 // set date created, date updated
                 ticket.Created = DateTime.UtcNow;
 
-                ticket.Updated = PostgresDate.Format(DateTime.Now);
+                ticket.Updated = SetDate.Format(DateTime.Now);
 
                 // call service
                 await _btTicketService.AddTicketAsync(ticket);
@@ -292,13 +295,16 @@ namespace BugTrackerMVC.Controllers
                 // ticket notification
                 BTUser? projectManager = await _btProjectService.GetProjectManagerAsync(ticket.ProjectId);
 
+                // sweet alert
+                string? swalMessage = string.Empty;
+
                 Notification notification = new()
                 {
                     NotificationTypeId = (await _context.NotificationTypes.FirstOrDefaultAsync(n => n.Name == nameof(BTNotificationTypes.Ticket)))!.Id,
                     TicketId = ticket.Id,
                     Title = "New Ticket Added",
                     Message = $"New Ticket : {ticket.Title}, was assigned by {btUser.FullName}",
-                    Created = PostgresDate.Format(DateTime.Now),
+                    Created = SetDate.Format(DateTime.Now),
                     SenderId = userId,
                     RecipientId = projectManager?.Id
                 };
@@ -308,15 +314,23 @@ namespace BugTrackerMVC.Controllers
                 {
                     await _btNotificationService.AddNotificationAsync(notification);
                     await _btNotificationService.SendEmailNotificationAsync(notification, $"New Ticket Added for Project: {ticket.Project!.Name}");
+
+                    swalMessage = "Success: Email Sent to Recipients!";
+
+                    return RedirectToAction("AllTickets", "Tickets", new { swalMessage });
                 }
                 else
                 {
                     // send email to admins
                     await _btNotificationService.AdminNotificationAsync(notification, companyId);
                     await _btNotificationService.SendAdminEmailNotificationAsync(notification, $"New Ticket Added for Project: {ticket.Project!.Name}", companyId);
+
+                    swalMessage = "Success: Email Sent to Admins!";
+
+                    return RedirectToAction("AllTickets", "Tickets", new { swalMessage });
                 }
 
-                return RedirectToAction(nameof(AllTickets));
+                //return RedirectToAction(nameof(AllTickets));
             }
 
             //ViewData["DeveloperUserId"] = new SelectList(_context.Users, "Id", "Id", ticket.DeveloperUserId);
@@ -383,10 +397,7 @@ namespace BugTrackerMVC.Controllers
                     // set date created, date updated
                     ticket.Created = DateTime.SpecifyKind(ticket.Created, DateTimeKind.Utc);
 
-                    if (ticket.Updated != null)
-                    {
-                        ticket.Updated = DateTime.SpecifyKind(ticket.Updated.Value, DateTimeKind.Utc);
-                    }
+                    ticket.Updated = DateTime.SpecifyKind(ticket.Updated!.Value, DateTimeKind.Utc);
 
                     // call service
                     await _btTicketService.UpdateTicketAsync(ticket);
@@ -419,7 +430,7 @@ namespace BugTrackerMVC.Controllers
                     TicketId = ticket.Id,
                     Title = "Ticket Updated",
                     Message = $"Ticket : {ticket.Title}, was edited by {btUser.FullName}",
-                    Created = PostgresDate.Format(DateTime.Now),
+                    Created = SetDate.Format(DateTime.Now),
                     SenderId = userId,
                     RecipientId = projectManager?.Id
                 };
