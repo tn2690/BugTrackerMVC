@@ -25,14 +25,14 @@
                                 <div class="progress">
                                     @* Razor code block *@
                                     @{
-                                        //var start = Model.StartDate;
-                                        //var end = Model.EndDate;
-                                        //var today = DateTime.Now;
-                                        //var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
+                                        var start = Model.Project!.StartDate!.Value;
+                                        var end = Model.Project!.EndDate!.Value;
+                                        var today = DateTime.Now;
+                                        var percent = today >= end ? 100 : today < start ? 0 : Math.Round((today.Subtract(start)) / (end.Subtract(start)) * 100);
                                     }
-                                    @*<div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: @percent%;">*@
+                                    <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: @percent%;">
                                         @* Use Progress Bar code variable here *@
-                                        @*<span class="progress-value">@percent%</span>*@
+                                        <span class="progress-value">@percent%</span>
                                     </div>
                                 </div>
                             </div>
