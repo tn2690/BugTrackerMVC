@@ -79,16 +79,16 @@
                 @Html.DisplayFor(modelItem => item.IsValid)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Company.Name)
+                @Html.DisplayFor(modelItem => item.Company!.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Project.Description)
+                @Html.DisplayFor(modelItem => item.Project!.Description)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Invitor.Id)
+                @Html.DisplayFor(modelItem => item.Invitor!.Id)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Invitee.Id)
+                @Html.DisplayFor(modelItem => item.Invitee!.Id)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
@@ -99,3 +99,25 @@
 }
     </tbody>
 </table>
+
+@section scripts {
+    <!-- Sweet Alerts -->
+    <script>
+        let message = '@(ViewBag.SwalMessage)';
+        if (!message.includes("Error") && message != '') {
+            Swal.fire({
+                backdrop: false,
+                icon: 'success',
+                title: message,
+                showConfirmButton: true
+            })
+        } else if (message.includes("Error")) {
+            Swal.fire({
+                backdrop: false,
+                icon: 'error',
+                title: 'Oops...',
+                text: message
+            })
+        }
+    </script>
+}

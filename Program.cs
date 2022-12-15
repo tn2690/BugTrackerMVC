@@ -25,9 +25,6 @@ builder.Services.AddIdentity<BTUser, IdentityRole>(options => options.SignIn.Req
                 .AddClaimsPrincipalFactory<BTUserClaimsPrincipalFactory>()
                 .AddDefaultUI()
                 .AddDefaultTokenProviders();
-
-builder.Services.AddMvc();
-
 // custom services
 builder.Services.AddScoped<IBTFileService, BTFileService>();
 builder.Services.AddScoped<IBTRolesService, BTRolesService>();
@@ -40,6 +37,8 @@ builder.Services.AddScoped<IBTInviteService, BTInviteService>();
 builder.Services.AddScoped<IEmailSender, BTEmailService>();
 
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+
+builder.Services.AddMvc();
 
 var app = builder.Build();
 

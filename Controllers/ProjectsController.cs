@@ -317,6 +317,8 @@ namespace BugTrackerMVC.Controllers
 
                 project.EndDate = DateTime.SpecifyKind(project.EndDate!.Value, DateTimeKind.Utc);
 
+                // project.StartDate = SetDate.Format(DateTime.UtcNow);
+
                 // set image
                 // check whether an image has been uploaded
                 if (project.ImageFormFile != null)
