@@ -156,9 +156,16 @@ namespace BugTrackerMVC.Controllers
                 RecipientId = viewModel.DevId
             };
 
-            // add and send notification
+            // sweet alert
+            string? swalMessage = string.Empty;
 
-            return RedirectToAction("Details", new { id = viewModel.Ticket!.Id });
+            // add and send notification
+            await _btNotificationService.AddNotificationAsync(notification);
+            await _btNotificationService.SendEmailNotificationAsync(notification, "Ticket Assignment");
+
+            swalMessage = "Success: Email Sent to Developer!";
+
+            return RedirectToAction("AllTickets", "Tickets", new { swalMessage });
         }
 
         // POST: Tickets/AddComment
