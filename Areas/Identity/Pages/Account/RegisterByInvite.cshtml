@@ -2,18 +2,21 @@
 @model RegisterByInviteModel
 @{
     ViewData["Title"] = "Register By Invite";
-    Layout = null;
+    Layout = "/Views/Shared/_LoginLayout.cshtml";
 }
 
-<h1>@ViewData["Title"]</h1>
+<body class="form-membership">
 
-<div class="row">
-    <div class="col-md-4">
+    <div class="form-wrapper">
+
         <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
             <input hidden asp-for="Input.CompanyId" />
             <input hidden asp-for="Input.ProjectId" />
-            <h2>Create a new account.</h2>
+
+            <h1>Welcome!</h1>
+            <p>Create a new account to begin.
             <hr />
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-floating">
                 <input asp-for="Input.Company" class="form-control" disabled />
@@ -46,10 +49,12 @@
                 <label asp-for="Input.ConfirmPassword"></label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+            <button id="registerSubmit" type="submit" class="btn btn-lg btn-primary rounded-pill">Register</button>
         </form>
+
     </div>
-</div>
+
+</body>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

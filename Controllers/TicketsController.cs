@@ -93,7 +93,7 @@ namespace BugTrackerMVC.Controllers
             string userId =_userManager.GetUserId(User);
 
             // call service
-            List<Ticket> tickets = (await _btTicketService.GetAllTicketsByCompanyIdAsync(companyId)).Where(t => t.DeveloperUserId == userId).ToList();
+            List<Ticket> tickets = (await _btTicketService.GetTicketsByUserIdAsync(userId, companyId)).ToList();
 
             return View(tickets);
         }
@@ -132,6 +132,9 @@ namespace BugTrackerMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignDeveloper(AssignDevViewModel viewModel)
         {
+            // sweet alert
+            string? swalMessage = string.Empty;
+
             if (viewModel.Ticket?.Id != null)
             {
                 // validate Dev id of viewModel
@@ -140,32 +143,32 @@ namespace BugTrackerMVC.Controllers
                     // call service to add Dev
                     await _btTicketService.AssignDeveloperAsync(viewModel.Ticket.Id, viewModel.DevId);
                 }
+
+                // add ticket notification
+                BTUser btUser = await _userManager.GetUserAsync(User);
+
+                Notification notification = new()
+                {
+                    NotificationTypeId = (await _context.NotificationTypes.FirstOrDefaultAsync(n => n.Name == nameof(BTNotificationTypes.Ticket)))!.Id,
+                    TicketId = viewModel.Ticket!.Id,
+                    Title = "Ticket Assignment",
+                    Message = $"Ticket : {viewModel.Ticket.Title}, was assigned by {btUser.FullName}",
+                    Created = SetDate.Format(DateTime.Now),
+                    SenderId = btUser.Id,
+                    RecipientId = viewModel.DevId
+                };
+
+                // add and send notification
+                await _btNotificationService.AddNotificationAsync(notification);
+                await _btNotificationService.SendEmailNotificationAsync(notification, "Ticket Assignment");
+
+                swalMessage = "Success: Email Sent to Developer!";
+
+                return RedirectToAction("AllTickets", "Tickets", new { swalMessage });
             }
 
-            // add ticket notification
-            BTUser btUser = await _userManager.GetUserAsync(User);
-
-            Notification notification = new()
-            {
-                NotificationTypeId = (await _context.NotificationTypes.FirstOrDefaultAsync(n => n.Name == nameof(BTNotificationTypes.Ticket)))!.Id,
-                TicketId = viewModel.Ticket!.Id,
-                Title = "Ticket Assignment",
-                Message = $"Ticket : {viewModel.Ticket.Title}, was assigned by {btUser.FullName}",
-                Created = SetDate.Format(DateTime.Now),
-                SenderId = btUser.Id,
-                RecipientId = viewModel.DevId
-            };
-
-            // sweet alert
-            string? swalMessage = string.Empty;
-
-            // add and send notification
-            await _btNotificationService.AddNotificationAsync(notification);
-            await _btNotificationService.SendEmailNotificationAsync(notification, "Ticket Assignment");
-
-            swalMessage = "Success: Email Sent to Developer!";
-
-            return RedirectToAction("AllTickets", "Tickets", new { swalMessage });
+            // check this
+            return RedirectToAction("AssignDeveloper", "Tickets", new { swalMessage });
         }
 
         // POST: Tickets/AddComment
@@ -284,10 +287,8 @@ namespace BugTrackerMVC.Controllers
                 // set submitter user id
                 ticket.SubmitterUserId = _userManager.GetUserId(User);
 
-                // set date created, date updated
+                // set date created
                 ticket.Created = DateTime.UtcNow;
-
-                ticket.Updated = SetDate.Format(DateTime.Now);
 
                 // call service
                 await _btTicketService.AddTicketAsync(ticket);
@@ -402,9 +403,9 @@ namespace BugTrackerMVC.Controllers
                 try
                 {
                     // set date created, date updated
-                    ticket.Created = DateTime.SpecifyKind(ticket.Created, DateTimeKind.Utc);
+                    ticket.Created = SetDate.Format(ticket.Created);
 
-                    ticket.Updated = DateTime.SpecifyKind(ticket.Updated!.Value, DateTimeKind.Utc);
+                    ticket.Updated = SetDate.Format(DateTime.Now);
 
                     // call service
                     await _btTicketService.UpdateTicketAsync(ticket);

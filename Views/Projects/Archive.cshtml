@@ -1,85 +1,64 @@
 ﻿@model BugTrackerMVC.Models.Project
+@using BugTrackerMVC.Services.Interfaces
+@using BugTrackerMVC.Models.Enums
+@using Microsoft.AspNetCore.Identity
+@inject IBTFileService _BTFileService
+@inject IBTProjectService _BTProjectService
+@inject UserManager<BTUser> _UserManager
 
 @{
     ViewData["Title"] = "Archive Project";
+    BTUser? projectManager = await _BTProjectService.GetProjectManagerAsync(Model.Id);
+    string btUser = _UserManager.GetUserId(User);
 }
 
-<div>
-    <h1>Archive</h1>
-    <h3>Are you sure you want to archive this project?</h3>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Created)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Created)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StartDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StartDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EndDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EndDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageFileType)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageFileType)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Archived)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Archived)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Company)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Company!.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Members)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Members)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Tickets)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Tickets)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProjectPriority)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProjectPriority!.Name)
-        </dd>
-    </dl>
-    
-    <form asp-action="Archive" method="post">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Archive" class="btn btn-danger rounded-pill" /> |
-        <a asp-action="AllProjects">Back to List</a>
-    </form>
+<div class="row">
+    <div class="col-12 col-md-8 offset-md-2">
+        <h2>Are you sure?</h2>
+        <p class="text-lead text-muted">This project will be archived. It will be moved to Archived Projects.</p>
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-md-4 square-img-container">
+                    <img src="@_BTFileService.ConvertByteArrayToFile(@Model.ImageFileData!, @Model.ImageFileType!, (int)DefaultImg.ProjectImg)" class="square-img rounded-start" style="max-width: 100%;" alt="blog post pictures">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">@Model.Name</h5>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Date Created:</span>@Model.Created.ToString("MMM dd, yyyy")
+                        </div>
+                        <br />
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Start Date:</span>@Model.StartDate!.Value.ToString("MMM dd, yyyy")
+                        </div>
+                        <br />
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Deadline:</span>@Model.EndDate!.Value.ToString("MMM dd, yyyy")
+                        </div>
+                        <br />
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Project Managers:</span>@(projectManager?.FullName ?? "Unassigned")
+                        </div>
+                        <br />
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Members:</span>@foreach (BTUser member in Model.Members)
+                            {
+                                @member.FullName
+                                <text><small><i> [@string.Join(",", await _UserManager.GetRolesAsync(member))] <br> </i></small></text>
+                            }
+                        </div>
+                        <br />
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Number of Tickets:</span>@Model.Tickets.Count()
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form class="d-flex justify-content-between" asp-action="Archive" asp-route-id="@Model.Id">
+            <input hidden asp-for="Id" />
+            <a asp-action="AllProjects" asp-controller="Projects" class="btn btn-outline-secondary rounded-pill btnLink">Cancel</a>
+            <button type="submit" class="btn btn-danger rounded-pill btnLink">Archive</button>
+        </form>
+    </div>
 </div>
