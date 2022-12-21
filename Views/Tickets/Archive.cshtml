@@ -4,87 +4,45 @@
     ViewData["Title"] = "Archive Ticket";
 }
 
-<div>
-    <h1>Archive</h1>
-    <h3>Are you sure you want to archive this ticket?</h3>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Created)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Created)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Updated)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Updated)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Archived)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Archived)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ArchivedByProject)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ArchivedByProject)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Project)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Project!.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketPriority)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TicketPriority!.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketType)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TicketType!.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketStatus)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TicketStatus!.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DeveloperUser)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DeveloperUser!.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SubmitterUser)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SubmitterUser!.FullName)
-        </dd>
-    </dl>
-    
-    <form asp-action="Archive" method="post">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Archive" class="btn btn-danger rounded-pill" /> |
-        <a asp-action="AllTickets">Back to List</a>
-    </form>
+<div class="row">
+    <div class="col-12 col-md-8 offset-md-2">
+        <h2>Are you sure?</h2>
+        <p class="text-lead text-muted">This ticket will be archived. It will be moved to Archived Tickets.</p>
+
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-12 col-lg-12">
+                    <div class="card-body">
+                        <h5 class="card-title">@Model.Title</h5>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Date Created:</span>@Model.Created.ToString("MMM dd, yyyy")
+                        </div>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Project:</span>@Model.Project!.Name
+                        </div>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Ticket Type:</span>@Model.TicketType!.Name
+                        </div>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Ticket Status:</span>@Model.TicketStatus!.Name
+                        </div>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Developer:</span>@(Model.DeveloperUser?.FullName ?? "Unassigned")
+                        </div>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Submitted by: </span>@Model.SubmitterUser!.FullName
+                        </div>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Updated:</span>@(Model.Updated?.ToString("MMM dd, yyyy") ?? "No date available")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form class="d-flex justify-content-between" asp-action="Archive" asp-route-id="@Model.Id">
+            <input hidden asp-for="Id" />
+            <a asp-action="AllTickets" asp-controller="Tickets" class="btn btn-outline-secondary rounded-pill btnLink">Cancel</a>
+            <button type="submit" class="btn btn-danger rounded-pill btnLink">Archive</button>
+        </form>
+    </div>
 </div>
