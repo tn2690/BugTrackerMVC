@@ -4,7 +4,50 @@
     ViewData["Title"] = "Delete";
 }
 
-<div>
+<div class="row">
+    <div class="col-12 col-md-8 offset-md-2">
+        <h2>Are you sure?</h2>
+        <p class="text-lead text-muted">This ticket will be restored. It will be moved to All Tickets.</p>
+
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-12 col-lg-12">
+                    <div class="card-body">
+                        <h5 class="card-title">@Model.Title</h5>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Date Created:</span>@Model.Created.ToString("MMM dd, yyyy")
+                        </div>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Project:</span>@Model.Project!.Name
+                        </div>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Ticket Type:</span>@Model.TicketType!.Name
+                        </div>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Ticket Status:</span>@Model.TicketStatus!.Name
+                        </div>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Developer:</span>@(Model.DeveloperUser?.FullName ?? "Unassigned")
+                        </div>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Submitted by: </span>@Model.SubmitterUser!.FullName
+                        </div>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Updated:</span>@(Model.Updated?.ToString("MMM dd, yyyy") ?? "No date available")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form class="d-flex justify-content-between" asp-action="Restore" asp-route-id="@Model.Id">
+            <input hidden asp-for="Id" />
+            <a asp-action="ArchivedTickets" asp-controller="Tickets" class="btn btn-outline-secondary rounded-pill btnLink">Cancel</a>
+            <button type="submit" class="btn btn-danger rounded-pill btnLink">Restore</button>
+        </form>
+    </div>
+</div>
+
+@*<div>
     <h1>Restore</h1>
     <h3>Are you sure you want to restore this ticket?</h3>
     <dl class="row">
@@ -87,4 +130,4 @@
         <input type="submit" value="Restore" class="btn btn-success rounded-pill" /> |
         <a asp-action="ArchivedTickets">Back to List</a>
     </form>
-</div>
+</div>*@

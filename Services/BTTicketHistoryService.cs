@@ -7,13 +7,20 @@ namespace BugTrackerMVC.Services
 {
     public class BTTicketHistoryService : IBTTicketHistoryService
     {
+        #region Properties
         private readonly ApplicationDbContext _context;
 
+        #endregion
+
+        #region Constructor
         public BTTicketHistoryService(ApplicationDbContext context)
         {
             _context = context;
         }
 
+        #endregion
+
+        #region Add History (1)
         public async Task AddHistoryAsync(Ticket oldTicket, Ticket newTicket, string userId)
         {
             // new ticket has been added
@@ -153,6 +160,9 @@ namespace BugTrackerMVC.Services
             }
         }
 
+        #endregion
+
+        #region Add History (2)
         public async Task AddHistoryAsync(int ticketId, string model, string userId)
         {
             try
@@ -183,6 +193,9 @@ namespace BugTrackerMVC.Services
             }
         }
 
+        #endregion
+
+        #region Get Project Tickets Histories
         public async Task<List<TicketHistory>> GetProjectTicketsHistoriesAsync(int projectId, int companyId)
         {
             try
@@ -190,7 +203,7 @@ namespace BugTrackerMVC.Services
                 Project? project = await _context.Projects.Where(p => p.CompanyId == companyId)
                                                           .Include(p => p.Tickets)
                                                                 .ThenInclude(t => t.History)
-                                                                .ThenInclude(h => h.BTUser)
+                                                                    .ThenInclude(h => h.BTUser)
                                                           .FirstOrDefaultAsync(p => p.Id == projectId);
 
                 List<TicketHistory> ticketHistory = project!.Tickets.SelectMany(t => t.History).ToList();
@@ -204,6 +217,9 @@ namespace BugTrackerMVC.Services
             }
         }
 
+        #endregion
+
+        #region Get Company Tickets Histories
         public async Task<List<TicketHistory>> GetCompanyTicketsHistoriesAsync(int companyId)
         {
             try
@@ -211,8 +227,8 @@ namespace BugTrackerMVC.Services
                 List<Project> projects = (await _context.Companies
                                                         .Include(c => c.Projects)
                                                                 .ThenInclude(p => p.Tickets)
-                                                                .ThenInclude(t => t.History)
-                                                                    .ThenInclude(h => h.BTUser)
+                                                                    .ThenInclude(t => t.History)
+                                                                        .ThenInclude(h => h.BTUser)
                                                         .FirstOrDefaultAsync(c => c.Id == companyId))!.Projects.ToList();
 
                 List<Ticket> tickets = projects.SelectMany(p => p.Tickets).ToList();
@@ -227,5 +243,7 @@ namespace BugTrackerMVC.Services
                 throw;
             }
         }
+
+        #endregion
     }
 }
