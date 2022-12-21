@@ -5,129 +5,59 @@
     ViewData["Title"] = "Add Members";
 }
 
-<div class="container mt-5">
+<h3 class="my-5">Add Developer(s) & Submitter(s)</h3>
 
-    <h3 class="my-5">Add Developer(s) & Submitter(s)</h3>
-    <div class="row">
-        <div class="col-12 col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">@Model.Project!.Name</div>
-                </div>
-                <div class="card-body">
-                    <div class="col-12 col-lg-12 mt-3">
-                        <form asp-action="AddMembers" method="post" class="d-flex flex-column">
-                            <select asp-items="Model.SubList" class="d-none" multiple asp-for="SelectedSubmitters">
-                            </select>
-                            <input type="hidden" asp-for="Project!.Id" />
+<div class="row">
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">@Model.Project!.Name</div>
+            </div>
+            <div class="card-body">
+                <div class="col-12 col-lg-12">
+                    <form asp-action="AddMembers" method="post" class="d-flex flex-column">
+                        <select asp-items="Model.SubList" class="d-none" multiple asp-for="SelectedSubmitters">
+                        </select>
+                        <input type="hidden" asp-for="Project!.Id" />
 
-                            <label asp-for="DevId" class="control-label">Developers</label>
-                            <select asp-items="Model.DevList" class="form-select" multiple asp-for="SelectedDevelopers">
-                            </select>
-                            <button type="submit" class="btn btn-primary my-2">Save</button>
-                            <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-secondary my-2">Cancel</a>
-                        </form>
-                    </div>
+                        <label asp-for="DevId" class="control-label">Developers</label>
+                        <select asp-items="Model.DevList" class="form-select" multiple asp-for="SelectedDevelopers">
+                        </select>
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="w-15 btn btn-primary rounded-pill my-2">Save</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-12 col-lg-6">
-            <div class="card my-5">
-                <div class="card-body">
-                    <div class="col-12 col-lg-12 mt-3">
-                        <form asp-action="AddMembers" method="post" class="d-flex flex-column">
-                            <select asp-items="Model.DevList" class="d-none" multiple asp-for="SelectedDevelopers">
-                            </select>
-                            <input type="hidden" asp-for="Project!.Id" />
+    <div class="col-12 col-lg-6">
+        <div class="card my-5">
+            <div class="card-body">
+                <div class="col-12 col-lg-12">
+                    <form asp-action="AddMembers" method="post" class="d-flex flex-column">
+                        <select asp-items="Model.DevList" class="d-none" multiple asp-for="SelectedDevelopers">
+                        </select>
+                        <input type="hidden" asp-for="Project!.Id" />
 
-                            <label asp-for="SubId" class="control-label">Submitters</label>
-                            <select asp-items="Model.SubList" class="form-select" multiple asp-for="SelectedSubmitters">
-                            </select>
-                            <button type="submit" class="btn btn-primary my-2">Save</button>
-                            <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-secondary my-2">Cancel</a>
-                        </form>
-                    </div>
+                        <label asp-for="SubId" class="control-label">Submitters</label>
+                        <select asp-items="Model.SubList" class="form-select" multiple asp-for="SelectedSubmitters">
+                        </select>
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" class="w-15 btn btn-primary rounded-pill my-2">Save</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-
     </div>
 
-    <div class="my-2">
-        <a asp-action="AllProjects">Back to List</a>
-    </div>
 </div>
 
-@*<div class="container mt-5">
-
-    <div class="d-flex justify-content-start mt-5 flex-column align-items-center">
-
-        <h3 class="my-5">Add Developer(s) & Submitter(s)</h3>
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">@Model.Project!.Name</div>
-            </div>
-            <div class="card-body">
-                <div class="col-12 col-lg-12 mt-3">
-                    <form asp-action="AddMembers" method="post" class="d-flex flex-column">
-                        <label asp-for="DevId" class="control-label">Developers</label>
-                        <select asp-items="Model.DevList" class="form-select" multiple asp-items="ViewBag.DevList">
-                        </select>
-                        <button type="submit" class="btn btn-primary my-2">Save</button>
-                        <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-secondary my-2">Cancel</a>
-                    </form>
-                </div>
-            </div>
-
-            <div class="card my-5">
-                <div class="card-header">
-                    <div class="card-title">@Model.Project!.Name</div>
-                </div>
-                <div class="card-body">
-                    <div class="col-12 col-lg-12 mt-3">
-                        <form asp-action="AddMembers" method="post" class="d-flex flex-column">
-                            <label asp-for="SubId" class="control-label">Submitters</label>
-                            <select asp-items="Model.SubList" class="form-select" multiple asp-items="ViewBag.SubList">
-                            </select>
-                            <button type="submit" class="btn btn-primary my-2">Save</button>
-                            <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-secondary my-2">Cancel</a>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="my-2">
-            <a asp-action="AllProjects">Back to List</a>
-        </div>
-    </div>*@
-
-@*<div class="d-flex justify-content-end mt-2 flex-column align-items-center">
-
-        <h3 class="my-5">Add Submitter</h3>
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">@Model.Project!.Name</div>
-            </div>
-            <div class="card-body">
-                <div class="col-12 col-lg-12 mt-3">
-                    <form asp-action="AddMembers" method="post" class="d-flex flex-column">
-                        <label asp-for="SubId" class="control-label">Submitters</label>
-                        <select asp-items="Model.SubList" class="form-select" multiple asp-items="ViewBag.SubList">
-                        </select>
-                        <button type="submit" class="btn btn-primary my-2">Save</button>
-                        <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-secondary my-2">Cancel</a>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="my-2">
-            <a asp-action="AllProjects">Back to List</a>
-        </div>
-    </div>*@
-@*</div>*@
+<div>
+    <a asp-action="AllProjects" class="btn btn-primary rounded-pill">Back to List</a>
+</div>
 
 @section Scripts {
     @{

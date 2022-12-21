@@ -244,7 +244,7 @@ namespace BugTrackerMVC.Services
             List<Ticket>? tickets = (await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId))
                                                             .Where(p => p.Archived == false)
                                                             .SelectMany(p => p.Tickets!)
-                                                            .Where(t => t.Archived | t.ArchivedByProject)
+                                                            .Where(t => t.Archived == false | t.ArchivedByProject == false)
                                                             .ToList();
 
             try
@@ -271,7 +271,7 @@ namespace BugTrackerMVC.Services
                     List<Ticket>? submittedTickets = tickets.Where(t => t.SubmitterUserId == userId)
                                                             .ToList();
 
-                    tickets = projectTickets.Concat(submittedTickets).ToList();
+                    return tickets = projectTickets.Concat(submittedTickets).ToList();
                 }
 
                 return tickets;

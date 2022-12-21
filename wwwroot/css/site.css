@@ -19,7 +19,7 @@
 }
 
 
-/*html {
+html {
   font-size: 14px;
 }
 
@@ -36,7 +36,7 @@ html {
 
 body {
   margin-bottom: 60px;
-}*/
+}
 
 /*--------- Styles for Sticky Footer Start ----------*/
 
@@ -45,19 +45,19 @@ body {
     100% tall
     takes up all visible space */
 
-html,
+/*html,
 body {
     height: 100%;
-}
+}*/
 
 /* body tag 
             cardboard box
             making the body a flex box */
 
-body {
+/*body {
     display: flex;
     flex-direction: column;
-}
+}*/
 
 /* content 
             grow = 1
@@ -66,18 +66,18 @@ body {
             can change content to main - same effect
             margin-top navbar fixed to the top */
 
-.content {
-    flex: 1 0 auto;
+/*.content {
+    flex: 1 0 auto;*/
     /* to offset the nav bar height */
-    margin-top: 4.75rem;
-}
+    /*margin-top: 4.75rem;
+}*/
 
 /* footer tag 
             shrinking the footer as small as possible */
 
-footer {
+/*footer {
     flex-shrink: 0;
-}
+}*/
 
 /*--------- Styles for Sticky Footer Stop ----------*/
 
@@ -98,15 +98,74 @@ footer {
     color: var(--tn-text-light-color);
 }
 
+.textDark {
+    color: var(--tn-text-dark-color);
+}
+
 .BTUserCommentImg {
     height: 60px;
     width: 60px;
 }
 
-.textPul {
+.textCrusher {
     color: red;
 }
 
 .textInsect {
     color: green;
+}
+
+/*--------- button overrides start ----------*/
+.btn-outline-primary {
+    color: var(--tn-background-color); /* change color of button */
+    border-color: var(--tn-nav-toggler-glow) !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:active,
+.btn-outline-primary:focus {
+    border-color: var(--tn-nav-toggler-glow);
+    background-color: var(--tn-secondary-color);
+    color: var(--tn-text-light-color) !important;
+}
+
+.btn-primary {
+    color: var(--tn-text-light-color); /* change color of text button */
+    background-color: var(--tn-secondary-color) !important;
+    border-color: var(--tn-nav-toggler-glow);
+}
+
+    .btn-primary:hover {
+        filter: brightness(1.1) !important;
+        border-color: var(--tn-nav-toggler-glow) !important;
+    }
+
+    .btn-primary:active,
+    .btn-primary:visited,
+    .btn-primary:focus {
+        filter: brightness(1.1) !important;
+        border-color: var(--tn-nav-toggler-glow);
+    }
+/*--------- button overrides start ----------*/
+
+/* square image */
+.square-img-container {
+    position: relative;
+    background-color: var(--tn-background-color);
+    border-color: var(--tn-light-color);
+    border-style: solid;
+}
+
+    .square-img-container::after {
+        content: "";
+        display: block;
+        padding-bottom: 100%;
+    }
+
+.square-img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
 }

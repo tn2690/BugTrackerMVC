@@ -1,10 +1,69 @@
 ﻿@model BugTrackerMVC.Models.Project
+@using BugTrackerMVC.Services.Interfaces
+@using BugTrackerMVC.Models.Enums
+@using Microsoft.AspNetCore.Identity
+@inject IBTFileService _BTFileService
+@inject IBTProjectService _BTProjectService
+@inject UserManager<BTUser> _UserManager
 
 @{
     ViewData["Title"] = "Restore Project";
+    BTUser? projectManager = await _BTProjectService.GetProjectManagerAsync(Model.Id);
+    string btUser = _UserManager.GetUserId(User);
 }
 
-<div>
+<div class="row">
+    <div class="col-12 col-md-8 offset-md-2">
+        <h2>Are you sure?</h2>
+        <p class="text-lead text-muted">This project will be restored. It will be moved to All Projects.</p>
+        <div class="card mb-3">
+            <div class="row g-0">
+                <div class="col-md-4 square-img-container">
+                    <img src="@_BTFileService.ConvertByteArrayToFile(@Model.ImageFileData!, @Model.ImageFileType!, (int)DefaultImg.ProjectImg)" class="square-img rounded-start" style="max-width: 100%;" alt="blog post pictures">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">@Model.Name</h5>
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Date Created:</span>@Model.Created.ToString("MMM dd, yyyy")
+                        </div>
+                        <br />
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Start Date:</span>@Model.StartDate!.Value.ToString("MMM dd, yyyy")
+                        </div>
+                        <br />
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Deadline:</span>@Model.EndDate!.Value.ToString("MMM dd, yyyy")
+                        </div>
+                        <br />
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Project Managers:</span>@(projectManager?.FullName ?? "Unassigned")
+                        </div>
+                        <br />
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Members:</span>@foreach (BTUser member in Model.Members)
+                            {
+                                @member.FullName
+                                <text><small><i> [@string.Join(",", await _UserManager.GetRolesAsync(member))] <br> </i></small></text>
+                            }
+                        </div>
+                        <br />
+                        <div class="card-text">
+                            <span class="fw-bold me-2">Number of Tickets:</span>@Model.Tickets.Count()
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form class="d-flex justify-content-between" asp-action="Restore" asp-route-id="@Model.Id">
+            <input hidden asp-for="Id" />
+            <a asp-action="ArchivedProjects" asp-controller="Projects" class="btn btn-outline-secondary rounded-pill btnLink">Cancel</a>
+            <button type="submit" class="btn btn-success rounded-pill btnLink">Restore</button>
+        </form>
+    </div>
+</div>
+
+@*<div>
     <h1>Restore</h1>
     <h3>Are you sure you want to restore this project?</h3>
     <hr />
@@ -82,4 +141,4 @@
         <input type="submit" value="Restore" class="btn btn-success rounded-pill" /> |
         <a asp-action="ArchivedProjects">Back to List</a>
     </form>
-</div>
+</div>*@

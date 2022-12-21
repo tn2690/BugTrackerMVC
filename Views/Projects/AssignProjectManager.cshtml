@@ -5,30 +5,34 @@
     ViewData["Title"] = "Assign Project Manager";
 }
 
-<div class="container mt-5">
-
 <div class="d-flex justify-content-center mt-5 flex-column align-items-center">
 
-        <h3 class="my-5">Assign Project Manager</h3>
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title">@Model.Project!.Name</div>
-            </div>
-            <div class="card-body">
-                <form asp-action="AssignProjectManager" method="post" class="d-flex flex-column">
-                    <input type="hidden" asp-for="Project!.Id" />
-                    <select asp-items="Model.PMList" asp-for="PMId">
-                        <option value="">Unassigned</option>
-                    </select>
-                    <button type="submit" class="btn btn-primary my-2">Save</button>
-                    <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-secondary my-2">Cancel</a>
-                </form>
+    <h3 class="my-5">Assign Project Manager</h3>
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">@Model.Project!.Name</div>
+        </div>
+        <div class="card-body">
+            <form asp-action="AssignProjectManager" method="post" class="d-flex flex-column">
+                <input type="hidden" asp-for="Project!.Id" />
+                <select asp-items="Model.PMList" asp-for="PMId">
+                    <option value="">Unassigned</option>
+                </select>
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-primary rounded-pill my-3 mx-2">Save</button>
+                    <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-secondary rounded-pill my-3">Cancel</a>
+                </div>
+            </form>
+
+            <div class="d-flex justify-content-center">
+                <a asp-action="AllProjects" class="btn btn-primary rounded-pill">Back to List</a>
             </div>
         </div>
     </div>
-
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    }

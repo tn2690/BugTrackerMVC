@@ -19,6 +19,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using BugTrackerMVC.Data;
+using BugTrackerMVC.Models.Enums;
 
 namespace BugTrackerMVC.Areas.Identity.Pages.Account
 {
@@ -30,13 +32,15 @@ namespace BugTrackerMVC.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<BTUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _context;
 
         public RegisterModel(
             UserManager<BTUser> userManager,
             IUserStore<BTUser> userStore,
             SignInManager<BTUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,6 +48,7 @@ namespace BugTrackerMVC.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         /// <summary>
@@ -76,15 +81,34 @@ namespace BugTrackerMVC.Areas.Identity.Pages.Account
             ///     directly from your code. This API may change or be removed in future releases.
             /// </summary>
 
+            /// <summary>
+            /// new user's first name
+            /// </summary>
             [Required]
             [Display(Name = "First Name")]
             [StringLength(50, ErrorMessage = "The {0} must be at least {2} and max {1} characters long.", MinimumLength = 2)]
             public string FirstName { get; set; }
 
+            /// <summary>
+            /// new user's last name
+            /// </summary>
             [Required]
             [Display(Name = "Last Name")]
             [StringLength(50, ErrorMessage = "The {0} must be at least {2} and max {1} characters long.", MinimumLength = 2)]
             public string LastName { get; set; }
+
+            /// <summary>
+            /// name of company
+            /// </summary>
+            [Required]
+            [Display(Name = "Company Name")]
+            public string CompanyName { get; set; }
+
+            /// <summary>
+            /// description of company
+            /// </summary>
+            [Display(Name = "Company Description")]
+            public string CompanyDesc { get; set; }
 
             [Required]
             [EmailAddress]
@@ -124,7 +148,18 @@ namespace BugTrackerMVC.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
+                // create new company
+                Company company = new()
+                {
+                    Name = Input.CompanyName,
+                    Description = Input.CompanyDesc
+                };
+
+                await _context.AddAsync(company);
+                await _context.SaveChangesAsync();
+
+                // create new user
+                var user = CreateUser(company.Id);
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -133,6 +168,8 @@ namespace BugTrackerMVC.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    await _userManager.AddToRoleAsync(user, nameof(BTRoles.Admin));
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -166,7 +203,7 @@ namespace BugTrackerMVC.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private BTUser CreateUser()
+        private BTUser CreateUser(int companyId)
         {
             try
             {
@@ -174,6 +211,7 @@ namespace BugTrackerMVC.Areas.Identity.Pages.Account
 
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
+                user.CompanyId = companyId;
 
                 return user;
             }

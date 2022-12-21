@@ -3,83 +3,99 @@
 
 @model IEnumerable<ManageUserRolesViewModel>
 
-    <div class="content-wrapper">
 
-        <!-- Navigation -->
+<!-- DataTable -->
+<link rel="stylesheet" href="~/vendors/dataTable/datatables.min.css" type="text/css">
 
-        <div class="content-body">
-
-            <div class="content ">
-                <!-- Components.... -->
-
-                <h2 class="m-t-0 h3"><b>Manage Member Roles </b></h2>
+<div class="card">
+    <div class="card-body">
+        <h2 class="m-t-0 h3"><b>Manage Member Roles </b></h2>
+        <table id="membersTable" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        Member Name
+                    </th>
+                    <th>
+                        Role(s)
+                    </th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
                 @foreach (var viewModel in Model)
                 {
-                    <div class="row">
-                        <div class="card col-4 m-3">
-                            <div class="card-body">
-                                <p class="text-muted font-13 m-b-30">
-                                    This form displays the current roles assigned to the user: <strong class="text-info">@viewModel.BTUser!.FullName</strong>.
-                                    Use the dropdown to select the roles this user should be assigned.
-                                    Once roles are selected, click "Assign Roles" to submit the form.
-                                </p>
-                                <hr />
-                                <form asp-action="ManageUserRoles" asp-controller="Companies" method=post>
-                                    <input type="hidden" asp-for="@viewModel.BTUser.Id" />
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <div class="form-group">
-                                                <label asp-for="@viewModel.Roles" class="custom-label"> Roles for @viewModel.BTUser.FullName </label>
-                                                <select asp-for="@viewModel.SelectedRoles" class="form-control" asp-items="@viewModel.Roles">
-                                                </select>
-                                                <hr />
-                                            </div>
-                                            <div class="form-group">
-                                                <input type="submit" value="Assign Role" class="btn btn-info" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
+                    <tr>
+                        <form asp-action="ManageUserRoles" asp-controller="Companies" method=post>
+                            <input type="hidden" asp-for="@viewModel.BTUser!.Id" />
+                        <td>
+                                @viewModel.BTUser!.FullName
+                        </td>
+                        <td>
+                            <select asp-for="@viewModel.SelectedRoles" class="form-control" style="height: 100px;" asp-items="@viewModel.Roles">
+                            </select>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <input type="submit" value="Assign Role" class="btn btn-primary rounded-pill" />
                             </div>
-                        </div>
-                    </div>
+                        </td>
+                        </form>
+                    </tr>
                 }
-            </div>
-        </div>
 
+            </tbody>
+        </table>
     </div>
+</div>
 
-@*<div class="row">
-    <h2 class="m-t-0 h3"><b>Manage Member Roles </b></h2>
-    @foreach (var viewModel in Model) 
-    {
-        <div class="row">
-            <div class="card col-4 m-3">
-                <div class="card-body">
-                    <p class="text-muted font-13 m-b-30">
-                        This form displays the current roles assigned to the user: <strong class="text-info">@viewModel.BTUser!.FullName</strong>.
-                        Use the dropdown to select the roles this user should be assigned.
-                        Once roles are selected, click "Assign Roles" to submit the form.
-                    </p>
-                    <hr />
-                    <form asp-action="ManageUserRoles" asp-controller="Companies" method=post>
-                        <input type="hidden" asp-for="@viewModel.BTUser.Id" />
-                        <div class="row">
-                            <div class="col-6">
-                                <div class="form-group">
-                                    <label asp-for="@viewModel.Roles" class="custom-label"> Roles for @viewModel.BTUser.FullName </label>
-                                    <select asp-for="@viewModel.SelectedRoles" class="form-control" asp-items="@viewModel.Roles">
-                                    </select>
-                                    <hr />
-                                </div>
-                                <div class="form-group">
-                                    <input type="submit" value="Assign Role" class="btn btn-info" />
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    }
-</div>*@
+@*<h2 class="m-t-0 h3"><b>Manage Member Roles </b></h2>
+<table id="membersTable" class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>
+                Member Name
+            </th>
+            <th>
+                Role(s)
+            </th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var viewModel in Model)
+        {
+            <tr>
+                <form asp-action="ManageUserRoles" asp-controller="Companies" method=post>
+                    <input type="hidden" asp-for="@viewModel.BTUser!.Id" />
+                <td>
+                        @viewModel.BTUser!.FullName
+                </td>
+                <td>
+                    <select asp-for="@viewModel.SelectedRoles" class="form-control" style="height: 100px;" asp-items="@viewModel.Roles">
+                    </select>
+                </td>
+                <td>
+                    <div class="form-group">
+                        <input type="submit" value="Assign Role" class="btn btn-primary rounded-pill" />
+                    </div>
+                </td>
+                </form>
+            </tr>
+        }
+
+    </tbody>
+</table>*@
+
+@section scripts {
+
+    <!-- DataTable -->
+    <script src="~/vendors/dataTable/datatables.min.js"></script>
+    <script src="~/assets/js/examples/datatable.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#membersTable').DataTable();
+        });
+    </script>
+}

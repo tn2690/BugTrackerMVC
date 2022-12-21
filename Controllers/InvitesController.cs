@@ -96,7 +96,7 @@ namespace BugTrackerMVC.Controllers
 
             ViewData["ProjectId"] = new SelectList(await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId), "Id", "Name");
 
-            return View();
+            return View(new Invite());
         }
 
         // POST: Invites/Create
@@ -124,7 +124,7 @@ namespace BugTrackerMVC.Controllers
                     string? callbackUrl = Url.Action("ProcessInvite", "Invites", new { token, email, company }, protocol: Request.Scheme);
 
                     string body = $@"{invite.Message} <br />
-                       Please join my Company. <br />
+                       You've received an invitation to join our company! <br />
                        Click the following link to join our team. <br />
                        <a href=""{callbackUrl}"">COLLABORATE</a>";
 
