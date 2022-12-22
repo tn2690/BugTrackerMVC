@@ -4,60 +4,76 @@
     ViewData["Title"] = "Create";
 }
 
-    <div class="row">
-        <div class="col-md-4">
-            <form asp-action="Create" method="post" asp-controller="Tickets">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="hidden" asp-for="Id" />
-                <input type="hidden" asp-for="Created" />
-                <input type="hidden" asp-for="Archived" />
-                <input type="hidden" asp-for="ArchivedByProject" />
-                <input type="hidden" asp-for="DeveloperUserId" />
-                <input type="hidden" asp-for="SubmitterUserId" />
+<!-- Select2 -->
+<link rel="stylesheet" href="~/vendors/select2/css/select2.min.css" type="text/css">
 
-                <h1>Create a Ticket</h1>
-                <hr />
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Create" method="post" asp-controller="Tickets">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Created" />
+            <input type="hidden" asp-for="Archived" />
+            <input type="hidden" asp-for="ArchivedByProject" />
+            <input type="hidden" asp-for="DeveloperUserId" />
+            <input type="hidden" asp-for="SubmitterUserId" />
 
-                <div class="form-group">
-                    <label asp-for="Title" class="control-label"></label>
-                    <input asp-for="Title" class="form-control" />
-                    <span asp-validation-for="Title" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Description" class="control-label"></label>
-                    <input asp-for="Description" class="form-control" />
-                    <span asp-validation-for="Description" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="ProjectId" class="control-label">Project</label>
-                    <select asp-for="ProjectId" class ="form-control" asp-items="ViewBag.ProjectId"></select>
-                </div>
-                <div class="form-group">
-                    <label asp-for="TicketTypeId" class="control-label">Type</label>
-                    <select asp-for="TicketTypeId" class ="form-control" asp-items="ViewBag.TicketTypeId"></select>
-                </div>
-                <div class="form-group">
-                    <label asp-for="TicketStatusId" class="control-label">Status</label>
-                    <select asp-for="TicketStatusId" class ="form-control" disabled asp-items="ViewBag.TicketStatusId"></select>
-                </div>
-                <div class="form-group">
-                    <label asp-for="TicketPriorityId" class="control-label">Priority</label>
-                    <select asp-for="TicketPriorityId" class ="form-control" asp-items="ViewBag.TicketPriorityId"></select>
-                </div>
-                <div class="form-group">
-                    <div class="d-flex justify-content-end">
-                            <input type="submit" value="Create" class="btn btn-primary rounded-pill my-2" />
+            <h1>Create a Ticket</h1>
+            <hr />
+
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="1"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="ProjectId" class="control-label">Project</label>
+                        <select asp-for="ProjectId" class="ticketList" asp-items="ViewBag.ProjectId"></select>
                     </div>
                 </div>
-            </form>
+                <div class="col-12 col-lg-6">
+                    <div class="form-group">
+                        <label asp-for="TicketTypeId" class="control-label">Type</label>
+                        <select asp-for="TicketTypeId" class="ticketList" asp-items="ViewBag.TicketTypeId"></select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TicketStatusId" class="control-label">Status</label>
+                        <select asp-for="TicketStatusId" class="form-control" disabled asp-items="ViewBag.TicketStatusId"></select>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="TicketPriorityId" class="control-label">Priority</label>
+                        <select asp-for="TicketPriorityId" class="ticketList" asp-items="ViewBag.TicketPriorityId"></select>
+                    </div>
+                    <div class="form-group">
+                        <div class="d-flex justify-content-end">
+                            <input type="submit" value="Create" class="btn btn-primary rounded-pill" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div>
+            <a asp-action="AllTickets" class="btn btn-primary rounded-pill">Back to List</a>
         </div>
     </div>
-
-    <div class="my-2">
-        <a asp-action="AllTickets">Back to List</a>
-    </div>
-
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <!-- Select2 -->
+    <script src="~/vendors/select2/js/select2.min.js"></script>
+
+    <script>
+        $('.ticketList').select2({
+            dir: $('body').hasClass('rtl') ? 'rtl' : ''
+        });
+    </script>
 }

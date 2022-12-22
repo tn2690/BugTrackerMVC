@@ -50,9 +50,6 @@
                                 @Html.DisplayNameFor(model => model.Updated)
                             </th>
                             <th>
-                                @Html.DisplayNameFor(model => model.TicketType)
-                            </th>
-                            <th>
                                 @Html.DisplayNameFor(model => model.TicketStatus)
                             </th>
                         </tr>
@@ -74,9 +71,6 @@
                                     @Html.DisplayFor(modelItem => item.Updated)
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.TicketType!.Name)
-                                </td>
-                                <td>
                                     @Html.DisplayFor(modelItem => item.TicketStatus!.Name)
                                 </td>
                                 <td>
@@ -91,10 +85,6 @@
                                     else
                                     {
                                         <a asp-action="Restore" asp-route-id="@item.Id" class="btn btn-success rounded-pill">Restore</a>
-                                    }
-                                    @if (item.DeveloperUser?.FullName is null && User.IsInRole(nameof(BTRoles.Admin)))
-                                    {
-                                        <a class="btn btn-sm btn-info rounded-pill mx-2" asp-action="AssignDeveloper" asp-route-id="@item.Id">Assign Developer</a>
                                     }
                                 </td>
                             </tr>

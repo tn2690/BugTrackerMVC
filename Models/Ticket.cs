@@ -43,11 +43,11 @@ namespace BugTrackerMVC.Models
 
         public int TicketPriorityId { get; set; }
 
-        [Display(Name = "Developer User Id")]
+        [Display(Name = "Developer")]
         public string? DeveloperUserId { get; set; }
 
         [Required]
-        [Display(Name = "Submitter User Id")]
+        [Display(Name = "Submitter")]
         public string? SubmitterUserId { get; set; }
 
         // ---------------- foreign keys ----------------

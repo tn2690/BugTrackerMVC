@@ -58,7 +58,7 @@
                         <label class="mg-b-0">Message</label>
                     </div>
                     <div class="col-md-8 mg-t-5 mg-md-t-0 my-2">
-                        <textarea asp-for="Message" class="form-control editor"></textarea>
+                        <textarea asp-for="Message" class="form-control" id="editor"></textarea>
                     </div>
                 </div>
                 <div class="form-group row justify-content-end mb-0">
@@ -75,11 +75,20 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
+    <!-- Javascript -->
+    <script src="~/vendors/ckeditor5/ckeditor.js"></script>
+
     <script>
         ClassicEditor
-            .create(document.querySelector('.editor'))
-            .catch(error => {
-                console.error(error);
-            });
+            .create(document.querySelector('#editor'), {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote'],
+                heading: {
+                    options: [
+                        { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                        { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                        { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' }
+                    ]
+                }
+            })
     </script>
 }
