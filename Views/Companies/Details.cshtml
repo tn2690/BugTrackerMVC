@@ -1,42 +1,61 @@
 ﻿@model BugTrackerMVC.Models.Company
+@using BugTrackerMVC.Services.Interfaces
+@using BugTrackerMVC.Models.Enums
+@using BugTrackerMVC.Extensions
+@using Microsoft.AspNetCore.Identity
+@inject IBTFileService _BTFileService
+@inject IBTProjectService _BTProjectService
+@inject IBTTicketService _BTTicketService
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Company Info";
+    List<Project> projects = (await _BTProjectService.GetAllProjectsByCompanyIdAsync(User.Identity!.GetCompanyId())).Where(p => p.Archived == false).ToList();
+    List<Ticket> tickets = (await _BTTicketService.GetAllTicketsByCompanyIdAsync(User.Identity!.GetCompanyId())).Where(p => p.Archived == false && p.ArchivedByProject == false).ToList();
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Company</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageFileData)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageFileData)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageFileType)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageFileType)
-        </dd>
-    </dl>
+<div class="page-header">
+    <div>
+        <h3>Company Info</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a asp-action="Index" asp-controller="Home">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Company</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Company Info</li>
+            </ol>
+        </nav>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="card">
+    <div class="card-body">
+
+        <div class="card shadow-none border">
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <img src="@_BTFileService.ConvertByteArrayToFile(Model.ImageFileData!, Model.ImageFileType!, (int)DefaultImg.CompanyImg)" class="img-fluid" alt="company picture">
+                </div>
+                <div class="col-12 col-lg-6">
+                    <div class="card-body">
+                        <h5 class="card-title"><span class="companyTitle">@Model.Name</span></h5>
+                        <p class="card-text">
+                            <span class="textItalics">@Model.Description</span>
+                        </p>
+                        <p class="card-text">
+                            Members: <span class="textBold">@Model.Members.Count()</span>
+                        </p>
+                        <p class="card-text">
+                            Active Projects: <span class="textBold">@projects.Count()</span>
+                        </p>
+                        <p class="card-text">
+                            Active Tickets: <span class="textBold">@tickets.Count()</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

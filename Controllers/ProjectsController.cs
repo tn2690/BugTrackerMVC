@@ -61,24 +61,10 @@ namespace BugTrackerMVC.Controllers
             int companyId = User.Identity!.GetCompanyId();
 
             // show archived projects for specific company
-            List<Project> projects = (await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId)).Where(p => p.Archived == true).ToList();
+            List<Project> projects = (await _btProjectService.GetArchivedProjectByCompanyIdAsync(companyId)).ToList();
 
             return View(projects);
         }
-        
-        //  GET: Projects/UnassignedProjects
-        //  for Admin and Project Managers to view
-        //[Authorize(Roles = "Admin,ProjectManager")]
-        //public async Task<IActionResult> UnassignedProjects()
-        //{
-        //    // assign user's company id to logged in user
-        //    int companyId = User.Identity!.GetCompanyId();
-
-        //    // show unassigned projects
-        //    List<Project> projects = (await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId)).Where(p => p.Members != null).ToList();
-
-        //    return View(projects);
-        //}
 
         // GET: Projects/MyProjects
         public async Task<IActionResult> MyProjects()
@@ -96,7 +82,7 @@ namespace BugTrackerMVC.Controllers
             else
             {
                 string userId = _userManager.GetUserId(User);
-                // create new service to get user projects?
+
                 // make call to service
                 projects = await _btProjectService.GetUserProjectsAsync(userId);
             }
@@ -186,18 +172,6 @@ namespace BugTrackerMVC.Controllers
                     BTUser member = await _userManager.FindByIdAsync(memberId);
                     await _btProjectService.AddMemberToProjectAsync(member, project.Id);
                 }
-
-                //// validate dev id of viewModel
-                //if (!string.IsNullOrEmpty(viewModel.DevId))
-                //{
-                //    // call service to add member
-                //    await _btProjectService.AddMemberToProjectAsync(member, viewModel.Project.Id);
-                //}
-                //else
-                //{
-                //    // call service to remove member
-                //    await _btProjectService.RemoveMemberFromProjectAsync(member, viewModel.Project.Id);
-                //}
 
                 return RedirectToAction(nameof(Details), new { id = model.Project?.Id });
             }
@@ -294,12 +268,10 @@ namespace BugTrackerMVC.Controllers
         }
 
         // POST: Projects/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,ProjectManager")]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,StartDate,EndDate,ProjectPriorityId,ImageFormFile")] Project project)
+        public async Task<IActionResult> Create([Bind("Id,Name,Description,Created,StartDate,EndDate,ProjectPriorityId,ImageFormFile")] Project project)
         {
             ModelState.Remove("CompanyId");
 
@@ -314,7 +286,7 @@ namespace BugTrackerMVC.Controllers
                 project.Created = DateTime.UtcNow;
 
                 project.StartDate = SetDate.Format(project.StartDate);
-                
+
                 project.EndDate = SetDate.Format(project.EndDate);
 
                 // set image
@@ -339,6 +311,7 @@ namespace BugTrackerMVC.Controllers
         }
 
         // GET: Projects/Edit/5
+        [Authorize(Roles = "Admin,ProjectManager")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -363,11 +336,10 @@ namespace BugTrackerMVC.Controllers
         }
 
         // POST: Projects/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CompanyId,Name,Description,Created,StartDate,EndDate,ProjectPriorityId,ImageFormFile,ImageFileData,ImageFileType")] Project project)
+        [Authorize(Roles = "Admin,ProjectManager")]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,CompanyId,Name,Description,StartDate,EndDate,ProjectPriorityId,ImageFormFile,ImageFileData,ImageFileType")] Project project)
         {
             if (id != project.Id)
             {
@@ -509,12 +481,7 @@ namespace BugTrackerMVC.Controllers
 
             int companyId = User.Identity!.GetCompanyId();
 
-            //BTUser member = await _userManager.GetUserAsync(User);
-
             Project? project = await _btProjectService.GetProjectByIdAsync(id, companyId);
-
-            // add a member to project when restoring
-            //await _btProjectService.AddMemberToProjectAsync(member, project.Id);
 
             if (project != null)
             {

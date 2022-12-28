@@ -14,5 +14,12 @@ namespace BugTrackerMVC.Services.Interfaces
 
         public Task<bool> SendEmailNotificationAsync(Notification notification, string emailSubject);
 
+        public Task<IEnumerable<NotificationType>> GetNotificationTypesAsync();
+
+        public Task UpdateNotificationAsync(Notification notification);
+
+        // get all notifications by company id
+        public Task<List<Notification>> GetAllNotificationsByCompanyId(int companyId);
+
     }
 }

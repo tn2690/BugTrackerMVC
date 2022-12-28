@@ -7,23 +7,33 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BugTrackerMVC.Data;
 using BugTrackerMVC.Models;
+using Microsoft.AspNetCore.Authorization;
+using BugTrackerMVC.Services.Interfaces;
+using BugTrackerMVC.Extensions;
 
 namespace BugTrackerMVC.Controllers
 {
+    [Authorize]
     public class NotificationsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IBTNotificationService _btNotificationService;
 
-        public NotificationsController(ApplicationDbContext context)
+        public NotificationsController(ApplicationDbContext context,
+                                        IBTNotificationService btNotificationService)
         {
             _context = context;
+            _btNotificationService = btNotificationService;
         }
 
         // GET: Notifications
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Notifications.Include(n => n.NotificationType).Include(n => n.Project).Include(n => n.Recipient).Include(n => n.Sender).Include(n => n.Ticket);
-            return View(await applicationDbContext.ToListAsync());
+            int companyId = User.Identity!.GetCompanyId();
+
+            List<Notification> notifications = (await _btNotificationService.GetAllNotificationsByCompanyId(companyId)).ToList();
+
+            return View(notifications);
         }
 
         // GET: Notifications/Details/5
@@ -34,13 +44,22 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            var notification = await _context.Notifications
-                .Include(n => n.NotificationType)
-                .Include(n => n.Project)
-                .Include(n => n.Recipient)
-                .Include(n => n.Sender)
-                .Include(n => n.Ticket)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            Notification? notification = await _context.Notifications
+                                                    .Include(n => n.NotificationType)
+                                                    .Include(n => n.Project)
+                                                    .Include(n => n.Recipient)
+                                                    .Include(n => n.Sender)
+                                                    .Include(n => n.Ticket)
+                                                    .FirstOrDefaultAsync(m => m.Id == id);
+
+            // if notification has not been viewed
+            if (notification!.HasBeenViewed == false)
+            {
+                // set to true
+                notification.HasBeenViewed = true;
+                await _btNotificationService.UpdateNotificationAsync(notification);
+            }
+
             if (notification == null)
             {
                 return NotFound();

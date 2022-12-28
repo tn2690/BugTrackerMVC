@@ -33,10 +33,13 @@
 
         <div class="card">
             <div class="card-body">
-                <p>
-                    <a asp-action="Create" class="btn btn-primary rounded-pill">Create New</a>
-                </p>
 
+                @* only admin or project manager can create projects *@
+                @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager))) {
+                    <p>
+                        <a asp-action="Create" class="btn btn-outline-primary rounded-pill">Create New</a>
+                    </p>
+                }
                 <table id="myProjectsTable" class="table table-striped table-bordered">
                     <thead>
                         <tr>
@@ -72,21 +75,27 @@
                                     @Html.DisplayFor(modelItem => item.EndDate)
                                 </td>
                                 <td>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary rounded-pill">Edit</a>
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary rounded-pill">Details</a>
-                                    <a asp-action="Archive" asp-route-id="@item.Id" class="btn btn-danger rounded-pill">Archive</a>
+                                    @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
+                                    {
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill">Edit</a>
+                                    }
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill">Details</a>
+                                    @if (User.IsInRole(nameof(BTRoles.Admin)))
+                                    {
+                                        <a asp-action="Archive" asp-route-id="@item.Id" class="btn btn-outline-danger rounded-pill">Archive</a>
+                                    }
                                     @{
                                         BTUser? projectManager = await _BTProjectService.GetProjectManagerAsync(item.Id);
                                     }
                                     @if (projectManager is null && User.IsInRole(nameof(BTRoles.Admin)))
                                     {
-                                        <a class="btn btn-sm btn-info rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@item.Id">Assign PM</a>
+                                        <a class="btn btn-sm btn-outline-info rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@item.Id">Assign PM</a>
                                     }
                                     else
                                     {
-                                        <a class="btn btn-sm btn-success rounded-pill" asp-action="AssignProjectManager" asp-route-id="@item.Id">@(projectManager?.FullName ?? "Unassigned")</a>
+                                        <a class="btn btn-sm btn-outline-secondary rounded-pill" asp-action="AssignProjectManager" asp-route-id="@item.Id">@(projectManager?.FullName ?? "Unassigned")</a>
                                     }
-                                    <a asp-action="AddMembers" asp-route-id="@item.Id" class="btn btn-primary rounded-pill">Add Member(s)</a>
+                                    <a asp-action="AddMembers" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill">Add Member(s)</a>
                                 </td>
                             </tr>
                         }
@@ -105,107 +114,14 @@
     <script src="~/assets/js/examples/datatable.js"></script>
 
     <script>
+        $('#myProjectsTable').DataTable({
+            "scrollY": "500px",
+            "scrollCollapse": true,
+            responsive: true
+        });
+
         $(document).ready(function () {
             $('#myProjectsTable').DataTable();
         });
     </script>
 }
-
-@*<div class="container mt-5">
-
-    <div class="card mb-3">
-        <div class="row g-0">
-            <div class="col-md-12">
-                <div class="card-body">
-                    <h1>Your Projects</h1>
-
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.Name)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.Description)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.Created)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.StartDate)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.EndDate)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.ImageFormFile)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.Archived)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.Company)
-                                </th>
-                                @*<th>
-                                @Html.DisplayNameFor(model => model.Members)
-                                </th>
-                                <th>
-                                @Html.DisplayNameFor(model => model.Tickets)
-                                </th>
-                                <th>
-                                    @Html.DisplayNameFor(model => model.ProjectPriority)
-                                </th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model)
-                            {
-                                <tr>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Name)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Description)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Created)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.StartDate)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.EndDate)
-                                    </td>
-                                    <td>
-                                        <img src="@_BTFileService.ConvertByteArrayToFile(item.ImageFileData!, item.ImageFileType!, (int)DefaultImg.ProjectImg)" class="img-fluid" style="max-height: 200px;" alt="project image" />
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Archived)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.Company!.Name)
-                                    </td>
-                                    <td>
-                                @Html.DisplayFor(modelItem => item.Members)
-                                </td>
-                                    <td>
-                                @Html.DisplayFor(modelItem => item.Tickets!.Title)
-                                </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.ProjectPriority!.Name)
-                                    </td>
-                                    <td>
-                                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                                        <a asp-action="Archive" asp-route-id="@item.Id">Archive</a>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>*@

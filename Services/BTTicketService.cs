@@ -34,6 +34,9 @@ namespace BugTrackerMVC.Services
                                                      .Include(t => t.TicketStatus)
                                                      .Include(t => t.DeveloperUser)
                                                      .Include(t => t.SubmitterUser)
+                                                     .OrderByDescending(t => t.TicketStatus)
+                                                        .ThenByDescending(t => t.Archived)
+                                                        .ThenByDescending(t => t.Created)
                                                      .ToListAsync();
 
                 return tickets;
@@ -59,7 +62,7 @@ namespace BugTrackerMVC.Services
             }
         }
 
-        public async Task<Ticket> GetTicketByIdAsync(int ticketId)
+        public async Task<Ticket> GetTicketByIdAsync(int ticketId, int companyId)
         {
             try
             {
@@ -74,7 +77,8 @@ namespace BugTrackerMVC.Services
                                                .Include(t => t.History)
                                                .Include(t => t.DeveloperUser)
                                                .Include(t => t.SubmitterUser)
-                                               .FirstOrDefaultAsync(t => t.Id == ticketId);
+                                               .FirstOrDefaultAsync(t => t.Id == ticketId
+                                                                    && t.SubmitterUser!.CompanyId == companyId);
 
                 return ticket!;
 
@@ -177,11 +181,11 @@ namespace BugTrackerMVC.Services
             }
         }
 
-        public async Task AssignDeveloperAsync(int ticketId, string userId)
+        public async Task AssignDeveloperAsync(int ticketId, string userId, int companyId)
         {
             try
             {
-                Ticket? ticket = await GetTicketByIdAsync(ticketId);
+                Ticket? ticket = await GetTicketByIdAsync(ticketId, companyId);
 
                 ticket.DeveloperUserId = userId;
 

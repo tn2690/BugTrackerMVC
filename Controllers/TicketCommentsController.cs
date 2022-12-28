@@ -9,9 +9,11 @@ using BugTrackerMVC.Data;
 using BugTrackerMVC.Models;
 using Microsoft.AspNetCore.Identity;
 using BugTrackerMVC.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BugTrackerMVC.Controllers
 {
+    [Authorize]
     public class TicketCommentsController : Controller
     {
         private readonly ApplicationDbContext _context;

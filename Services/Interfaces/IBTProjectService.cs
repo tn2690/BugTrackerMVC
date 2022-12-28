@@ -8,6 +8,9 @@ namespace BugTrackerMVC.Services.Interfaces
         // get all projects for specific company
         public Task<List<Project>> GetAllProjectsByCompanyIdAsync(int companyId);
 
+        // get archived projects for specific company
+        public Task<List<Project>> GetArchivedProjectByCompanyIdAsync(int companyId);
+
         // get user projects
         public Task<List<Project>?> GetUserProjectsAsync(string userId);
 

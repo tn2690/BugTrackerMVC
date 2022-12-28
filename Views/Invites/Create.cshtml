@@ -1,15 +1,31 @@
 ﻿@model BugTrackerMVC.Models.Invite
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Send Invite";
 }
+
+<div class="page-header">
+    <div>
+        <h3>Company Invite</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a asp-action="Index" asp-controller="Home">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="#">Company</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Company Invite</li>
+            </ol>
+        </nav>
+    </div>
+</div>
 
 <div class="col-lg-6 col-md-12">
     <div class="card custom-card">
         <div class="card-body">
             <div>
-                <h6 class="main-content-label mb-1">Company Invite</h6>
-                <p class="text-muted card-sub-title">Invite a new user to join your Bug Tracker company.</p>
+                <p class="textItalics">Invite a new user to join your company.</p>
             </div>
             <form asp-action="Create">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -25,6 +41,7 @@
                     </div>
                     <div class="col-md-8 mg-t-5 mg-md-t-0 my-2">
                         <input type="email" asp-for="InviteeEmail" class="form-control" placeholder="Enter email">
+                        <span asp-validation-for="InviteeEmail" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="row row-xs align-items-center mg-b-20 my-2">
@@ -33,6 +50,7 @@
                     </div>
                     <div class="col-md-8 mg-t-5 mg-md-t-0 my-2">
                         <input type="text" asp-for="InviteeFirstName" class="form-control" placeholder="Enter first name">
+                        <span asp-validation-for="InviteeFirstName" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="row row-xs align-items-center mg-b-20 my-2">
@@ -41,6 +59,7 @@
                     </div>
                     <div class="col-md-8 mg-t-5 mg-md-t-0 my-2">
                         <input type="text" asp-for="InviteeLastName" class="form-control" placeholder="Enter last name">
+                        <span asp-validation-for="InviteeLastName" class="text-danger"></span>
                     </div>
                 </div>
                 <div class="row row-xs align-items-center mg-b-20">
@@ -63,8 +82,8 @@
                 </div>
                 <div class="form-group row justify-content-end mb-0">
                     <div class="col-md-8 pl-md-2 my-2">
-                        <input type="submit" class="btn ripple btn-primary pd-x-30 mg-r-5 rounded-pill" value="Send Invite" />
-                        <a asp-action="Index" asp-controller="Invites" class="btn ripple btn-secondary pd-x-30 rounded-pill">Cancel</a>
+                        <input type="submit" class="btn ripple btn-outline-primary pd-x-30 mg-r-5 rounded-pill" value="Send Invite" />
+                        <a asp-action="Index" asp-controller="Home" class="btn ripple btn-outline-secondary pd-x-30 rounded-pill">Cancel</a>
                     </div>
                 </div>
             </form>

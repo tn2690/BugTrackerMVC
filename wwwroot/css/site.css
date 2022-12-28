@@ -115,9 +115,23 @@ body {
     color: green;
 }
 
+.textBold {
+    font-weight: bold;
+    font-size: 25px;
+}
+
+.textItalics {
+    font-style: italic;
+}
+
+.companyTitle {
+    font-weight: bold;
+    font-size: 25px;
+}
+
 /*--------- button overrides start ----------*/
 .btn-outline-primary {
-    color: var(--tn-background-color); /* change color of button */
+    color: var(--tn-highlight-color); /* change color of button */
     border-color: var(--tn-nav-toggler-glow) !important;
 }
 

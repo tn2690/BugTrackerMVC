@@ -11,7 +11,7 @@
     <div class="col-12 col-lg-6">
         <div class="card">
             <div class="card-header">
-                <div class="card-title">@Model.Project!.Name</div>
+                <div class="card-title">Project: @Model.Project!.Name</div>
             </div>
             <div class="card-body">
                 <div class="col-12 col-lg-12">
@@ -24,7 +24,7 @@
                         <select asp-items="Model.DevList" class="form-select" multiple asp-for="SelectedDevelopers">
                         </select>
                         <div class="d-flex justify-content-center">
-                            <button type="submit" class="w-15 btn btn-primary rounded-pill my-2">Save</button>
+                            <button type="submit" class="w-15 btn btn-outline-primary rounded-pill my-2">Save</button>
                         </div>
                     </form>
                 </div>
@@ -45,7 +45,7 @@
                         <select asp-items="Model.SubList" class="form-select" multiple asp-for="SelectedSubmitters">
                         </select>
                         <div class="d-flex justify-content-center">
-                            <button type="submit" class="w-15 btn btn-primary rounded-pill my-2">Save</button>
+                            <button type="submit" class="w-15 btn btn-outline-primary rounded-pill my-2">Save</button>
                         </div>
                     </form>
                 </div>
@@ -55,8 +55,11 @@
 
 </div>
 
-<div>
-    <a asp-action="AllProjects" class="btn btn-primary rounded-pill">Back to List</a>
+<div class="col-12 col-lg-12">
+    <div class="d-flex justify-content-center">
+        <a asp-action="AllProjects" class="btn btn-outline-primary rounded-pill mx-2">Back to Projects</a>
+        <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-outline-secondary rounded-pill">Back to Project Details</a>
+    </div>
 </div>
 
 @section Scripts {

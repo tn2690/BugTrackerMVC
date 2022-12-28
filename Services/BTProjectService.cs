@@ -31,15 +31,54 @@ namespace BugTrackerMVC.Services
                                                        .Include(p => p.Company)
                                                        .Include(p => p.ProjectPriority)
                                                        .Include(p => p.Tickets)
+                                                            .ThenInclude(t => t.TicketPriority)
+                                                       .Include(p => p.Tickets)
+                                                            .ThenInclude(t => t.TicketType)
+                                                       .Include(p => p.Tickets)
+                                                            .ThenInclude(t => t.TicketStatus)
+                                                       .Include(p => p.Tickets)
+                                                            .ThenInclude(t => t.Comments)
+                                                       .Include(p => p.Tickets)
+                                                            .ThenInclude(t => t.Attachments)
+                                                       .Include(p => p.Tickets)
+                                                            .ThenInclude(t => t.History)
+                                                       .Include(p => p.Tickets)
+                                                            .ThenInclude(t => t.DeveloperUser)
+                                                       .Include(p => p.Tickets)
+                                                            .ThenInclude(t => t.SubmitterUser)
                                                        .Include(p => p.Members)
-                                                       .OrderByDescending(p => p.ProjectPriority)
-                                                            .ThenByDescending(p => p.Archived)
-                                                            .ThenByDescending(p => p.Created)
+                                                       .OrderByDescending(p => p.Created)
+                                                            .ThenByDescending(p => p.StartDate)
+                                                            .ThenByDescending(p => p.EndDate)
                                                        .ToListAsync();
 
                 return projects;
 
             } catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Project>> GetArchivedProjectByCompanyIdAsync(int companyId)
+        {
+            try
+            {
+                List<Project> projects = await _context.Projects
+                                                       .Where(p => p.CompanyId == companyId && p.Archived == true)
+                                                       .Include(p => p.Company)
+                                                       .Include(p => p.ProjectPriority)
+                                                       .Include(p => p.Tickets)
+                                                       .Include(p => p.Members)
+                                                       .OrderByDescending(p => p.Created)
+                                                            .ThenByDescending(p => p.StartDate)
+                                                            .ThenByDescending(p => p.EndDate)
+                                                       .ToListAsync();
+
+                return projects;
+
+            }
+            catch (Exception)
             {
                 throw;
             }

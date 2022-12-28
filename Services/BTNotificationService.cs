@@ -118,5 +118,55 @@ namespace BugTrackerMVC.Services
                 throw;
             }
         }
+
+        public async Task<IEnumerable<NotificationType>> GetNotificationTypesAsync()
+        {
+            try
+            {
+                IEnumerable<NotificationType> notificationTypes = await _context.NotificationTypes
+                                                                          .ToListAsync();
+
+                return notificationTypes;
+
+            } catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task UpdateNotificationAsync(Notification notification)
+        {
+            try
+            {
+                _context.Update(notification);
+                await _context.SaveChangesAsync();
+
+            } catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Notification>> GetAllNotificationsByCompanyId(int companyId)
+        {
+            try
+            {
+                List<Notification> notifications = await _context.Notifications
+                                                            .Where(n => n.Ticket!.Project!.CompanyId == companyId)
+                                                            .Include(n => n.NotificationType)
+                                                            .Include(n => n.Project)
+                                                                .ThenInclude(n => n!.Company)
+                                                            .Include(n => n.Recipient)
+                                                            .Include(n => n.Sender)
+                                                            .Include(n => n.Ticket)
+                                                            .ToListAsync();
+
+                return notifications;
+
+            } catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

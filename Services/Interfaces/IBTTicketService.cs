@@ -11,7 +11,7 @@ namespace BugTrackerMVC.Services.Interfaces
         public Task AddTicketAsync(Ticket ticket);
 
         // get ticket by id
-        public Task<Ticket> GetTicketByIdAsync(int projectId);
+        public Task<Ticket> GetTicketByIdAsync(int projectId, int companyId);
 
         // update ticket to db
         public Task UpdateTicketAsync(Ticket ticket);
@@ -32,7 +32,7 @@ namespace BugTrackerMVC.Services.Interfaces
         public Task<List<BTUser>> GetUsersAsync();
 
         // assign a Developer to ticket
-        public Task AssignDeveloperAsync(int ticketId, string userId);
+        public Task AssignDeveloperAsync(int ticketId, string userId, int companyId);
 
         // add file attachments
         public Task AddTicketAttachmentAsync(TicketAttachment ticketAttachment);

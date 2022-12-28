@@ -4,11 +4,28 @@
 @inject IBTFileService _BTFileService
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Project";
 }
 
 <!-- Select2 -->
 <link rel="stylesheet" href="~/vendors/select2/css/select2.min.css" type="text/css">
+
+<div class="page-header">
+    <div>
+        <h3>Edit a Project</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a asp-action="Index" asp-controller="Home">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a asp-action="AllProjects">Projects</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Edit a Project</li>
+            </ol>
+        </nav>
+    </div>
+</div>
 
 <div class="card">
     <div class="card-body">
@@ -20,9 +37,6 @@
             <input type="hidden" asp-for="ImageFileData" />
             <input type="hidden" asp-for="ImageFileType" />
             <input type="hidden" asp-for="Archived" />
-
-            <h1>Edit a Project</h1>
-            <hr />
 
             <div class="row">
                 <div class="col-12 col-lg-6">
@@ -62,14 +76,15 @@
                     </div>
                     <div class="form-group">
                         <div class="d-flex justify-content-end">
-                            <input type="submit" value="Save" class="btn btn-primary rounded-pill" />
+                            <input type="submit" value="Save" class="btn btn-outline-primary rounded-pill" />
                         </div>
                     </div>
                 </div>
              </div>
         </form>
         <div>
-            <a asp-action="AllProjects" class="btn btn-primary rounded-pill">Back to List</a>
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary rounded-pill mx-2">Back to Project Details</a>
+            <a asp-action="AllProjects" class="btn btn-outline-primary rounded-pill">Back to Projects</a>
         </div>
     </div>
 </div>

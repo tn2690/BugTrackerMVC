@@ -1,8 +1,15 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@using BugTrackerMVC.Extensions
+@using BugTrackerMVC.Models.Enums
+@inject SignInManager<BTUser> SignInManager
+
+@{
+    string? controller = (string?)Context.GetRouteValue("controller");
+    string? action = (string?)Context.GetRouteValue("action");
 }
 
-<!-- Sidebar Partial View -->
 
+<!-- Sidebar Partial View -->
 <!-- begin::navigation -->
 <div class="navigation">
     <div class="navigation-header">
@@ -12,160 +19,115 @@
         </a>
     </div>
     <div class="navigation-menu-body">
+        <!-- Dashboard -->
         <ul>
-            <li class="nav-item">
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link px-sm-0 px-2">
-                    <i class="fs-5 bi-house"></i><span class="ms-1 d-none d-sm-inline">Home</span>
-                </a>
-            </li>
-            <li class="dropdown">
-                <a asp-area="" asp-controller="Companies" asp-action="Details" class="nav-link dropdown-toggle px-sm-0 px-2" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fs-5 bi-building"></i><span class="ms-1 d-none d-sm-inline">Company</span>
-                </a>
-                @if (User.IsInRole("Admin"))
-                {
-                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown">
-                        <li><a class="dropdown-item" asp-area="" asp-controller="Companies" asp-action="ManageUserRoles">Manage Roles</a></li>
-                    </ul>
-                }
-            </li>
-            <li class="dropdown">
-                <a asp-area="" asp-controller="Projects" asp-action="Index" class="nav-link dropdown-toggle px-sm-0 px-2" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fs-5 bi-file-earmark-ppt"></i><span class="ms-1 d-none d-sm-inline">Projects</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown">
-                    <li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="Create">New project...</a></li>
-                    <li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="AllProjects">All Projects</a></li>
-                    <li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="UnassignedProjects">Unassigned Projects</a></li>
-                    <li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="MyProjects">My Projects</a></li>
-                    <li><a class="dropdown-item" asp-area="" asp-controller="Projects" asp-action="ArchivedProjects">Archived Projects</a></li>
-                </ul>
-            </li>
-            <li class="dropdown">
-                <a asp-area="" asp-controller="Tickets" asp-action="Index" class="nav-link dropdown-toggle px-sm-0 px-2" id="dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fs-5 bi-file-earmark-font"></i><span class="ms-1 d-none d-sm-inline">Tickets</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown">
-                    <li><a class="dropdown-item" asp-area="" asp-controller="Tickets" asp-action="Create">New ticket...</a></li>
-                    <li><a class="dropdown-item" asp-area="" asp-controller="Tickets" asp-action="AllTickets">All Tickets</a></li>
-                    <li><a class="dropdown-item" asp-area="" asp-controller="Tickets" asp-action="UnassignedTickets">Unassigned Tickets</a></li>
-                    <li><a class="dropdown-item" asp-area="" asp-controller="Tickets" asp-action="MyTickets">My Tickets</a></li>
-                    <li><a class="dropdown-item" asp-area="" asp-controller="Tickets" asp-action="ArchivedTickets">Archived Tickets</a></li>
-                    <li><a class="dropdown-item" asp-area="" asp-controller="TicketComments" asp-action="Index">Ticket Comments</a></li>
-                </ul>
-            </li>
             <li>
-                <a asp-area="" asp-controller="Notifications" asp-action="Index" class="nav-link px-sm-0 px-2">
-                    <i class="fs-5 bi-mailbox2"></i><span class="ms-1 d-none d-sm-inline">Notifications</span>
+                <a class="@(controller == "Home" ? "active" : "")" asp-action="Index" asp-controller="Home">
+                    <span class="nav-link-icon">
+                        <i data-feather="bar-chart"></i>
+                    </span>
+                    <span>Dashboard</span>
                 </a>
             </li>
+            <!-- Company -->
             <li>
                 <a href="#">
                     <span class="nav-link-icon">
-                        <i data-feather="shopping-cart"></i>
+                        <i class="bi bi-building"></i>
                     </span>
-                    <span>E-commerce</span>
+                    <span>Company</span>
                 </a>
+
                 <ul>
-                    <li>
-                        <a href="orders.html">Orders</a>
-                    </li>
-                    <li>
-                        <a href="products.html">Products</a>
-                    </li>
-                    <li>
-                        <a href="product-detail.html">Product Detail</a>
-                    </li>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li>
+                            <a asp-area="" asp-controller="Companies" asp-action="Details" asp-route-id="@User.Identity!.GetCompanyId()"
+                           class="@(controller == "Companies" && action == "Details" ? "active" : "")">Company Info</a>
+                        </li>
+                        <li>
+                            <a asp-area="" asp-controller="Companies" asp-action="ManageUserRoles"
+                           class="@(controller == "Companies" && action == "ManageUserRoles" ? "active" : "")">Manage Roles</a>
+                        </li>
+                        <li>
+                            <a asp-area="" asp-controller="Invites" asp-action="Create"
+                           class="@(controller == "Invites" && action == "Create" ? "active" : "")">Company Invite</a>
+                        </li>
+                    }
                 </ul>
+
             </li>
+            <!-- Projects -->
             <li>
                 <a href="#">
                     <span class="nav-link-icon">
-                        <i data-feather="copy"></i>
+                        <i class="bi bi-file-ppt"></i>
                     </span>
-                    <span>Pages</span>
+                    <span>Projects</span>
                 </a>
                 <ul>
+                    @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
+                    {
+                        <li>
+                            <a asp-area="" asp-controller="Projects" asp-action="Create"
+                           class="@(controller == "Projects" && action == "Create" ? "active" : "")">Create a Project</a>
+                        </li>
+                    }
                     <li>
-                        <a href="profile.html">Profile</a>
+                        <a asp-area="" asp-controller="Projects" asp-action="AllProjects"
+                           class="@(controller == "Projects" && action == "AllProjects" ? "active" : "")">All Projects</a>
                     </li>
                     <li>
-                        <a href="users.html">Users</a>
+                        <a asp-area="" asp-controller="Projects" asp-action="MyProjects"
+                           class="@(controller == "Projects" && action == "MyProjects" ? "active" : "")">My Projects</a>
                     </li>
-                    <li>
-                        <a href="settings.html">Settings</a>
-                    </li>
-                    <li>
-                        <a href="login.html" target="_blank">Login</a>
-                    </li>
-                    <li>
-                        <a href="register.html" target="_blank">Register</a>
-                    </li>
-                    <li>
-                        <a href="recovery-password.html" target="_blank">Recovery Password</a>
-                    </li>
-                    <li>
-                        <a href="lock-screen.html" target="_blank">Lock Screen</a>
-                    </li>
-                    <li>
-                        <a href="#">Error Pages</a>
-                        <ul>
-                            <li>
-                                <a href="404.html" target="_blank">404</a>
-                            </li>
-                            <li>
-                                <a href="mean-at-work.html" target="_blank">Mean at Work</a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="blank-page.html">Blank Page</a>
-                    </li>
+                    @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
+                    {
+                        <li>
+                            <a asp-area="" asp-controller="Projects" asp-action="ArchivedProjects"
+                           class="@(controller == "Projects" && action == "ArchivedProjects" ? "active" : "")">Archived Projects</a>
+                        </li>
+                    }
                 </ul>
             </li>
-            <li>
-                <a href="mailing.html">
-                    <span class="nav-link-icon">
-                        <i data-feather="corner-up-right"></i>
-                    </span>
-                    <span>Mailing</span>
-                </a>
-                <ul>
-                    <li>
-                        <a target="_blank" href="email-template-basic.html">Basic</a>
-                    </li>
-                    <li>
-                        <a target="_blank" href="email-template-alert.html">Alert</a>
-                    </li>
-                    <li>
-                        <a target="_blank" href="email-template-billing.html">Billing</a>
-                    </li>
-                </ul>
-            </li>
+            <!-- Tickets -->
             <li>
                 <a href="#">
                     <span class="nav-link-icon">
-                        <i data-feather="menu"></i>
+                        <i class="bi bi-ticket"></i>
                     </span>
-                    <span>Menu Level</span>
+                    <span>Tickets</span>
                 </a>
                 <ul>
                     <li>
-                        <a href="#">Menu Level</a>
-                        <ul>
-                            <li>
-                                <a href="#">Menu Level </a>
-                            </li>
-                        </ul>
+                        <a asp-area="" asp-controller="Tickets" asp-action="Create"
+                           class="@(controller == "Tickets" && action == "Create" ? "active" : "")">Create a Ticket</a>
+                    </li>
+                    <li>
+                        <a asp-area="" asp-controller="Tickets" asp-action="AllTickets"
+                           class="@(controller == "Tickets" && action == "AllTickets" ? "active" : "")">All Tickets</a>
+                    </li>
+                    <li>
+                        <a asp-area="" asp-controller="Tickets" asp-action="UnassignedTickets"
+                           class="@(controller == "Tickets" && action == "UnassignedTickets" ? "active" : "")">Unassigned Tickets</a>
+                    </li>
+                    <li>
+                        <a asp-area="" asp-controller="Tickets" asp-action="MyTickets"
+                           class="@(controller == "Tickets" && action == "MyTickets" ? "active" : "")">My Tickets</a>
+                    </li>
+                    <li>
+                        <a asp-area="" asp-controller="Tickets" asp-action="ArchivedTickets"
+                           class="@(controller == "Tickets" && action == "ArchivedTickets" ? "active" : "")">Archived Tickets</a>
                     </li>
                 </ul>
             </li>
+            <!-- Notifications -->
             <li>
-                <a href="#" class="disabled">
+                <a class="@(controller == "Notifications" ? "active" : "")" asp-area="" asp-controller="Notifications" asp-action="Index">
                     <span class="nav-link-icon">
-                        <i data-feather="mouse-pointer"></i>
+                        <i data-feather="bell"></i>
                     </span>
-                    <span>Disabled</span>
+                    <span>Notifications</span>
                 </a>
             </li>
         </ul>

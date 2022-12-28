@@ -9,6 +9,9 @@
     <title>@ViewData["Title"] - Insect Crusher</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
 
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
 
@@ -31,236 +34,263 @@
     <!-- App css -->
     <link rel="stylesheet" href="~/assets/css/app.min.css" type="text/css">
     <!-- ------------------------------------------ Gogi stylesheets end ------------------------------------------------- -->
-
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/site.css" />
 </head>
 
-@{
+@*@{
     string? controller = (string?)Context.GetRouteValue("controller");
     string? action = (string?)Context.GetRouteValue("action");
-}
+}*@
 
 <body>
 
-    @*@if (SignInManager.IsSignedIn(User))
-    {*@
-        <!-- Layout wrapper -->
-        <div class="layout-wrapper">
+    @*<div class="container-fluid overflow-hidden">
+    <div class="row vh-100 overflow-auto">
+    <div class="col-12 col-sm-3 col-xl-2 px-sm-2 px-0 bg-dark d-flex sticky-top">
+    <div class="d-flex flex-sm-column flex-row flex-grow-1 align-items-center align-items-sm-start px-3 pt-2 text-white">
+    <partial name="_LoginPartial" />
+    </div>
+    </div>
+    </div>
+    </div>
+    *@
 
-            <!-- Header -->
-            <div class="header d-print-none">
-                <div class="header-container">
-                    <div class="header-left">
-                        <div class="navigation-toggler">
-                            <a href="#" data-action="navigation-toggler">
-                                <i data-feather="menu"></i>
-                            </a>
-                        </div>
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="preloader-icon"></div>
+        <span>Loading...</span>
+    </div>
+    <!-- ./ Preloader -->
 
-                        <div class="header-logo">
-                            <a asp-action="Index" asp-controller="Home">
-                                <img class="logo" src="~/img/MBDLogoOnly_500_edited.png" class="img-fluid" style="max-height: 50px;" alt="logo">
-                            </a>
-                        </div>
-                    </div>
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper">
 
-                    <div class="header-body">
-                        <div class="header-body-left">
-                            <ul class="navbar-nav">
-                                <li class="nav-item mr-3">
-                                    <div class="header-search-form">
-                                        <form>
-                                            <div class="input-group">
-                                                <div class="input-group-prepend">
-                                                    <button class="btn">
-                                                        <i data-feather="search"></i>
-                                                    </button>
-                                                </div>
-                                                <input type="text" class="form-control" placeholder="Search">
-                                                <div class="input-group-append">
-                                                    <button class="btn header-search-close-btn">
-                                                        <i data-feather="x"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="header-body-right">
-                            <ul class="navbar-nav">
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link mobile-header-search-btn" title="Search">
-                                        <i data-feather="search"></i>
-                                    </a>
-                                </li>
-
-                                <li class="nav-item dropdown d-none d-md-block">
-                                    <a href="#" class="nav-link" title="Fullscreen" data-toggle="fullscreen">
-                                        <i class="maximize" data-feather="maximize"></i>
-                                        <i class="minimize" data-feather="minimize"></i>
-                                    </a>
-                                </li>
-
-                                <partial name="_LoginPartial" />
-                            </ul>
-                        </div>
-                    </div>
-
-                    <ul class="navbar-nav ml-auto">
-                        <li class="nav-item header-toggler">
-                            <a href="#" class="nav-link">
-                                <i data-feather="arrow-down"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <!-- ./ Header -->
-
-            <!-- Content wrapper -->
-            <div class="content-wrapper">
-                <!-- begin::navigation -->
-                <div class="navigation">
-                    <div class="navigation-header">
-                        <span>Navigation</span>
-                        <a href="#">
-                            <i class="ti-close"></i>
+        <!-- Header -->
+        <div class="header d-print-none">
+            <div class="header-container">
+                <div class="header-left">
+                    <div class="navigation-toggler">
+                        <a href="#" data-action="navigation-toggler">
+                            <i data-feather="menu"></i>
                         </a>
                     </div>
-                    <div class="navigation-menu-body">
-                        <!-- Dashboard -->
-                        <ul>
-                            <li>
-                                <a class="@(controller == "Home" ? "active" : "")"  asp-action="Index" asp-controller="Home">
-                                    <span class="nav-link-icon">
-                                        <i data-feather="bar-chart"></i>
-                                    </span>
-                                    <span>Dashboard</span>
-                                </a>
-                            </li>
-                            <!-- Company -->
-                            <li>
-                            <a href="#">
-                                    <span class="nav-link-icon">
-                                        <i class="bi bi-building"></i>
-                                    </span>
-                                    <span>Company</span>
-                                </a>
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <ul>
-                                        <li><a asp-area="" asp-controller="Companies" asp-action="ManageUserRoles"
-                                                class="@(controller == "Companies" && action == "ManageUserRoles" ? "active" : "")">Manage Roles</a></li>
-                                        <li><a asp-area="" asp-controller="Invites" asp-action="Create"
-                                                class="@(controller == "Invites" && action == "Create" ? "active" : "")">Company Invite</a></li>
-                                    </ul>
-                                }
-                            </li>
-                            <!-- Projects -->
-                            <li>
-                                <a href="#">
-                                    <span class="nav-link-icon">
-                                        <i class="bi bi-file-ppt"></i>
-                                    </span>
-                                    <span>Projects</span>
-                                </a>
-                                <ul>
-                                    <li>
-                                        <a asp-area="" asp-controller="Projects" asp-action="Create"
-                                            class="@(controller == "Projects" && action == "Create" ? "active" : "")">Create a Project</a>
-                                    </li>
-                                    <li>
-                                        <a asp-area="" asp-controller="Projects" asp-action="AllProjects"
-                                            class="@(controller == "Projects" && action == "AllProjects" ? "active" : "")">All Projects</a>
-                                    </li>
-                                    <li>
-                                        <a asp-area="" asp-controller="Projects" asp-action="MyProjects"
-                                            class="@(controller == "Projects" && action == "MyProjects" ? "active" : "")">My Projects</a>
-                                    </li>
-                                    <li>
-                                        <a asp-area="" asp-controller="Projects" asp-action="ArchivedProjects"
-                                            class="@(controller == "Projects" && action == "ArchivedProjects" ? "active" : "")">Archived Projects</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <!-- Tickets -->
-                            <li>
-                                <a href="#">
-                                    <span class="nav-link-icon">
-                                        <i class="bi bi-ticket"></i>
-                                    </span>
-                                    <span>Tickets</span>
-                                </a>
-                                <ul>
-                                    <li>
-                                        <a asp-area="" asp-controller="Tickets" asp-action="Create"
-                                            class="@(controller == "Tickets" && action == "Create" ? "active" : "")">Create a Ticket</a>
-                                    </li>
-                                    <li>
-                                        <a asp-area="" asp-controller="Tickets" asp-action="AllTickets"
-                                            class="@(controller == "Tickets" && action == "AllTickets" ? "active" : "")">All Tickets</a>
-                                    </li>
-                                    <li>
-                                        <a asp-area="" asp-controller="Tickets" asp-action="UnassignedTickets"
-                                            class="@(controller == "Tickets" && action == "UnassignedTickets" ? "active" : "")">Unassigned Tickets</a>
-                                    </li>
-                                    <li>
-                                        <a asp-area="" asp-controller="Tickets" asp-action="MyTickets"
-                                            class="@(controller == "Tickets" && action == "MyTickets" ? "active" : "")">My Tickets</a>
-                                    </li>
-                                    <li>
-                                        <a asp-area="" asp-controller="Tickets" asp-action="ArchivedTickets"
-                                            class="@(controller == "Tickets" && action == "ArchivedTickets" ? "active" : "")">Archived Tickets</a>
-                                    </li>
-                                    <li>
-                                        <a asp-area="" asp-controller="TicketComments" asp-action="Index"
-                                            class="@(controller == "TicketComments" && action == "Index" ? "active" : "")">Ticket Comments</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <!-- Notifications -->
-                            <li>
-                                <a class="@(controller == "Notifications" ? "active" : "")" asp-area="" asp-controller="Notifications" asp-action="Index">
-                                    <span class="nav-link-icon">
-                                        <i data-feather="bell"></i>
-                                    </span>
-                                    <span>Notifications</span>
-                                </a>
+
+                    <div class="header-logo">
+                        <a asp-action="Index" asp-controller="Home">
+                            <img class="logo" src="~/img/InsectCrusherLogo_500.png" class="img-fluid" style="max-height: 75px;" alt="logo">
+                        </a>
+                    </div>
+                </div>
+
+                <div class="header-body">
+                    <div class="header-body-left">
+                        <ul class="navbar-nav">
+                            <li class="nav-item mr-3">
+                                <div class="header-search-form">
+                                    <form>
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <button class="btn">
+                                                    <i data-feather="search"></i>
+                                                </button>
+                                            </div>
+                                            <input type="text" class="form-control" placeholder="Search">
+                                            <div class="input-group-append">
+                                                <button class="btn header-search-close-btn">
+                                                    <i data-feather="x"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
                             </li>
                         </ul>
                     </div>
-                </div>
-                <!-- end::navigation -->
 
-                <!-- Content body -->
-                <div class="content-body">
-                    <!-- Content -->
-                    <div class="content ">
+                    <div class="header-body-right">
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a href="#" class="nav-link mobile-header-search-btn" title="Search">
+                                    <i data-feather="search"></i>
+                                </a>
+                            </li>
 
-                        @RenderBody()
+                            <li class="nav-item dropdown d-none d-md-block">
+                                <a href="#" class="nav-link" title="Fullscreen" data-toggle="fullscreen">
+                                    <i class="maximize" data-feather="maximize"></i>
+                                    <i class="minimize" data-feather="minimize"></i>
+                                </a>
+                            </li>
 
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link nav-link-notify" title="Notifications" data-toggle="dropdown">
+                                    <i data-feather="bell"></i>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right dropdown-menu-big">
+                                    <div class="border-bottom px-4 py-3 text-center d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Notifications</h5>
+                                        <small class="opacity-7">2   unread notifications</small>
+                                    </div>
+                                    <div class="dropdown-scroll">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="px-4 py-2 text-center small text-muted bg-light">Today</li>
+                                            <li class="px-4 py-3 list-group-item">
+                                                <a href="#" class="d-flex align-items-center hide-show-toggler">
+                                                    <div class="flex-shrink-0">
+                                                        <figure class="avatar mr-3">
+                                                            <span class="avatar-title bg-info-bright text-info rounded-circle">
+                                                                <i class="ti-lock"></i>
+                                                            </span>
+                                                        </figure>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-0 line-height-20 d-flex justify-content-between">
+                                                            2 steps verification
+                                                            <i title="Mark as read" data-toggle="tooltip"
+                                                               class="hide-show-toggler-item fa fa-circle-o font-size-11"></i>
+                                                        </p>
+                                                        <span class="text-muted small">20 min ago</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li class="px-4 py-3 list-group-item">
+                                                <a href="#" class="d-flex align-items-center hide-show-toggler">
+                                                    <div class="flex-shrink-0">
+                                                        <figure class="avatar mr-3">
+                                                            <span class="avatar-title bg-warning-bright text-warning rounded-circle">
+                                                                <i class="ti-server"></i>
+                                                            </span>
+                                                        </figure>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-0 line-height-20 d-flex justify-content-between">
+                                                            Storage is running low!
+                                                            <i title="Mark as read" data-toggle="tooltip"
+                                                               class="hide-show-toggler-item fa fa-circle-o font-size-11"></i>
+                                                        </p>
+                                                        <span class="text-muted small">45 sec ago</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li class="px-4 py-2 text-center small text-muted bg-light">Old Notifications</li>
+                                            <li class="px-4 py-3 list-group-item">
+                                                <a href="#" class="d-flex align-items-center hide-show-toggler">
+                                                    <div class="flex-shrink-0">
+                                                        <figure class="avatar mr-3">
+                                                            <span class="avatar-title bg-secondary-bright text-secondary rounded-circle">
+                                                                <i class="ti-file"></i>
+                                                            </span>
+                                                        </figure>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-0 line-height-20 d-flex justify-content-between">
+                                                            1 person sent a file
+                                                            <i title="Mark as unread" data-toggle="tooltip"
+                                                               class="hide-show-toggler-item fa fa-check font-size-11"></i>
+                                                        </p>
+                                                        <span class="text-muted small">Yesterday</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li class="px-4 py-3 list-group-item">
+                                                <a href="#" class="d-flex align-items-center hide-show-toggler">
+                                                    <div class="flex-shrink-0">
+                                                        <figure class="avatar mr-3">
+                                                            <span class="avatar-title bg-success-bright text-success rounded-circle">
+                                                                <i class="ti-download"></i>
+                                                            </span>
+                                                        </figure>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-0 line-height-20 d-flex justify-content-between">
+                                                            Reports ready to download
+                                                            <i title="Mark as unread" data-toggle="tooltip"
+                                                               class="hide-show-toggler-item fa fa-check font-size-11"></i>
+                                                        </p>
+                                                        <span class="text-muted small">Yesterday</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li class="px-4 py-3 list-group-item">
+                                                <a href="#" class="d-flex align-items-center hide-show-toggler">
+                                                    <div class="flex-shrink-0">
+                                                        <figure class="avatar mr-3">
+                                                            <span class="avatar-title bg-primary-bright text-primary rounded-circle">
+                                                                <i class="ti-arrow-top-right"></i>
+                                                            </span>
+                                                        </figure>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="mb-0 line-height-20 d-flex justify-content-between">
+                                                            The invitation has been sent.
+                                                            <i title="Mark as unread" data-toggle="tooltip"
+                                                               class="hide-show-toggler-item fa fa-check font-size-11"></i>
+                                                        </p>
+                                                        <span class="text-muted small">Last Week</span>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="px-4 py-3 text-right border-top">
+                                        <ul class="list-inline small">
+                                            <li class="list-inline-item mb-0">
+                                                <a href="#">Mark All Read</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <partial name="_LoginPartial" />
+                        </ul>
                     </div>
-                    <!-- ./ Content -->
-
-                    <!-- Footer -->
-                    <footer class="content-footer">
-                        <div>All Rights Reserved &copy; 2022 Tom Nguyen</div>
-                        <div>
-                            <a href="https://www.linkedin.com/in/txn9517"><i class="bi bi-linkedin px-2 socialIcons"></i></a>
-                            <a href="https://github.com/tn2690/"><i class="bi bi-github socialIcons"></i></a>
-                        </div>
-                    </footer>
-                    <!-- ./ Footer -->
                 </div>
-                <!-- ./ Content body -->
+
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item header-toggler">
+                        <a href="#" class="nav-link">
+                            <i data-feather="arrow-down"></i>
+                        </a>
+                    </li>
+                </ul>
             </div>
-            <!-- ./ Content wrapper -->
         </div>
-        <!-- ./ Layout wrapper -->
+        <!-- ./ Header -->
+
+        <!-- Content wrapper -->
+        <div class="content-wrapper">
+
+            <partial name="_Sidebar" />
+
+            <!-- Content body -->
+            <div class="content-body">
+                <!-- Content -->
+                <div class="content ">
+
+                    @RenderBody()
+
+                </div>
+                <!-- ./ Content -->
+
+                <!-- Footer -->
+                <footer class="content-footer">
+                    <div>System Created by Tom Nguyen | All Rights Reserved &copy; 2022</div>
+                    <div>
+                        <a href="https://www.linkedin.com/in/txn9517"><i class="bi bi-linkedin px-2 socialIcons"></i></a>
+                        <a href="https://github.com/tn2690/"><i class="bi bi-github socialIcons"></i></a>
+                    </div>
+                </footer>
+                <!-- ./ Footer -->
+            </div>
+            <!-- ./ Content body -->
+        </div>
+        <!-- ./ Content wrapper -->
+    </div>
+    <!-- ./ Layout wrapper -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
 
     <!-- ------------------- Gogi scripts start ----------------------------- -->
     <!-- Main scripts -->
@@ -285,7 +315,6 @@
     <script src="~/vendors/ckeditor5/ckeditor.js"></script>
 
     <!-- ------------------- Gogi scripts end ----------------------------- -->
-
     <!-- Sweet Alerts -->
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
