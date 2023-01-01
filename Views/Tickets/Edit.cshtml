@@ -4,12 +4,34 @@
     ViewData["Title"] = "Edit";
 }
 
+<!-- Edit a Ticket -->
+
 <!-- Select2 -->
 <link rel="stylesheet" href="~/vendors/select2/css/select2.min.css" type="text/css">
 
+<div class="page-header">
+    <div>
+        <h3>Edit a Ticket</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a asp-action="Index" asp-controller="Home">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a asp-action="AllTickets">Tickets</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a asp-action="Details" asp-route-id="@Model.Id">Ticket Details</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Edit a Ticket</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
 <div class="card">
     <div class="card-body">
-        <form asp-action="Edit" method="post" asp-controller="Projects" enctype="multipart/form-data">
+        <form asp-action="Edit" method="post" asp-controller="Tickets">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="ProjectId" />
@@ -19,9 +41,6 @@
             <input type="hidden" asp-for="ArchivedByProject" />
             <input type="hidden" asp-for="DeveloperUserId" />
             <input type="hidden" asp-for="SubmitterUserId" />
-
-            <h1>Edit a Ticket</h1>
-            <hr />
 
             <div class="row">
                 <div class="col-12 col-lg-4">
@@ -65,16 +84,12 @@
                         <span asp-validation-for="SubmitterUserId" class="text-danger"></span>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="d-flex justify-content-end">
-                        <input type="submit" value="Save" class="btn btn-primary rounded-pill" />
-                    </div>
-                </div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary rounded-pill mx-3">Back to Ticket Details</a>
+                <input type="submit" value="Save" class="btn btn-outline-primary rounded-pill" />
             </div>
         </form>
-        <div>
-            <a asp-action="AllTickets" class="btn btn-primary rounded-pill">Back to List</a>
-        </div>
     </div>
 </div>
 

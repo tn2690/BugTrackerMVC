@@ -115,10 +115,13 @@
                         <a asp-area="" asp-controller="Tickets" asp-action="MyTickets"
                            class="@(controller == "Tickets" && action == "MyTickets" ? "active" : "")">My Tickets</a>
                     </li>
-                    <li>
-                        <a asp-area="" asp-controller="Tickets" asp-action="ArchivedTickets"
-                           class="@(controller == "Tickets" && action == "ArchivedTickets" ? "active" : "")">Archived Tickets</a>
-                    </li>
+                    @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
+                    {
+                        <li>
+                            <a asp-area="" asp-controller="Tickets" asp-action="ArchivedTickets"
+                               class="@(controller == "Tickets" && action == "ArchivedTickets" ? "active" : "")">Archived Tickets</a>
+                        </li>
+                    }
                 </ul>
             </li>
             <!-- Notifications -->

@@ -1,9 +1,14 @@
 ﻿@model IEnumerable<BugTrackerMVC.Models.Ticket>
 @using BugTrackerMVC.Models.Enums
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<BTUser> _UserManager
 
 @{
     ViewData["Title"] = "Unassigned Tickets";
+    string btUser = _UserManager.GetUserId(User);
 }
+
+<!-- Unassigned Tickets -->
 
 <!-- DataTable -->
 <link rel="stylesheet" href="~/vendors/dataTable/datatables.min.css" type="text/css">
@@ -31,7 +36,7 @@
         <div class="card">
             <div class="card-body">
                 <p>
-                    <a asp-action="Create" class="btn btn-primary rounded-pill">Create New</a>
+                    <a asp-action="Create" class="btn btn-outline-primary rounded-pill">Create New</a>
                 </p>
 
                 <table id="unassignedTicketsTable" class="table table-striped table-bordered">
@@ -52,6 +57,7 @@
                             <th>
                                 @Html.DisplayNameFor(model => model.TicketStatus)
                             </th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -74,21 +80,35 @@
                                     @Html.DisplayFor(modelItem => item.TicketStatus!.Name)
                                 </td>
                                 <td>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary rounded-pill">Edit</a>
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary rounded-pill">Details</a>
-                                    @* show Archive button if ticket is not archived *@
-                                    @if (item.Archived == false && item.ArchivedByProject == false)
+                                    @* Admin, submitter or developer of ticket can see Edit button *@
+                                    @if (User.IsInRole(nameof(BTRoles.Admin)) || (item.SubmitterUserId == btUser || item.DeveloperUserId == btUser))
                                     {
-                                        <a asp-action="Archive" asp-route-id="@item.Id" class="btn btn-danger rounded-pill">Archive</a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Edit</a>
                                     }
-                                    @* Restore button if ticket is archived *@
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Details</a>
+                                    @* show Archive button if ticket is not archived *@
+                                    @if (User.IsInRole(nameof(BTRoles.Admin)))
+                                    {
+                                        @if (item.Archived == false && item.ArchivedByProject == false)
+                                        {
+                                            <a asp-action="Archive" asp-route-id="@item.Id" class="btn btn-outline-danger rounded-pill mx-2">Archive</a>
+                                        }
+                                        @* Restore button if ticket is archived *@
+                                        else
+                                        {
+                                            <a asp-action="Restore" asp-route-id="@item.Id" class="btn btn-outline-success rounded-pill mx-2">Restore</a>
+                                        }
+                                    }
+                                    @if (item.DeveloperUserId is null && User.IsInRole(nameof(BTRoles.ProjectManager)))
+                                    {
+                                        <a class="btn btn-outline-info rounded-pill mx-2" asp-action="AssignDeveloper" asp-route-id="@item.Id">Assign Developer</a>
+                                    }
                                     else
                                     {
-                                        <a asp-action="Restore" asp-route-id="@item.Id" class="btn btn-success rounded-pill">Restore</a>
-                                    }
-                                    @if (item.DeveloperUser?.FullName is null && User.IsInRole(nameof(BTRoles.Admin)))
-                                    {
-                                        <a class="btn btn-sm btn-info rounded-pill mx-2" asp-action="AssignDeveloper" asp-route-id="@item.Id">Assign Developer</a>
+                                        @if (User.IsInRole(nameof(BTRoles.ProjectManager)))
+                                        {
+                                            <a class="btn btn-outline-secondary rounded-pill mx-2" asp-action="AssignDeveloper" asp-route-id="@item.Id">@(item.DeveloperUser?.FullName ?? "Unassigned")</a>
+                                        }
                                     }
                                 </td>
                             </tr>
@@ -102,11 +122,18 @@
 </div>
 
 @section scripts {
+
     <!-- DataTable -->
     <script src="~/vendors/dataTable/datatables.min.js"></script>
     <script src="~/assets/js/examples/datatable.js"></script>
 
     <script>
+        $('#unassignedTicketsTable').DataTable({
+            "scrollY": "500px",
+            "scrollCollapse": true,
+            responsive: true
+        });
+
         $(document).ready(function () {
             $('#unassignedTicketsTable').DataTable();
         });

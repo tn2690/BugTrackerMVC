@@ -1,10 +1,20 @@
 ﻿@page
 @model AccessDeniedModel
 @{
-    ViewData["Title"] = "Access denied";
+    ViewData["Title"] = "Page Not Available";
 }
 
-<header>
-    <h1 class="text-danger">@ViewData["Title"]</h1>
-    <p class="text-danger">You do not have access to this resource.</p>
-</header>
+<div class="row">
+    <div class="col-12 col-lg-4">
+
+        <div class="card">
+            <div class="card-body">
+                <img class="img-fluid" src="~/assets/media/svg/404.svg" alt="error image">
+                <h3>Page not found</h3>
+                <p class="text-muted">The page you want to go to is not available for access</p>
+                <a asp-action="Index" class="btn btn-outline-light ml-2">Back</a>
+            </div>
+        </div>
+
+    </div>
+</div>

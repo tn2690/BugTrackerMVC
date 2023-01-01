@@ -5,7 +5,27 @@
     ViewData["Title"] = "Add Members";
 }
 
-<h3 class="my-5">Add Developer(s) & Submitter(s)</h3>
+<!-- Add Members to Project -->
+
+<div class="page-header">
+    <div>
+        <h3>Add Developer(s) & Submitter(s)</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a asp-action="Index" asp-controller="Home">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a asp-action="AllProjects">Projects</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a asp-action="Details" asp-route-id="@Model.Project!.Id">Project Details</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Add Developer(s) & Submitter(s)<li>
+            </ol>
+        </nav>
+    </div>
+</div>
 
 <div class="row">
     <div class="col-12 col-lg-6">
@@ -57,8 +77,7 @@
 
 <div class="col-12 col-lg-12">
     <div class="d-flex justify-content-center">
-        <a asp-action="AllProjects" class="btn btn-outline-primary rounded-pill mx-2">Back to Projects</a>
-        <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-outline-secondary rounded-pill">Back to Project Details</a>
+        <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-outline-primary rounded-pill">Back to Project Details</a>
     </div>
 </div>
 

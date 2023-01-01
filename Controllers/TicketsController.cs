@@ -65,6 +65,7 @@ namespace BugTrackerMVC.Controllers
         }
 
         // GET: Tickets/ArchivedTickets
+        [Authorize(Roles = "Admin,ProjectManager")]
         public async Task<IActionResult> ArchivedTickets()
         {
             int companyId = User.Identity!.GetCompanyId();
@@ -161,7 +162,13 @@ namespace BugTrackerMVC.Controllers
                 // get new ticket
                 Ticket newTicket = await _btTicketService.GetTicketAsNoTrackingAsync(viewModel.Ticket.Id, companyId);
 
+                // get ticket to change status
+                // TODO: check this
+                Ticket ticket = await _btTicketService.GetTicketByIdAsync(viewModel.Ticket.ProjectId, companyId);
+
                 // set ticket status
+                //ticket.TicketStatusId = (await _btTicketService.GetTicketStatusesAsync()).FirstOrDefault(s => s.Name == nameof(BTTicketStatuses.Development))!.Id;
+
                 newTicket.TicketStatusId = (await _btTicketService.GetTicketStatusesAsync()).FirstOrDefault(s => s.Name == nameof(BTTicketStatuses.Development))!.Id;
 
                 // add ticket history record
@@ -389,13 +396,21 @@ namespace BugTrackerMVC.Controllers
                 return NotFound();
             }
 
-            ViewData["ProjectId"] = new SelectList(await _btTicketService.GetProjectsAsync(), "Id", "Name", ticket.ProjectId);
-            ViewData["SubmitterUserId"] = new SelectList(await _btTicketService.GetUsersAsync(), "Id", "FullName", ticket.SubmitterUserId);
-            ViewData["TicketPriorityId"] = new SelectList(await _btTicketService.GetTicketPrioritiesAsync(), "Id", "Name", ticket.TicketPriorityId);
-            ViewData["TicketStatusId"] = new SelectList(await _btTicketService.GetTicketStatusesAsync(), "Id", "Name", ticket.TicketStatusId);
-            ViewData["TicketTypeId"] = new SelectList(await _btTicketService.GetTicketTypesAsync(), "Id", "Name", ticket.TicketTypeId);
-            
-            return View(ticket);
+            // check if the user is an admin, or submitter user id matches the user logged in or if developer user id matches user
+            if ((User.IsInRole(nameof(BTRoles.Admin) ) || ticket.SubmitterUserId == _userManager.GetUserId(User) || ticket.DeveloperUserId == _userManager.GetUserId(User)))
+            {
+                ViewData["ProjectId"] = new SelectList(await _btTicketService.GetProjectsAsync(), "Id", "Name", ticket.ProjectId);
+                ViewData["SubmitterUserId"] = new SelectList(await _btTicketService.GetUsersAsync(), "Id", "FullName", ticket.SubmitterUserId);
+                ViewData["TicketPriorityId"] = new SelectList(await _btTicketService.GetTicketPrioritiesAsync(), "Id", "Name", ticket.TicketPriorityId);
+                ViewData["TicketStatusId"] = new SelectList(await _btTicketService.GetTicketStatusesAsync(), "Id", "Name", ticket.TicketStatusId);
+                ViewData["TicketTypeId"] = new SelectList(await _btTicketService.GetTicketTypesAsync(), "Id", "Name", ticket.TicketTypeId);
+
+                return View(ticket);
+            }
+            else
+            {
+                return Unauthorized();
+            }
         }
 
         // POST: Tickets/Edit/5
@@ -406,6 +421,13 @@ namespace BugTrackerMVC.Controllers
             if (id != ticket.Id)
             {
                 return NotFound();
+            }
+
+            // if user is admin, the submitter or developer, let them edit
+            // return error
+            if ( !(User.IsInRole(nameof(BTRoles.Admin) ) || !(ticket.SubmitterUserId == _userManager.GetUserId(User) ) || !(ticket.DeveloperUserId == _userManager.GetUserId(User) ) ) )
+            {
+                return Unauthorized();
             }
 
             if (ModelState.IsValid)
@@ -486,6 +508,7 @@ namespace BugTrackerMVC.Controllers
         }
 
         // GET: Tickets/Archive/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Archive(int? id)
         {
             if (id == null)
@@ -496,7 +519,7 @@ namespace BugTrackerMVC.Controllers
             // get company id
             int companyId = User.Identity!.GetCompanyId();
 
-            // TODO: call service
+            // call service
             Ticket? ticket = await _btTicketService.GetTicketByIdAsync(id.Value, companyId);
 
             if (ticket == null)
@@ -508,6 +531,7 @@ namespace BugTrackerMVC.Controllers
         }
 
         // GET: Tickets/Restore/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Restore(int? id)
         {
             if (id == null)
@@ -518,7 +542,7 @@ namespace BugTrackerMVC.Controllers
             // get company id
             int companyId = User.Identity!.GetCompanyId();
 
-            // TODO: call service
+            // call service
             Ticket? ticket = await _btTicketService.GetTicketByIdAsync(id.Value, companyId);
 
             if (ticket == null)
@@ -532,6 +556,7 @@ namespace BugTrackerMVC.Controllers
         // POST: Tickets/Archive/5
         [HttpPost, ActionName("Archive")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ArchiveConfirmed(int id)
         {
             if (id == 0)
@@ -544,6 +569,7 @@ namespace BugTrackerMVC.Controllers
 
             Ticket? ticket = await _btTicketService.GetTicketByIdAsync(id, companyId);
 
+            // TODO: check this
             if (ticket != null)
             {
                 // set status to Resolved
@@ -562,6 +588,7 @@ namespace BugTrackerMVC.Controllers
         // POST: Tickets/Restore/5
         [HttpPost, ActionName("Restore")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RestoreConfirmed(int id)
         {
             if (id == 0)

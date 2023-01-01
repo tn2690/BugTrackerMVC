@@ -5,9 +5,30 @@
     ViewData["Title"] = "Assign Project Manager";
 }
 
+<!-- Assign Project Manager -->
+
+<div class="page-header">
+    <div>
+        <h3>Assign Project Manager</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a asp-action="Index" asp-controller="Home">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a asp-action="AllProjects">Projects</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a asp-action="Details" asp-route-id="@Model.Project!.Id">Project Details</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Assign Project Manager<li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
 <div class="d-flex justify-content-center mt-5 flex-column align-items-center">
 
-    <h3 class="my-5">Assign Project Manager</h3>
     <div class="card">
         <div class="card-header">
             <div class="card-title">Project: @Model.Project!.Name</div>
@@ -19,14 +40,13 @@
                     <option value="">Unassigned</option>
                 </select>
                 <div class="d-flex justify-content-center">
-                    <button type="submit" class="btn btn-outline-primary rounded-pill my-3 mx-2">Save</button>
+                    <button type="submit" class="btn btn-outline-primary rounded-pill my-2">Save</button>
                 </div>
             </form>
 
             <div class="col-12 col-lg-12">
                 <div class="d-flex justify-content-center">
-                    <a asp-action="AllProjects" class="btn btn-outline-primary rounded-pill mx-2">Back to Projects</a>
-                    <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-outline-secondary rounded-pill">Back to Project Details</a>
+                    <a asp-action="Details" asp-route-id="@Model.Project!.Id" class="btn btn-outline-primary rounded-pill my-2">Back to Project Details</a>
                 </div>
             </div>
         </div>

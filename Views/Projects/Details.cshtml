@@ -17,6 +17,8 @@
 
 }
 
+<!-- Project Details -->
+
 <div class="page-header">
     <div>
         <h3>Project Details</h3>
@@ -34,12 +36,25 @@
     </div>
 </div>
 
-<div>
+@*<div>
     @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
     {
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary rounded-pill">Edit This Project</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary rounded-pill mx-2">Edit This Project</a>
+
+        @if (User.IsInRole(nameof(BTRoles.Admin)))
+        {
+
+            @if (Model.Archived == false)
+            {
+                <a asp-action="Archive" asp-route-id="@Model.Id" class="btn btn-outline-danger rounded-pill">Archive This Project</a>
+            }
+            else
+            {
+                <a asp-action="Restore" asp-route-id="@Model.Id" class="btn btn-outline-success rounded-pill">Restore This Project</a>
+            }
+        }
     }
-</div>
+</div>*@
 
 <div>
     <div class="container-fluid">
@@ -50,7 +65,24 @@
                     <div class="card col m-1 p-2">
                         <div class="body">
                             @* Project Name *@
-                            <h5>@Model.Name</h5>
+                            <h3>Project: @Model.Name</h3>
+                            @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
+                            {
+                                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary rounded-pill mx-2 my-2">Edit This Project</a>
+
+                                @if (User.IsInRole(nameof(BTRoles.Admin)))
+                                {
+
+                                    @if (Model.Archived == false)
+                                    {
+                                        <a asp-action="Archive" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-danger rounded-pill my-2">Archive This Project</a>
+                                    }
+                                    else
+                                    {
+                                        <a asp-action="Restore" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-success rounded-pill my-2">Restore This Project</a>
+                                    }
+                                }
+                            }
                             @* Project Description *@
                             <p>@Model.Description</p>
                             <div class="progress-container progress-info m-b-25">
@@ -105,13 +137,16 @@
                                  alt="project manager image" />
                             @(projectManager?.FullName ?? "Unassigned")
 
-                            @if (projectManager is null && User.IsInRole(nameof(BTRoles.Admin)))
+                            @if (projectManager is null && (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager))))
                             {
-                                <a class="btn btn btn-outline-info rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@Model.Id">Assign PM</a>
+                                <a class="btn btn-outline-info rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@Model.Id">Assign PM</a>
                             }
                             else
                             {
-                                <a class="btn btn btn-outline-secondary rounded-pill" asp-action="AssignProjectManager" asp-route-id="@Model.Id">Change PM</a>
+                                @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
+                                {
+                                    <a class="btn btn-outline-secondary rounded-pill" asp-action="AssignProjectManager" asp-route-id="@Model.Id">Change PM</a>
+                                }
                             }
                         </div>
                     </div>
@@ -139,7 +174,10 @@
                                     </li>
                                 }
 
-                                <a asp-action="AddMembers" asp-route-id="@Model.Id" class="btn btn-outline-primary rounded-pill">Add Member(s)</a>
+                                @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
+                                {
+                                    <a asp-action="AddMembers" asp-route-id="@Model.Id" class="btn btn-outline-primary rounded-pill">Add Member(s)</a>
+                                }
 
                             </ul>
 
@@ -191,6 +229,10 @@
                     <div class="card m-1 p-2">
                         <div>
                             <h2>Tickets</h2>
+
+                            <p>
+                                <a asp-action="Create" asp-controller="Tickets" class="btn btn-outline-primary rounded-pill">Create New</a>
+                            </p>
                         </div>
                         <div class="body">
                             <div class="table-responsive" style="overflow-y:auto;height:600px;">
@@ -259,10 +301,6 @@
                     </div>
 
                 </div>
-            </div>
-
-            <div class="d-flex justify-content-start my-2">
-                <a asp-action="AllProjects" class="btn btn-outline-primary rounded-pill">Back to Projects</a>
             </div>
         </div>
     </div>

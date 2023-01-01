@@ -4,10 +4,32 @@
     ViewData["Title"] = "Archive Ticket";
 }
 
+<!-- Archive Ticket -->
+
+<div class="page-header">
+    <div>
+        <h3>Archive Ticket</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a asp-action="Index" asp-controller="Home">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a asp-action="AllTickets">Tickets</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a asp-action="Details" asp-route-id="@Model.Id">Ticket Details</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Archive Ticket<li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12 col-md-8 offset-md-2">
         <h2>Are you sure?</h2>
-        <p class="text-lead text-muted">This ticket will be archived. It will be moved to Archived Tickets.</p>
+        <p class="text-lead text-muted">This ticket will be archived. It will be marked as 'Resolved' and moved to Archived Tickets.</p>
 
         <div class="card mb-3">
             <div class="row g-0">
@@ -33,7 +55,7 @@
                             <span class="fw-bold me-2">Submitted by: </span>@Model.SubmitterUser!.FullName
                         </div>
                         <div class="card-text">
-                            <span class="fw-bold me-2">Updated:</span>@(Model.Updated?.ToString("MMM dd, yyyy") ?? "No date available")
+                            <span class="fw-bold me-2">Updated:</span>@(Model.Updated?.ToString("MMM dd, yyyy") ?? "No Date Available")
                         </div>
                     </div>
                 </div>
@@ -41,8 +63,8 @@
         </div>
         <form class="d-flex justify-content-between" asp-action="Archive" asp-route-id="@Model.Id">
             <input hidden asp-for="Id" />
-            <a asp-action="AllTickets" asp-controller="Tickets" class="btn btn-outline-secondary rounded-pill btnLink">Cancel</a>
-            <button type="submit" class="btn btn-danger rounded-pill btnLink">Archive</button>
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary rounded-pill">Back to Ticket Details</a>
+            <button type="submit" class="btn btn-danger rounded-pill">Archive</button>
         </form>
     </div>
 </div>

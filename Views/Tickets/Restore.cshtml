@@ -4,6 +4,28 @@
     ViewData["Title"] = "Delete";
 }
 
+<!-- Restore Ticket -->
+
+<div class="page-header">
+    <div>
+        <h3>Restore Ticket</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a asp-action="Index" asp-controller="Home">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a asp-action="ArchivedTickets">Archived Tickets</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a asp-action="Details" asp-route-id="@Model.Id">Ticket Details</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Restore Ticket<li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-12 col-md-8 offset-md-2">
         <h2>Are you sure?</h2>
@@ -33,7 +55,7 @@
                             <span class="fw-bold me-2">Submitted by: </span>@Model.SubmitterUser!.FullName
                         </div>
                         <div class="card-text">
-                            <span class="fw-bold me-2">Updated:</span>@(Model.Updated?.ToString("MMM dd, yyyy") ?? "No date available")
+                            <span class="fw-bold me-2">Updated:</span>@(Model.Updated?.ToString("MMM dd, yyyy") ?? "No Date Available")
                         </div>
                     </div>
                 </div>
@@ -41,93 +63,8 @@
         </div>
         <form class="d-flex justify-content-between" asp-action="Restore" asp-route-id="@Model.Id">
             <input hidden asp-for="Id" />
-            <a asp-action="ArchivedTickets" asp-controller="Tickets" class="btn btn-outline-secondary rounded-pill btnLink">Cancel</a>
-            <button type="submit" class="btn btn-danger rounded-pill btnLink">Restore</button>
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary rounded-pill">Back to Ticket Details</a>
+            <button type="submit" class="btn btn-success rounded-pill">Restore</button>
         </form>
     </div>
 </div>
-
-@*<div>
-    <h1>Restore</h1>
-    <h3>Are you sure you want to restore this ticket?</h3>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Created)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Created)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Updated)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Updated)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Archived)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Archived)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ArchivedByProject)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ArchivedByProject)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Project)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Project!.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketPriority)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TicketPriority!.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketType)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TicketType!.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TicketStatus)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TicketStatus!.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DeveloperUser)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DeveloperUser!.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SubmitterUser)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SubmitterUser!.FullName)
-        </dd>
-    </dl>
-    
-    <form asp-action="Restore" method="post">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Restore" class="btn btn-success rounded-pill" /> |
-        <a asp-action="ArchivedTickets">Back to List</a>
-    </form>
-</div>*@

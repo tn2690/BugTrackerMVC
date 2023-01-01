@@ -12,6 +12,8 @@
     string btUser = _UserManager.GetUserId(User);
 }
 
+<!-- Archive Project -->
+
 <div class="page-header">
     <div>
         <h3>Archive Project</h3>
@@ -77,7 +79,7 @@
         </div>
         <form class="d-flex justify-content-between" asp-action="Archive" asp-route-id="@Model.Id">
             <input hidden asp-for="Id" />
-            <a asp-action="AllProjects" asp-controller="Projects" class="btn btn-outline-secondary rounded-pill btnLink">Back to All Projects</a>
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary rounded-pill">Back to Project Details</a>
             <button type="submit" class="btn btn-outline-danger rounded-pill btnLink">Archive</button>
         </form>
     </div>

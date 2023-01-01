@@ -8,6 +8,8 @@
     ViewData["Title"] = "My Projects";
 }
 
+<!-- My Projects -->
+
 <!-- DataTable -->
 <link rel="stylesheet" href="~/vendors/dataTable/datatables.min.css" type="text/css">
 
@@ -77,25 +79,39 @@
                                 <td>
                                     @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
                                     {
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill">Edit</a>
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Edit</a>
                                     }
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill">Details</a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Details</a>
                                     @if (User.IsInRole(nameof(BTRoles.Admin)))
                                     {
-                                        <a asp-action="Archive" asp-route-id="@item.Id" class="btn btn-outline-danger rounded-pill">Archive</a>
+                                        @if (item.Archived == false)
+                                        {
+                                            <a asp-action="Archive" asp-route-id="@item.Id" class="btn btn-outline-danger rounded-pill mx-2">Archive</a>
+                                        }
+                                        @* Restore button if project is archived *@
+                                        else
+                                        {
+                                            <a asp-action="Restore" asp-route-id="@item.Id" class="btn btn-outline-success rounded-pill mx-2">Restore</a>
+                                        }
                                     }
                                     @{
                                         BTUser? projectManager = await _BTProjectService.GetProjectManagerAsync(item.Id);
                                     }
-                                    @if (projectManager is null && User.IsInRole(nameof(BTRoles.Admin)))
+                                    @if (projectManager is null && (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager))))
                                     {
-                                        <a class="btn btn-sm btn-outline-info rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@item.Id">Assign PM</a>
+                                        <a class="btn btn-outline-info rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@item.Id">Assign PM</a>
                                     }
                                     else
                                     {
-                                        <a class="btn btn-sm btn-outline-secondary rounded-pill" asp-action="AssignProjectManager" asp-route-id="@item.Id">@(projectManager?.FullName ?? "Unassigned")</a>
+                                        @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
+                                        {
+                                            <a class="btn btn-outline-secondary rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@item.Id">@(projectManager?.FullName ?? "Unassigned")</a>
+                                        }
                                     }
-                                    <a asp-action="AddMembers" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill">Add Member(s)</a>
+                                    @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
+                                    {
+                                        <a asp-action="AddMembers" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Add Member(s)</a>
+                                    }
                                 </td>
                             </tr>
                         }

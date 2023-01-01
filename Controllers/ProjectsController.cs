@@ -92,6 +92,7 @@ namespace BugTrackerMVC.Controllers
 
         // GET: Projects/AddMembers/5
         [HttpGet]
+        [Authorize(Roles = "Admin,ProjectManager")]
         public async Task<IActionResult> AddMembers(int? id)
         {
             // validate id
@@ -148,6 +149,7 @@ namespace BugTrackerMVC.Controllers
         // POST: Projects/AddMembers/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,ProjectManager")]
         public async Task<IActionResult> AddMembers(AssignPMViewModel model)
         { 
             // check if project exists
@@ -181,7 +183,7 @@ namespace BugTrackerMVC.Controllers
 
         // GET: Projects/AssignProjectManager/5
         [HttpGet]
-        [Authorize(Roles = nameof(BTRoles.Admin))]
+        [Authorize(Roles = "Admin,ProjectManager")]
         public async Task<IActionResult> AssignProjectManager(int? id)
         {
             // validate id
@@ -213,7 +215,7 @@ namespace BugTrackerMVC.Controllers
         // POST: Projects/AssignProjectManager/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,ProjectManager")]
         public async Task<IActionResult> AssignProjectManager(AssignPMViewModel viewModel)
         {
             if (viewModel.Project?.Id != null)
@@ -449,13 +451,9 @@ namespace BugTrackerMVC.Controllers
 
             int companyId = User.Identity!.GetCompanyId();
 
-            //BTUser member = await _userManager.GetUserAsync(User);
-
             Project? project = await _btProjectService.GetProjectByIdAsync(id, companyId);
 
-            // remove a member from a project
-            //await _btProjectService.RemoveMemberFromProjectAsync(member, project.Id);
-
+            // TODO: check this
             if (project != null)
             {
                 // call service (UpdateProjectAsync)
@@ -483,6 +481,7 @@ namespace BugTrackerMVC.Controllers
 
             Project? project = await _btProjectService.GetProjectByIdAsync(id, companyId);
 
+            // TODO: check this
             if (project != null)
             {
                 // call service (UpdateProjectAsync)
