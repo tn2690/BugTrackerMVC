@@ -8,6 +8,7 @@ namespace BugTrackerMVC.Services.Interfaces
 
         public Task AdminNotificationAsync(Notification notification, int companyId);
 
+        // get all notifications by user id
         public Task<List<Notification>> GetNotificationsByUserIdAsync(string userId);
 
         public Task<bool> SendAdminEmailNotificationAsync(Notification notification, string emailSubject, int companyId);
@@ -18,8 +19,8 @@ namespace BugTrackerMVC.Services.Interfaces
 
         public Task UpdateNotificationAsync(Notification notification);
 
-        // get all notifications by company id
-        public Task<List<Notification>> GetAllNotificationsByCompanyId(int companyId);
+        // get new notifications by user id
+        public Task<List<Notification>> GetNewNotificationsByUserIdAsync(string userId);
 
     }
 }

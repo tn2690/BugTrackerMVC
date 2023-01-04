@@ -10,6 +10,7 @@ using BugTrackerMVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using BugTrackerMVC.Services.Interfaces;
 using BugTrackerMVC.Extensions;
+using Microsoft.AspNetCore.Identity;
 
 namespace BugTrackerMVC.Controllers
 {
@@ -18,20 +19,23 @@ namespace BugTrackerMVC.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IBTNotificationService _btNotificationService;
+        private readonly UserManager<BTUser> _userManager;
 
         public NotificationsController(ApplicationDbContext context,
-                                        IBTNotificationService btNotificationService)
+                                        IBTNotificationService btNotificationService,
+                                        UserManager<BTUser> userManager)
         {
             _context = context;
             _btNotificationService = btNotificationService;
+            _userManager = userManager;
         }
 
         // GET: Notifications
         public async Task<IActionResult> Index()
         {
-            int companyId = User.Identity!.GetCompanyId();
+            string userId = _userManager.GetUserId(User);
 
-            List<Notification> notifications = (await _btNotificationService.GetAllNotificationsByCompanyId(companyId)).ToList();
+            List<Notification> notifications = (await _btNotificationService.GetNotificationsByUserIdAsync(userId)).ToList();
 
             return View(notifications);
         }

@@ -40,7 +40,7 @@
                         <div class="card-body">
                             @*Title of Ticket*@
                             <h2>Ticket: @Model.Title</h2>
-                            @if ((User.IsInRole(nameof(BTRoles.Admin)) || Model.SubmitterUserId == btUser || Model.DeveloperUserId == btUser))
+                            @if ((User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)) || Model.DeveloperUserId == btUser || Model.SubmitterUserId == btUser))
                             {
                                 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary rounded-pill my-2">Edit This Ticket</a>
 
@@ -48,16 +48,16 @@
                                 {
                                     @if (Model.Archived == false)
                                     {
-                                        <a asp-action="Archive" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-danger rounded-pill my-2">Archive This Project</a>
+                                        <a asp-action="Archive" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-danger rounded-pill my-2">Archive This Ticket</a>
                                     }
                                     else
                                     {
-                                        <a asp-action="Restore" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-success rounded-pill my-2">Restore This Project</a>
+                                        <a asp-action="Restore" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-success rounded-pill my-2">Restore This Ticket</a>
                                     }
                                 }
                             }
                             @*Title of Project*@
-                            <h5>Project: @Model.Project.Name</h5>
+                            <h5>Project: @Model.Project!.Name</h5>
                             <a asp-action="Details" asp-controller="Projects" asp-route-id="@Model.ProjectId" class="btn btn-sm btn-outline-primary rounded-pill my-2">Go to Project Details</a>
                             @*Description of Ticket*@
                             <p>Description: @Model.Description</p>
@@ -98,18 +98,25 @@
                                 @*Ticket developer*@
                                 <li>
                                     <strong>Assigned To:</strong> <span class="">  @(Model.DeveloperUser?.FullName ?? "No Developer Assigned")</span>
-                                    @if (@Model.DeveloperUserId is null && User.IsInRole(nameof(BTRoles.ProjectManager)))
+                                    @if (Model.DeveloperUserId is null && (User.IsInRole(nameof(BTRoles.Admin))) || User.IsInRole(nameof(BTRoles.ProjectManager)))
                                     {
                                         <a class="btn btn-outline-info rounded-pill mx-2" asp-action="AssignDeveloper" asp-route-id="@Model.Id">Assign Developer</a>
                                     }
                                     else
                                     {
-                                        @if (User.IsInRole(nameof(BTRoles.ProjectManager)))
+                                        @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
                                         {
                                             <a class="btn btn-outline-secondary rounded-pill mx-2" asp-action="AssignDeveloper" asp-route-id="@Model.Id">Change Developer</a>
                                         }
                                     }
                                 </li>
+                                @*Ticket active/inactive*@
+                                <li><strong>Ticket Active/Inactive: </strong> <span class="">  @if (Model.Archived == false && Model.ArchivedByProject == false && @percent < 100) {
+                                    <text>Ticket is Active</text>
+                                    }
+                                    else {
+                                        <text>Ticket is Inactive</text>
+                                    }</span></li>
                             </ul>
                         </div>
                     </div>
@@ -129,26 +136,31 @@
                                 <!-- user has to log in to see post comment fields -->
                                 @if (User.Identity!.IsAuthenticated)
                                 {
-                                    <!-- Start Comment Respond  -->
-                                    <div class="">
-                                        <h4 class="title">Leave a comment</h4>
-                                        <form asp-action="AddComment" method="post" asp-controller="Tickets">
-                                            <input type="hidden" asp-for="Id" name="TicketId">
-                                            <div class="row row--10">
-                                                <div class="col-12">
-                                                    <div class="">
-                                                        <textarea id="message" name="Comment" class="form-control"></textarea>
+                                    <!-- user has to be part of the ticket/project to comment -->
+                                    <!-- user has to be the developer of the ticket or the submitter of the ticket -->
+                                    @if (User.IsInRole("Admin") || Model.DeveloperUserId == btUser || Model.SubmitterUserId == btUser)
+                                    {
+                                        <!-- Start Comment Respond  -->
+                                        <div class="">
+                                            <h4 class="title">Leave a comment</h4>
+                                            <form asp-action="AddComment" method="post" asp-controller="Tickets">
+                                                <input type="hidden" asp-for="Id" name="TicketId">
+                                                <div class="row row--10">
+                                                    <div class="col-12">
+                                                        <div class="">
+                                                            <textarea id="message" name="Comment" class="form-control editor"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-12">
+                                                        <div class="">
+                                                            <input name="submit" type="submit" id="submit" class="btn btn-outline-primary rounded-pill my-2" value="Post">
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-lg-12">
-                                                    <div class="">
-                                                        <input name="submit" type="submit" id="submit" class="btn btn-outline-primary rounded-pill my-2" value="Post">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <!-- End Comment Respond  -->
+                                            </form>
+                                        </div>
+                                        <!-- End Comment Respond  -->
+                                    }
                                 }
                                 <hr />
                                 <h6>Comments</h6>
@@ -219,24 +231,28 @@
                                 @* Refer to the Ticket Attachments document for this section *@
 
                                 @* Ticket attachments part 1 here *@
-                                <div class="row clearfix">
-                                    <div>
-                                        <form asp-action="AddTicketAttachment" asp-controller="Tickets" enctype="multipart/form-data" method="post">
-                                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                            <input type="hidden" asp-for="@Model.Id" name="TicketId">
-                                            <div class="media-body ml-3">
-                                                <label>
-                                                    Description
-                                                    <input asp-for="@Model.Attachments.FirstOrDefault()!.Description" type="text" class="form-control" />
-                                                </label><br />
-                                                <label class="btn btn-outline-primary btn-sm">
-                                                    <input asp-for="@Model.Attachments.FirstOrDefault()!.FormFile" type="file" class="form-control-file" />
-                                                </label>
-                                                <button type="submit" class="btn btn-outline-secondary btn-sm md-btn-flat rounded-pill my-2">Submit</button>
-                                            </div>
-                                        </form>
+                                <!-- user has to be part of the project/ticket to add attachments -->
+                                @if (User.IsInRole("Admin") || Model.DeveloperUserId == btUser || Model.SubmitterUserId == btUser)
+                                {
+                                    <div class="row clearfix">
+                                        <div>
+                                            <form asp-action="AddTicketAttachment" asp-controller="Tickets" enctype="multipart/form-data" method="post">
+                                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                                <input type="hidden" asp-for="@Model.Id" name="TicketId">
+                                                <div class="media-body ml-3">
+                                                    <label>
+                                                        Description
+                                                        <input asp-for="@Model.Attachments.FirstOrDefault()!.Description" type="text" class="form-control" />
+                                                    </label><br />
+                                                    <label class="btn btn-outline-primary btn-sm">
+                                                        <input asp-for="@Model.Attachments.FirstOrDefault()!.FormFile" type="file" class="form-control-file" />
+                                                    </label>
+                                                    <button type="submit" class="btn btn-outline-secondary btn-sm md-btn-flat rounded-pill my-2">Submit</button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
-                                </div>
+                                }
 
 
                                 @* Ticket attachments part 2 here *@
@@ -311,3 +327,22 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <!-- Javascript -->
+    @*<script src="~/vendors/ckeditor5/ckeditor.js"></script>*@
+
+    <script>
+        ClassicEditor
+            .create(document.querySelector('.editor'), {
+                toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote'],
+                heading: {
+                    options: [
+                        { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                        { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                        { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' }
+                    ]
+                }
+            })
+    </script>
+}

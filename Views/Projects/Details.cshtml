@@ -36,26 +36,6 @@
     </div>
 </div>
 
-@*<div>
-    @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
-    {
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary rounded-pill mx-2">Edit This Project</a>
-
-        @if (User.IsInRole(nameof(BTRoles.Admin)))
-        {
-
-            @if (Model.Archived == false)
-            {
-                <a asp-action="Archive" asp-route-id="@Model.Id" class="btn btn-outline-danger rounded-pill">Archive This Project</a>
-            }
-            else
-            {
-                <a asp-action="Restore" asp-route-id="@Model.Id" class="btn btn-outline-success rounded-pill">Restore This Project</a>
-            }
-        }
-    }
-</div>*@
-
 <div>
     <div class="container-fluid">
         <div class="row gy-2">
@@ -110,7 +90,7 @@
                                 <li>Deadline: <span class="">@Model.EndDate</span></li>
                                 <li>Priority: <span class="">@Model.ProjectPriority?.Name</span></li>
                                 @* if() logic for project active/inactive *@
-                                @if (Model.Archived == false)
+                                @if (Model.Archived == false && @percent < 100)
                                 {
                                     <text>Project is Active</text>
                                 }

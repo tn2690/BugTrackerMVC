@@ -147,19 +147,16 @@ namespace BugTrackerMVC.Services
             }
         }
 
-        public async Task<List<Notification>> GetAllNotificationsByCompanyId(int companyId)
+        public async Task<List<Notification>> GetNewNotificationsByUserIdAsync(string userId)
         {
             try
             {
                 List<Notification> notifications = await _context.Notifications
-                                                            .Where(n => n.Ticket!.Project!.CompanyId == companyId)
-                                                            .Include(n => n.NotificationType)
-                                                            .Include(n => n.Project)
-                                                                .ThenInclude(n => n!.Company)
-                                                            .Include(n => n.Recipient)
-                                                            .Include(n => n.Sender)
-                                                            .Include(n => n.Ticket)
-                                                            .ToListAsync();
+                                                                         .Where(n => n.HasBeenViewed == false && n.Ticket!.Archived == false)
+                                                                         .Where(n => n.SenderId == userId || n.RecipientId == userId)
+                                                                         .Include(n => n.Sender)
+                                                                         .Include(n => n.Recipient)
+                                                                         .ToListAsync();
 
                 return notifications;
 

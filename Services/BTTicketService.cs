@@ -103,6 +103,40 @@ namespace BugTrackerMVC.Services
             }
         }
 
+        public async Task ArchiveTicketAsync(Ticket ticket)
+        {
+            try
+            {
+                // set status to Resolved
+                ticket.TicketStatusId = (await GetTicketStatusesAsync()).FirstOrDefault(s => s.Name == nameof(BTTicketStatuses.Resolved))!.Id;
+
+                // set Archived property to true
+                ticket.Archived = true;
+
+                await UpdateTicketAsync(ticket);
+
+            } catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task RestoreTicketAsync(Ticket ticket)
+        {
+            try
+            {
+                // set Archived property to false
+                ticket.Archived = false;
+
+                await UpdateTicketAsync(ticket);
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<IEnumerable<TicketPriority>> GetTicketPrioritiesAsync()
         {
             try

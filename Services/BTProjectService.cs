@@ -207,6 +207,37 @@ namespace BugTrackerMVC.Services
             }
         }
 
+        public async Task ArchiveProjectAsync(Project project)
+        {
+            try
+            {
+                // set Archived property to true
+                project.Archived = true;
+
+                await UpdateProjectAsync(project);
+
+            } catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task RestoreProjectAsync(Project project)
+        {
+            try
+            {
+                // set Archived property to false
+                project.Archived = false;
+
+                await UpdateProjectAsync(project);
+                
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<IEnumerable<ProjectPriority>> GetProjectPrioritiesAsync()
         {
             try
@@ -347,6 +378,22 @@ namespace BugTrackerMVC.Services
 
             }
             catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<Project>> GetAllProjectsByPriorityAsync(int companyId, string priority)
+        {
+            try
+            {
+                List<Project> projects = (_context.Projects
+                                                          .Where(p => nameof(p.ProjectPriority) == priority))
+                                                          .ToList();
+
+                return projects;
+
+            } catch (Exception)
             {
                 throw;
             }

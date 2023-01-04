@@ -4,7 +4,7 @@
 @inject UserManager<BTUser> _UserManager
 
 @{
-    ViewData["Title"] = "All Tickets";
+    ViewData["Title"] = "Archived Tickets";
     string btUser = _UserManager.GetUserId(User);
 }
 
@@ -22,7 +22,7 @@
                     <a asp-action="Index" asp-controller="Home">Home</a>
                 </li>
                 <li class="breadcrumb-item">
-                    <a href="#">Tickets</a>
+                    <a>Tickets</a>
                 </li>
                 <li class="breadcrumb-item active" aria-current="page">Archived Tickets</li>
             </ol>
@@ -46,6 +46,9 @@
                                 @Html.DisplayNameFor(model => model.Title)
                             </th>
                             <th>
+                                @Html.DisplayNameFor(model => model.Description)
+                            </th>
+                            <th>
                                 @Html.DisplayNameFor(model => model.Project)
                             </th>
                             <th>
@@ -56,6 +59,12 @@
                             </th>
                             <th>
                                 @Html.DisplayNameFor(model => model.TicketStatus)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.TicketPriority)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.TicketType)
                             </th>
                             <th></th>
                         </tr>
@@ -68,6 +77,9 @@
                                     @Html.DisplayFor(modelItem => item.Title)
                                 </td>
                                 <td>
+                                    @Html.DisplayFor(modelItem => item.Description)
+                                </td>
+                                <td>
                                     @Html.DisplayFor(modelItem => item.Project!.Name)
                                 </td>
                                 <td>
@@ -78,6 +90,12 @@
                                 </td>
                                 <td>
                                     @Html.DisplayFor(modelItem => item.TicketStatus!.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TicketPriority!.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TicketType!.Name)
                                 </td>
                                 <td>
                                     @* Admin, submitter or developer of ticket can see Edit button *@
@@ -99,13 +117,13 @@
                                             <a asp-action="Restore" asp-route-id="@item.Id" class="btn btn-outline-success rounded-pill mx-2">Restore</a>
                                         }
                                     }
-                                    @if (item.DeveloperUserId is null && User.IsInRole(nameof(BTRoles.ProjectManager)))
+                                    @if (item.DeveloperUserId is null && (User.IsInRole(nameof(BTRoles.ProjectManager)) || User.IsInRole(nameof(BTRoles.Admin))))
                                     {
                                         <a class="btn btn-outline-info rounded-pill mx-2" asp-action="AssignDeveloper" asp-route-id="@item.Id">Assign Developer</a>
                                     }
                                     else
                                     {
-                                        @if (User.IsInRole(nameof(BTRoles.ProjectManager)))
+                                        @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
                                         {
                                             <a class="btn btn-outline-secondary rounded-pill mx-2" asp-action="AssignDeveloper" asp-route-id="@item.Id">@(item.DeveloperUser?.FullName ?? "Unassigned")</a>
                                         }

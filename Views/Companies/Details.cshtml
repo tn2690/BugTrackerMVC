@@ -9,8 +9,8 @@
 
 @{
     ViewData["Title"] = "Company Info";
-    List<Project> projects = (await _BTProjectService.GetAllProjectsByCompanyIdAsync(User.Identity!.GetCompanyId())).Where(p => p.Archived == false).ToList();
-    List<Ticket> tickets = (await _BTTicketService.GetAllTicketsByCompanyIdAsync(User.Identity!.GetCompanyId())).Where(p => p.Archived == false && p.ArchivedByProject == false).ToList();
+    List<Project> projects = (await _BTProjectService.GetAllProjectsByCompanyIdAsync(User.Identity!.GetCompanyId())).ToList();
+    List<Ticket> tickets = (await _BTTicketService.GetAllTicketsByCompanyIdAsync(User.Identity!.GetCompanyId())).ToList();
 }
 
 <div class="page-header">
@@ -48,10 +48,10 @@
                             Members: <span class="textBold">@Model.Members.Count()</span>
                         </p>
                         <p class="card-text">
-                            Active Projects: <span class="textBold">@projects.Count()</span>
+                            Total Projects: <span class="textBold">@projects.Count()</span>
                         </p>
                         <p class="card-text">
-                            Active Tickets: <span class="textBold">@tickets.Count()</span>
+                            Total Tickets: <span class="textBold">@tickets.Count()</span>
                         </p>
                     </div>
                 </div>

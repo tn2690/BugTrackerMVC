@@ -1,0 +1,62 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using BugTrackerMVC.Extensions
+@using BugTrackerMVC.Models.Enums
+@using BugTrackerMVC.Services.Interfaces
+@inject SignInManager<BTUser> _SignInManager
+@inject UserManager<BTUser> _UserManager
+@inject IBTNotificationService _BTNotificationService
+
+@{
+    string userId = _UserManager.GetUserId(User);
+    //List<Notification> notifications = (await _BTNotificationService.GetAllNotificationsByCompanyIdAsync(companyId)).Where(n => n.HasBeenViewed == false).Take(6).ToList();
+    List<Notification> newNotifications = (_BTNotificationService.GetNewNotificationsByUserIdAsync(userId)).Result.OrderByDescending(n => n.Created).ToList();
+    List<Notification> unreadNotifications = newNotifications.Take(6).ToList();
+}
+
+<!-- Notifications Partial View -->
+
+<li class="nav-item dropdown">
+    <a href="#" class="nav-link nav-link-notify" title="Notifications" data-toggle="dropdown">
+        <i data-feather="bell"></i>
+        @if ((newNotifications).Count() != 0)
+        {
+            <span class="dot-animated"></span>
+        }
+    </a>
+    <div class="dropdown-menu dropdown-menu-right dropdown-menu-big">
+        <div class="border-bottom px-4 py-3 text-center d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Notifications</h5>
+            <small class="opacity-7">@unreadNotifications.Count() unread notifications</small>
+        </div>
+        <div class="dropdown-scroll">
+            <ul class="list-group list-group-flush">
+                <li class="px-4 py-2 text-center small text-muted bg-light">Recent</li>
+                <li class="px-4 py-3 list-group-item">
+                    <a href="#" class="d-flex align-items-center hide-show-toggler">
+                        <div class="flex-grow-1">
+                            <p class="mb-0 line-height-20">
+                                @foreach (Notification notification in unreadNotifications)
+                                {
+                                    @notification.Title
+                                    <span class="text-muted small">@notification.Created</span>
+                                    <br />
+                                }
+
+                            </p>
+
+                        </div>
+                    </a>
+                </li>
+                <li class="px-4 py-3 list-group-item">
+                    <a asp-action="Index" asp-controller="Notifications" class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            <h3 class="text-center">
+                                See All Notifications
+                            </h3>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</li>

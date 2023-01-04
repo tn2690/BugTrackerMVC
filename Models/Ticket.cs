@@ -9,11 +9,11 @@ namespace BugTrackerMVC.Models
         public int Id { get; set; }
 
         [Required]
-        [Display(Name = "Ticket Title")]
+        [Display(Name = "Ticket")]
         public string? Title { get; set; }
 
         [Required]
-        [Display(Name = "Ticket Description")]
+        [Display(Name = "Description")]
         [StringLength(2000)]
         public string? Description { get; set; }
 

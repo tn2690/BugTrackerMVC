@@ -1,4 +1,5 @@
 ﻿using BugTrackerMVC.Models;
+using System.ComponentModel.Design;
 
 namespace BugTrackerMVC.Services.Interfaces
 {
@@ -23,6 +24,12 @@ namespace BugTrackerMVC.Services.Interfaces
         // update project to db
         public Task UpdateProjectAsync(Project project);
 
+        // archive project
+        public Task ArchiveProjectAsync(Project project);
+        
+        // restore project
+        public Task RestoreProjectAsync(Project project);
+
         // get project priority list
         public Task<IEnumerable<ProjectPriority>> GetProjectPrioritiesAsync();
 
@@ -40,5 +47,8 @@ namespace BugTrackerMVC.Services.Interfaces
 
         // remove Member from project
         public Task<bool> RemoveMemberFromProjectAsync(BTUser member, int projectId);
+
+        // get projects by priority
+        public Task<List<Project>> GetAllProjectsByPriorityAsync(int companyId, string priority);
     }
 }

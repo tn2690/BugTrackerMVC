@@ -22,7 +22,7 @@
                     <a asp-action="Index" asp-controller="Home">Home</a>
                 </li>
                 <li class="breadcrumb-item">
-                    <a href="#">Projects</a>
+                    <a>Projects</a>
                 </li>
                 <li class="breadcrumb-item active" aria-current="page">All Projects</li>
             </ol>
@@ -78,10 +78,7 @@
                                     @Html.DisplayFor(modelItem => item.EndDate)
                                 </td>
                                 <td>
-                                    @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
-                                    {
-                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Edit</a>
-                                    }
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Edit</a>
                                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Details</a>
                                     @* show Archive button if project is not archived *@
                                     @if (User.IsInRole(nameof(BTRoles.Admin)))
@@ -99,20 +96,15 @@
                                     @{
                                         BTUser? projectManager = await _BTProjectService.GetProjectManagerAsync(item.Id);
                                     }
-                                    @if (projectManager is null && (User.IsInRole( nameof( BTRoles.Admin ) ) || User.IsInRole ( nameof( BTRoles.ProjectManager) ) ) )
+                                    @if (projectManager is null)
                                     {
                                         <a class="btn btn-outline-info rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@item.Id">Assign PM</a>
                                     }
                                     else
                                     {
-                                        @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager))) 
-                                        {
-                                            <a class="btn btn-outline-secondary rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@item.Id">@(projectManager?.FullName ?? "Unassigned")</a>
-                                        }
+                                        <a class="btn btn-outline-secondary rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@item.Id">@(projectManager?.FullName ?? "Unassigned")</a>
                                     }
-                                    @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager))) {
-                                        <a asp-action="AddMembers" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Add Member(s)</a>
-                                    }
+                                    <a asp-action="AddMembers" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Add Member(s)</a>
                                 </td>
                             </tr>
                         }

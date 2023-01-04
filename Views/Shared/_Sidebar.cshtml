@@ -8,8 +8,8 @@
     string? action = (string?)Context.GetRouteValue("action");
 }
 
-
 <!-- Sidebar Partial View -->
+
 <!-- begin::navigation -->
 <div class="navigation">
     <div class="navigation-header">
@@ -30,17 +30,17 @@
                 </a>
             </li>
             <!-- Company -->
-            <li>
-                <a href="#">
-                    <span class="nav-link-icon">
-                        <i class="bi bi-building"></i>
-                    </span>
-                    <span>Company</span>
-                </a>
+            @if (User.IsInRole("Admin"))
+            {
+                <li>
+                    <a href="#">
+                        <span class="nav-link-icon">
+                            <i class="bi bi-building"></i>
+                        </span>
+                        <span>Company</span>
+                    </a>
 
-                <ul>
-                    @if (User.IsInRole("Admin"))
-                    {
+                    <ul>
                         <li>
                             <a asp-area="" asp-controller="Companies" asp-action="Details" asp-route-id="@User.Identity!.GetCompanyId()"
                            class="@(controller == "Companies" && action == "Details" ? "active" : "")">Company Info</a>
@@ -53,10 +53,10 @@
                             <a asp-area="" asp-controller="Invites" asp-action="Create"
                            class="@(controller == "Invites" && action == "Create" ? "active" : "")">Company Invite</a>
                         </li>
-                    }
-                </ul>
+                    </ul>
 
-            </li>
+                </li>
+            }
             <!-- Projects -->
             <li>
                 <a href="#">
@@ -72,11 +72,11 @@
                             <a asp-area="" asp-controller="Projects" asp-action="Create"
                            class="@(controller == "Projects" && action == "Create" ? "active" : "")">Create a Project</a>
                         </li>
-                    }
-                    <li>
-                        <a asp-area="" asp-controller="Projects" asp-action="AllProjects"
+                        <li>
+                            <a asp-area="" asp-controller="Projects" asp-action="AllProjects"
                            class="@(controller == "Projects" && action == "AllProjects" ? "active" : "")">All Projects</a>
-                    </li>
+                        </li>
+                    }
                     <li>
                         <a asp-area="" asp-controller="Projects" asp-action="MyProjects"
                            class="@(controller == "Projects" && action == "MyProjects" ? "active" : "")">My Projects</a>
@@ -107,10 +107,13 @@
                         <a asp-area="" asp-controller="Tickets" asp-action="AllTickets"
                            class="@(controller == "Tickets" && action == "AllTickets" ? "active" : "")">All Tickets</a>
                     </li>
-                    <li>
-                        <a asp-area="" asp-controller="Tickets" asp-action="UnassignedTickets"
+                    @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
+                    {
+                        <li>
+                            <a asp-area="" asp-controller="Tickets" asp-action="UnassignedTickets"
                            class="@(controller == "Tickets" && action == "UnassignedTickets" ? "active" : "")">Unassigned Tickets</a>
-                    </li>
+                        </li>
+                    }
                     <li>
                         <a asp-area="" asp-controller="Tickets" asp-action="MyTickets"
                            class="@(controller == "Tickets" && action == "MyTickets" ? "active" : "")">My Tickets</a>
@@ -119,7 +122,7 @@
                     {
                         <li>
                             <a asp-area="" asp-controller="Tickets" asp-action="ArchivedTickets"
-                               class="@(controller == "Tickets" && action == "ArchivedTickets" ? "active" : "")">Archived Tickets</a>
+                           class="@(controller == "Tickets" && action == "ArchivedTickets" ? "active" : "")">Archived Tickets</a>
                         </li>
                     }
                 </ul>

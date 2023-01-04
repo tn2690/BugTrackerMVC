@@ -16,6 +16,12 @@ namespace BugTrackerMVC.Services.Interfaces
         // update ticket to db
         public Task UpdateTicketAsync(Ticket ticket);
 
+        // archive ticket
+        public Task ArchiveTicketAsync(Ticket ticket);
+
+        // restore ticket
+        public Task RestoreTicketAsync(Ticket ticket);
+
         // get ticket priority list
         public Task<IEnumerable<TicketPriority>> GetTicketPrioritiesAsync();
         

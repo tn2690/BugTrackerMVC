@@ -41,6 +41,7 @@ namespace BugTrackerMVC.Controllers
         }
 
         // GET: Projects/AllProjects
+        [Authorize(Roles = "Admin,ProjectManager")]
         public async Task<IActionResult> AllProjects()
         {
             // assign user's company id to logged in user
@@ -456,11 +457,8 @@ namespace BugTrackerMVC.Controllers
             // TODO: check this
             if (project != null)
             {
-                // call service (UpdateProjectAsync)
-                // set Archived property to true
-                project.Archived = true;
-                // send project to service for update
-                await _btProjectService.UpdateProjectAsync(project);
+                // call service (ArchiveProjectAsync)
+                await _btProjectService.ArchiveProjectAsync(project);
             }
             
             return RedirectToAction(nameof(AllProjects));
@@ -484,11 +482,8 @@ namespace BugTrackerMVC.Controllers
             // TODO: check this
             if (project != null)
             {
-                // call service (UpdateProjectAsync)
-                // set Archived property to false
-                project.Archived = false;
-                // send project to service for update
-                await _btProjectService.UpdateProjectAsync(project);
+                // call service (RestoreProjectAsync)
+                await _btProjectService.RestoreProjectAsync(project);
             }
 
             return RedirectToAction(nameof(ArchivedProjects));

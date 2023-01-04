@@ -183,3 +183,7 @@ body {
     object-fit: cover;
     object-position: top;
 }
+
+.ck-editor__editable {
+    min-height: 25px !important;
+}

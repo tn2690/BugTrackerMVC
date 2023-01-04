@@ -1,16 +1,21 @@
 ﻿@model BugTrackerMVC.Models.BTUser
 @using Microsoft.AspNetCore.Identity
-@inject UserManager<BTUser> UserManager
+@using BugTrackerMVC.Services.Interfaces
+@inject UserManager<BTUser> _UserManager
+@inject IBTRolesService _BTRolesService
 
 @{
     ViewData["Title"] = "Home";
-    BTUser btUser = await UserManager.GetUserAsync(User);
+    BTUser btUser = await _UserManager.GetUserAsync(User);
+    IEnumerable<string> currentRoles = await _BTRolesService.GetUserRolesAsync(btUser!);
     //Layout = "/Views/Shared/_LayoutLanding.cshtml";
 }
 
 <!-- Home Index -->
 
-<div class="page-header d-md-flex justify-content-between">
+<partial name="Dashboard" />
+
+@*<div class="page-header d-md-flex justify-content-between">
     <div>
         <h3>Welcome back, @btUser.FullName!</h3>
         <p class="text-muted">This page shows an overview of your projects and tickets.</p>
@@ -879,4 +884,4 @@
             </table>
         </div>
     </div>
-</div>
+</div>*@
