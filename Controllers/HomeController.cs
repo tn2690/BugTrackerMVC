@@ -26,6 +26,17 @@ namespace BugTrackerMVC.Controllers
         [Authorize]
         public IActionResult Index()
         {
+            return View("/Views/Home/Dashboard.cshtml");
+        }
+
+        public IActionResult Welcome()
+        {
+            return View();
+        }
+
+        [Authorize]
+        public IActionResult Dashboard()
+        {
             return View();
         }
 
@@ -54,20 +65,6 @@ namespace BugTrackerMVC.Controllers
 
 
             return Json(amChartData.Data);
-        }
-
-        public class PlotlyBarData
-        {
-            public List<PlotlyBar>? Data { get; set; }
-        }
-
-
-        public class PlotlyBar
-        {
-            public string[]? X { get; set; }
-            public int[]? Y { get; set; }
-            public string? Name { get; set; }
-            public string? Type { get; set; }
         }
 
         [HttpPost]

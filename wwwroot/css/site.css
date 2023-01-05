@@ -85,14 +85,21 @@ body {
     color: var(--tn-dark-color);
 }
 
-.socialIcons {
+.devIcons {
     font-size: 4rem;
-    color: var(--tn-light-color);
+    padding-left: .5rem;
+}
+
+.socialIcons {
+    color: var(--tn-secondary-color);
+    font-size: 2rem;
+    padding-left: .5rem;
 }
 
     .socialIcons:hover {
-        color: var(--tn-nav-toggler-glow);
+        color: var(--tn-highlight-color);
     }
+
 
 .textLight {
     color: var(--tn-text-light-color);

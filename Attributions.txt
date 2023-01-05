@@ -2,3 +2,6 @@
 
 img for logo
 https://www.linkedin.com/pulse/how-debug-sapui5-code-after-build-process-boris-perlov/
+
+HTML template
+<a href='https://monsterone.com/html-templates/landing-page-templates/'>Landing Page Templates item created by coderamrin - https://monsterone.com</a>

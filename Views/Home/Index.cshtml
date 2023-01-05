@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Identity
 @using BugTrackerMVC.Services.Interfaces
 @inject UserManager<BTUser> _UserManager
+@inject SignInManager<BTUser> SignInManager
 @inject IBTRolesService _BTRolesService
 
 @{
@@ -13,7 +14,16 @@
 
 <!-- Home Index -->
 
-<partial name="Dashboard" />
+@if (SignInManager.IsSignedIn(User))
+{
+    <partial name="Dashboard" />
+}
+
+@section scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
 
 @*<div class="page-header d-md-flex justify-content-between">
     <div>

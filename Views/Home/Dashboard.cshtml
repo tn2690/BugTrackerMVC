@@ -61,27 +61,27 @@
                                 <i class="ti-more-alt"></i>
                             </a>
                             <div class="dropdown-menu dropdown-menu-right">
-                                <a class="dropdown-item" asp-action="Details" asp-controller="Projects" asp-route-id="@mostRecentProj!.Id">See Project Details</a>
+                                @*<a class="dropdown-item" asp-action="Details" asp-controller="Projects" asp-route-id="@mostRecentProj!.Id">See Project Details</a>*@
                                 <a class="dropdown-item" asp-action="Create" asp-controller="Tickets">Create Ticket</a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <p>@mostRecentProj!.Name</p>
+                @*<p>@mostRecentProj!.Name</p>
                 <p>Start Date: @mostRecentProj.StartDate</p>
-                <p>Deadline: @mostRecentProj.EndDate</p>
+                <p>Deadline: @mostRecentProj.EndDate</p>*@
                 <ul>
-                    Members: @foreach (BTUser member in mostRecentProj.Members)
+                    @*Members: @foreach (BTUser member in mostRecentProj.Members)
                     {
-                        <li>
+                        <li>*@
                             @* Logic for avatars *@
-                            <img src="@_BTFileService.ConvertByteArrayToFile(member.ImageFileData!, btUser.ImageFileType!, (int)DefaultImg.BTUserImg)" style="max-height: 35px;"
+                            @*<img src="@_BTFileService.ConvertByteArrayToFile(member.ImageFileData!, btUser.ImageFileType!, (int)DefaultImg.BTUserImg)" style="max-height: 35px;"
                              class="rounded-circle"
                              alt="member image" />
                             @member.FullName
                             <text><small><i> [@string.Join(",", await _UserManager.GetRolesAsync(member))] </i></small></text>
                         </li>
-                    }
+                    }*@
                 </ul>
             </div>
         </div>
@@ -142,35 +142,6 @@
     </div>
 </div>
 
-<div>
-  <canvas id="myChart"></canvas>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-  const ctx = document.getElementById('myChart');
-
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-      datasets: [{
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
-        }
-      }
-    }
-  });
-</script>
-
 <div id="myfirstchart" style="height: 250px;"></div>
 
 <div class="row gy-2">
@@ -204,74 +175,85 @@
 <div class="card">
     <div class="card-body">
         <h6 class="card-title">Projects</h6>
-        <div class="table-responsive">
-            <table id="myProjectsTable" class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Created</th>
-                        <th>StartDate</th>
-                        <th>EndDate</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in projects!)
-                    {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Name)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.Created)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.StartDate)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.EndDate)
-                            </td>
-                            <td>
-                                @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
+        
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="card">
+                    <div class="card-body">
+
+                        <table id="myProjectsTable" class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Created</th>
+                                    <th>StartDate</th>
+                                    <th>EndDate</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in projects!)
                                 {
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Edit</a>
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Created)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.StartDate)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.EndDate)
+                                        </td>
+                                        <td>
+                                            @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
+                                            {
+                                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Edit</a>
+                                            }
+                                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Details</a>
+                                            @if (User.IsInRole(nameof(BTRoles.Admin)))
+                                            {
+                                                @if (item.Archived == false)
+                                                {
+                                                    <a asp-action="Archive" asp-route-id="@item.Id" class="btn btn-outline-danger rounded-pill mx-2">Archive</a>
+                                                }
+                                                @* Restore button if project is archived *@
+                                                else
+                                                {
+                                                    <a asp-action="Restore" asp-route-id="@item.Id" class="btn btn-outline-success rounded-pill mx-2">Restore</a>
+                                                }
+                                            }
+                                            @{
+                                                BTUser? projectManager = await _BTProjectService.GetProjectManagerAsync(item.Id);
+                                            }
+                                            @if (projectManager is null && (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager))))
+                                            {
+                                                <a class="btn btn-outline-info rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@item.Id">Assign PM</a>
+                                            }
+                                            else
+                                            {
+                                                @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
+                                                {
+                                                    <a class="btn btn-outline-secondary rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@item.Id">@(projectManager?.FullName ?? "Unassigned")</a>
+                                                }
+                                            }
+                                            @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
+                                            {
+                                                <a asp-action="AddMembers" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Add Member(s)</a>
+                                            }
+                                        </td>
+                                    </tr>
                                 }
-                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Details</a>
-                                @if (User.IsInRole(nameof(BTRoles.Admin)))
-                                {
-                                    @if (item.Archived == false)
-                                    {
-                                        <a asp-action="Archive" asp-route-id="@item.Id" class="btn btn-outline-danger rounded-pill mx-2">Archive</a>
-                                    }
-                                    @* Restore button if project is archived *@
-                                    else
-                                    {
-                                        <a asp-action="Restore" asp-route-id="@item.Id" class="btn btn-outline-success rounded-pill mx-2">Restore</a>
-                                    }
-                                }
-                                @{
-                                    BTUser? projectManager = await _BTProjectService.GetProjectManagerAsync(item.Id);
-                                }
-                                @if (projectManager is null && (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager))))
-                                {
-                                    <a class="btn btn-outline-info rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@item.Id">Assign PM</a>
-                                }
-                                else
-                                {
-                                    @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
-                                    {
-                                        <a class="btn btn-outline-secondary rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@item.Id">@(projectManager?.FullName ?? "Unassigned")</a>
-                                    }
-                                }
-                                @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
-                                {
-                                    <a asp-action="AddMembers" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Add Member(s)</a>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
@@ -598,10 +580,13 @@
 </div>*@
 
 @section scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 
     <!-- DataTable -->
     <script src="~/vendors/dataTable/datatables.min.js"></script>
-    //<script src="~/assets/js/examples/datatable.js"></script>
+    @*<script src="~/assets/js/examples/datatable.js"></script>*@
 
     <script>
         $('#myProjectsTable').DataTable({
@@ -653,52 +638,7 @@
     </div>
 
     <!-- *** Begin Chart JS Pie/Donut *** -->
-    <script>
-
-        var donutChartCanvas = $('#donutChart').get(0).getContext('2d');
-        var donutData = {
-            labels: [
-                '@nameof(BTTicketStatuses.Development)',
-                '@nameof(BTTicketStatuses.New)',
-                '@nameof(BTTicketStatuses.Resolved)',
-                '@nameof(BTTicketStatuses.Testing)'
-            ],
-            datasets: [
-                {
-                    data: [
-        @Model.Tickets.Where(t=> t.TicketStatus!.Name == nameof(BTTicketStatuses.Development)).Count(),
-        @Model.Tickets.Where(t=> t.TicketStatus!.Name ==nameof(BTTicketStatuses.New)).Count(),
-        @Model.Tickets.Where(t=> t.TicketStatus!.Name ==nameof(BTTicketStatuses.Resolved)).Count(),
-        @Model.Tickets.Where(t=> t.TicketStatus!.Name ==nameof(BTTicketStatuses.Testing)).Count()
-                        ],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)'
-                    ]
-                }
-            ]
-        };
-
-        var donutOptions = {
-            maintainAspectRatio: false,
-            responsive: true,
-        };
-        //Create pie or douhnut chart
-        // You can switch between pie and doughnut using the method below.
-        new Chart(donutChartCanvas, {
-            type: 'doughnut',
-            data: donutData,
-            options: donutOptions
-        });
-    </script>
+    
     <!-- *** End Chart JS Donut *** -->
 
     <!-- *** Begin AM Charts *** -->
