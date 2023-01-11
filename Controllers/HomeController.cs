@@ -15,18 +15,20 @@ namespace BugTrackerMVC.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IBTProjectService _btProjectService;
+        private readonly IBTRolesService _btRolesService;
 
         public HomeController(ILogger<HomeController> logger,
-                              IBTProjectService btProjectService)
+                              IBTProjectService btProjectService,
+                              IBTRolesService btRolesService)
         {
             _logger = logger;
             _btProjectService = btProjectService;
+            _btRolesService = btRolesService;
         }
 
-        [Authorize]
         public IActionResult Index()
         {
-            return View("/Views/Home/Dashboard.cshtml");
+            return View("/Views/Home/Welcome.cshtml");
         }
 
         public IActionResult Welcome()
@@ -57,6 +59,7 @@ namespace BugTrackerMVC.Controllers
 
                 item.Project = project.Name;
                 item.Tickets = project.Tickets.Count;
+                item.Developers = (await _btRolesService.GetUsersInRoleAsync(nameof(BTRoles.Developer), companyId)).Count();
 
                 amItems.Add(item);
             }
@@ -80,7 +83,7 @@ namespace BugTrackerMVC.Controllers
             //Bar One
             PlotlyBar barOne = new()
             {
-                X = projects.Select(p => p.Name).ToArray()!,
+                X = projects.Select(p => p.Name).ToArray(),
                 Y = projects.SelectMany(p => p.Tickets).GroupBy(t => t.ProjectId).Select(g => g.Count()).ToArray(),
                 Name = "Tickets",
                 Type = "bar"
@@ -89,7 +92,8 @@ namespace BugTrackerMVC.Controllers
             //Bar Two
             PlotlyBar barTwo = new()
             {
-                X = projects.Select(p => p.Name).ToArray()!,
+                X = projects.Select(p => p.Name).ToArray(),
+                Y = projects.Select(async p => (await _btProjectService.GetProjectMembersByRoleAsync(p.Id, nameof(BTRoles.Developer))).Count).Select(c => c.Result).ToArray(),
                 Name = "Developers",
                 Type = "bar"
             };
@@ -123,21 +127,21 @@ namespace BugTrackerMVC.Controllers
         [HttpPost]
         public async Task<JsonResult> GglProjectPriority()
         {
-            int companyId = User.Identity!.GetCompanyId();
+                int companyId = User.Identity!.GetCompanyId();
 
-            List<Project> projects = await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId);
+                List<Project> projects = await _btProjectService.GetAllProjectsByCompanyIdAsync(companyId);
 
-            List<object> chartData = new();
-            chartData.Add(new object[] { "Priority", "Count" });
+                List<object> chartData = new();
+                chartData.Add(new object[] { "Priority", "Count" });
 
 
-            foreach (string priority in Enum.GetNames(typeof(BTProjectPriorities)))
-            {
-                int priorityCount = (await _btProjectService.GetAllProjectsByPriorityAsync(companyId, priority)).Count();
-                chartData.Add(new object[] { priority, priorityCount });
-            }
+                foreach (string priority in Enum.GetNames(typeof(BTProjectPriorities)))
+                {
+                    int priorityCount = (await _btProjectService.GetAllProjectsByPriorityAsync(companyId, priority)).Count();
+                    chartData.Add(new object[] { priority, priorityCount });
+                }
 
-            return Json(chartData);
+                return Json(chartData);
         }
 
         public IActionResult Privacy()

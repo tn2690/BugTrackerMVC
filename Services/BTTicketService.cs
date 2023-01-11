@@ -215,6 +215,30 @@ namespace BugTrackerMVC.Services
             }
         }
 
+        public async Task<BTUser> GetDeveloperAsync(int ticketId, int companyId)
+        {
+            try
+            {
+                Ticket? ticket = await GetTicketByIdAsync(ticketId, companyId);
+
+                // if no developer, return null
+                if (ticket.DeveloperUserId == null)
+                {
+                    return null!;
+                }
+                // otherwise, return developer
+                else
+                {
+                    return ticket.DeveloperUser!;
+                }
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task AssignDeveloperAsync(int ticketId, string userId, int companyId)
         {
             try
@@ -223,9 +247,7 @@ namespace BugTrackerMVC.Services
 
                 ticket.DeveloperUserId = userId;
 
-                _context.Update(ticket);
-
-                await _context.SaveChangesAsync();
+                await UpdateTicketAsync(ticket);
 
             }
             catch (Exception)

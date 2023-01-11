@@ -120,6 +120,7 @@ namespace BugTrackerMVC.Controllers
 
             List<BTUser> developers = await _btRolesService.GetUsersInRoleAsync(nameof(BTRoles.Developer), companyId);
 
+
             // create/instantiate DevViewModel
             // get and assign Ticket property of view model
             AssignDevViewModel viewModel = new()
@@ -139,7 +140,7 @@ namespace BugTrackerMVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin,ProjectManager")]
-        public async Task<IActionResult> AssignDeveloper(AssignDevViewModel viewModel, Ticket ticket)
+        public async Task<IActionResult> AssignDeveloper(AssignDevViewModel viewModel)
         {
             // get company id
             int companyId = User.Identity!.GetCompanyId();
@@ -149,12 +150,12 @@ namespace BugTrackerMVC.Controllers
 
             // get ticket to change status
             // TODO: check this
-            ticket = await _btTicketService.GetTicketByIdAsync(ticket.ProjectId, companyId);
+            //ticket = await _btTicketService.GetTicketByIdAsync(ticket.ProjectId, companyId);
 
             // set ticket status
-            ticket.TicketStatusId = (await _btTicketService.GetTicketStatusesAsync()).FirstOrDefault(s => s.Name == nameof(BTTicketStatuses.Development))!.Id;
+            //ticket.TicketStatusId = (await _btTicketService.GetTicketStatusesAsync()).FirstOrDefault(s => s.Name == nameof(BTTicketStatuses.Development))!.Id;
 
-            await _btTicketService.UpdateTicketAsync(ticket);
+            //await _btTicketService.UpdateTicketAsync(ticket);
 
             if (viewModel.Ticket?.Id != null)
             {
@@ -174,7 +175,7 @@ namespace BugTrackerMVC.Controllers
                 // get new ticket
                 Ticket newTicket = await _btTicketService.GetTicketAsNoTrackingAsync(viewModel.Ticket.Id, companyId);
 
-                //newTicket.TicketStatusId = (await _btTicketService.GetTicketStatusesAsync()).FirstOrDefault(s => s.Name == nameof(BTTicketStatuses.Development))!.Id;
+                newTicket.TicketStatusId = (await _btTicketService.GetTicketStatusesAsync()).FirstOrDefault(s => s.Name == nameof(BTTicketStatuses.Development))!.Id;
 
                 // add ticket history record
                 await _btTicketHistoryService.AddHistoryAsync(oldTicket!, newTicket, btUser.Id);
@@ -203,7 +204,7 @@ namespace BugTrackerMVC.Controllers
             ViewData["TicketStatusId"] = new SelectList(await _btTicketService.GetTicketStatusesAsync(), "Id", "Name");
 
             // check this
-            return View(ticket);
+            return RedirectToAction("AssignDeveloper", "Tickets", new { swalMessage });
         }
 
         // POST: Tickets/AddComment

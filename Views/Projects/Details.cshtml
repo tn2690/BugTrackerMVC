@@ -156,7 +156,8 @@
 
                                 @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
                                 {
-                                    <a asp-action="AddMembers" asp-route-id="@Model.Id" class="btn btn-outline-primary rounded-pill">Add Member(s)</a>
+                                    <a asp-action="AddMembers" asp-route-id="@Model.Id" class="btn btn-outline-success rounded-pill">Add Member(s)</a>
+                                    //<a asp-action="RemoveMembers" asp-route-id="@Model.Id" class="btn btn-outline-danger rounded-pill">Remove Member(s)</a>
                                 }
 
                             </ul>

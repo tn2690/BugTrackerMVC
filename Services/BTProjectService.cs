@@ -4,6 +4,7 @@ using BugTrackerMVC.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BugTrackerMVC.Models.Enums;
+using System.ComponentModel.Design;
 
 namespace BugTrackerMVC.Services
 {
@@ -277,6 +278,56 @@ namespace BugTrackerMVC.Services
             }
         }
 
+        public async Task<BTUser> GetDeveloperAsync(int projectId)
+        {
+            try
+            {
+                Project? project = await _context.Projects
+                                                .Include(p => p.Members)
+                                                .FirstOrDefaultAsync(p => p.Id == projectId);
+
+                foreach (BTUser member in project!.Members)
+                {
+                    if (await _btRolesService.IsUserInRoleAsync(member, nameof(BTRoles.Developer)))
+                    {
+                        return member;
+                    }
+                }
+
+                return null!;
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<BTUser> GetSubmitterAsync(int projectId)
+        {
+            try
+            {
+                Project? project = await _context.Projects
+                                                .Include(p => p.Members)
+                                                .FirstOrDefaultAsync(p => p.Id == projectId);
+
+                foreach (BTUser member in project!.Members)
+                {
+                    if (await _btRolesService.IsUserInRoleAsync(member, nameof(BTRoles.Submitter)))
+                    {
+                        return member;
+                    }
+                }
+
+                return null!;
+
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         public async Task<bool> AddProjectManagerAsync(string userId, int projectId)
         {
             try
@@ -387,11 +438,39 @@ namespace BugTrackerMVC.Services
         {
             try
             {
-                List<Project> projects = (_context.Projects
-                                                          .Where(p => nameof(p.ProjectPriority) == priority))
-                                                          .ToList();
+                List<Project> projects = _context.Projects
+                                                        .Where(p => p.CompanyId == companyId)
+                                                        .Where(p => p.ProjectPriority!.Name!.Equals(priority))
+                                                        .ToList();
 
                 return projects;
+
+            } catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<List<BTUser>> GetProjectMembersByRoleAsync(int projectId, string roleName)
+        {
+            try
+            {
+                // get project
+                Project? project = await _context.Projects
+                                                        .Include(p => p.Members)
+                                                        .FirstOrDefaultAsync(p => p.Id == projectId);
+
+                List<BTUser> developers = new List<BTUser>();
+
+                foreach (BTUser member in project!.Members)
+                {
+                    if (await _btRolesService.IsUserInRoleAsync(member, nameof(BTRoles.Developer)))
+                    {
+                        developers.Add(member);
+                    }
+                }
+
+                return developers;
 
             } catch (Exception)
             {

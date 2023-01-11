@@ -54,7 +54,9 @@
                                 @viewModel.BTUser!.FullName
                         </td>
                         <td>
-                            <select asp-for="@viewModel.SelectedRoles" class="form-control" style="height: 100px;" asp-items="@viewModel.Roles">
+                            @*<select asp-for="@viewModel.SelectedRoles" class="form-control" style="height: 100px;" asp-items="@viewModel.Roles">
+                            </select>*@
+                            <select asp-for="@viewModel.SelectedRoles" class="custom-select custom-select-lg mb-3" asp-items="@viewModel.Roles">
                             </select>
                         </td>
                         <td>
