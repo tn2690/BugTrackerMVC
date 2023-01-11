@@ -22,21 +22,7 @@
     Project? mostRecentProj = (_BTProjectService.GetUserProjectsAsync(userId)).Result!.OrderByDescending(r => r.ProjectPriorityId).FirstOrDefault();
 }
 
-<!-- Styles -->
-<style>
-	.amDark {
-		background-color: #30303d;
-		color: #fff;
-	}
-
-	#chartdiv {
-		width: 100%;
-		height: 500px;
-	}
-</style>
-
 <!-- Dashboard -->
-
 <!-- DataTable -->
 <link rel="stylesheet" href="~/vendors/dataTable/datatables.min.css" type="text/css">
 
@@ -73,14 +59,14 @@
                 <ul>
                     @*Members: @foreach (BTUser member in mostRecentProj.Members)
                     {
-                        <li>*@
-                            @* Logic for avatars *@
-                            @*<img src="@_BTFileService.ConvertByteArrayToFile(member.ImageFileData!, btUser.ImageFileType!, (int)DefaultImg.BTUserImg)" style="max-height: 35px;"
-                             class="rounded-circle"
-                             alt="member image" />
-                            @member.FullName
-                            <text><small><i> [@string.Join(",", await _UserManager.GetRolesAsync(member))] </i></small></text>
-                        </li>
+                    <li>*@
+                    @* Logic for avatars *@
+                    @*<img src="@_BTFileService.ConvertByteArrayToFile(member.ImageFileData!, btUser.ImageFileType!, (int)DefaultImg.BTUserImg)" style="max-height: 35px;"
+                    class="rounded-circle"
+                    alt="member image" />
+                    @member.FullName
+                    <text><small><i> [@string.Join(",", await _UserManager.GetRolesAsync(member))] </i></small></text>
+                    </li>
                     }*@
                 </ul>
             </div>
@@ -108,29 +94,32 @@
     <div class="col-md-12 col">
         <div class="row col-cols-4 mt-5">
             <div class="card col m-1 p-2">
-                <div class="card-body">
-                    <h5>Chart 1</h5>
-                    <p>[Projects]</p>
-                </div>
+	            <div class="card-body">
+		            <h5>Projects by Priority</h5>
+		            <div id="chart3D"></div>
+	            </div>
+            </div>
+            <div class="card col m-1 p-2">
+	            <div class="card-body">
+		            <h5>Project Tickets Count (%)</h5>
+		            <div id="donut"></div>
+	            </div>
             </div>
             <div class="card col m-1 p-2">
                 <div class="card-body">
-                    <h5>Chart 2</h5>
-                    <p>[Projects]</p>
-                    <div id="apex_chart_seven" style="height: 300px"></div>
-                </div>
-            </div>
-            <div class="card col m-1 p-2">
-                <div class="card-body">
-                    <h5>Chart 3</h5>
-                    <p>[Tickets]</p>
-                    <canvas id="chartjs_three"></canvas>
+                    <h5>Tickets by Priority</h5>
+                    <!-- Morris: Donut -->
+                    <div class="col-md-12">
+                        <div id="legend" class="donut-legend" style="font-size:x-small"></div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="chart chart-md" id="morrisTicketPriority"></div>
+                    </div>
                 </div>
             </div>
             <div class="card col m-1 p-2">
                 <div class="card-body">
                     <h5>Tickets by Status</h5>
-                    <p>[ChartJS]</p>
                     <!-- ChartJS: Pie/Doughnut -->
                     <div class="col-md-12">
                         <!--  Chart.js Canvas Tag -->
@@ -142,40 +131,22 @@
     </div>
 </div>
 
-<div id="myfirstchart" style="height: 250px;"></div>
-
 <div class="row gy-2">
     <div class="cols mt-5">
         <div class="card col m-1 p-2">
-            <div class="card-body" style="height:380px">
-                <h5>Chart 5</h5>
-                <p>[Projects: Tickets vs Developers]</p>
-                <p>[amCharts]</p>
-	<!-- HTML -->
-	<div id="chartdiv"></div>
+            <div class="card-body" style="height:600px;overflow-y:auto;">
+                <h5>Project: Tickets vs Developers</h5>
+                <!-- HTML -->
+                <div id="plotlyChart"></div>
             </div>
         </div>
     </div>
-</div>
-<hr />
-
-<div class="row gy-2">
-	<div class="cols mt-5">
-		<div class="card col m-1 p-2">
-			<div class="card-body" style="height:600px;overflow-y:auto;">
-				<h5>Project: Tickets vs Developers</h5>
-				<p>[Plotly]</p>	
-				<!-- HTML -->
-				<div id="plotlyChart"></div>
-			</div>
-		</div>
-	</div>
 </div>
 
 <div class="card">
     <div class="card-body">
         <h6 class="card-title">Projects</h6>
-        
+
         <div class="row">
             <div class="col-md-12">
 
@@ -340,245 +311,6 @@
     </div>
 </div>
 
-@*<div>
-    <div classxfont-weighteighteightgetainer-fluid">*@
-
-<!-- Info Pills -->
-@*<div class="row mt-2">
-            <div class="col-lg-3 col-md-6 col-sm-6">
-                <a asp-action="MyProjects" asp-controller="Projects" style="text-decoration:none">
-                    <div class="card text-center bg-info">
-                        <div class="body">
-                            <div class="p-15 text-light">
-                                <h3>@projects!.Where(p => p.StartDate < DateTime.Now && p.EndDate > DateTime.Now).Count()</h3>
-                                <span>Active Projects</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6">
-                <a asp-action="MyTickets" asp-controller="Tickets" style="text-decoration:none">
-                    <div class="card text-center bg-secondary">
-                        <div class="body">
-                            <div class="p-15 text-light">
-
-                                <h3>@tickets.Count()</h3>
-                                <span>Total Tickets</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6">
-                <a asp-action="Details" asp-controller="Projects" asp-route-id="@mostRecentProj.Id" style="text-decoration:none">
-                    <div class="card text-center bg-success">
-                        <div class="body">
-                            <div class="p-15 text-light">
-                                <h3>@mostRecentProj!.Name</h3>
-                                <p>Start Date: @mostRecentProj!.StartDate</p>
-                                <p>Deadline: @mostRecentProj!.EndDate</p>
-                                <span>Most Recent Project</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6">
-                <div class="card text-center bg-primary">
-                    <div class="body">
-                        <div class="p-15 text-light">
-                            <h3>
-                                Your Projects: @projects!.Count() projects
-                            </h3>
-                            <h3>
-                                Your Tickets: @tickets.Count() tickets
-                            </h3>
-                            <span>Projects/Tickets Summary</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>*@
-@*<div class="row mt-2">
-            <div class="col-lg-3 col-md-6 col-sm-6">
-                        <div class="card">
-                            <div class="card-body">
-                                <h6 class="card-title">Active Projects</h6>
-                                <div class="d-flex align-items-center mb-3">
-                                    <a asp-action="MyProjects" asp-controller="Projects" style="text-decoration:none">
-                                        <div class="font-weight-bold ml-1 font-size-30 ml-3">@projects!.Where(p => p.StartDate < DateTime.Now && p.EndDate > DateTime.Now).Count() projects</div>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-            </div>*@
-@*<div class="row gy-2">
-            <div class="col-md-12 col">
-                <div class="row col-cols-4 mt-5">
-                    <div class="card col m-1 p-2">
-                        <div class="card-body">
-                            <h5>Chart 1</h5>
-                            <p>[Projects]</p>
-                        </div>
-                    </div>
-                    <div class="card col m-1 p-2">
-                        <div class="card-body">
-                            <h5>Chart 2</h5>
-                            <p>[Projects]</p>
-                        </div>
-                    </div>
-                    <div class="card col m-1 p-2">
-                        <div class="card-body">
-                            <h5>Chart 3</h5>
-                            <p>[Tickets]</p>
-                        </div>
-                    </div>
-                    <div class="card col m-1 p-2">
-                        <div class="card-body">
-                            <h5>Chart 4</h5>
-                            <p>[Tickets]</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>*@
-@*<div class="row gy-2">
-            <div class="cols mt-5">
-                <div class="card col m-1 p-2">
-                    <div class="card-body" style="height:380px">
-                        <h5>Chart 5</h5>
-                        <p>[Projects: Tickets vs Developers]</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <hr />*@
-@*<div class="mt-5 ">
-        <div class="row">*@
-@* Projects Table *@
-@*<div class="col">
-                <div class="">
-                    <div class="card m-1 p-2">
-                        <div class="card-header">
-                            <h2>Projects</h2>
-                        </div>
-                        <div class="card-body">
-                                <table id="myProjectsTable" class="table table-striped table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                Title
-                                            </th>
-                                            <th>
-                                                Created
-                                            </th>
-                                            <th>
-                                                Start Date
-                                            </th>
-                                            <th>
-                                                End Date
-                                            </th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in projects!)
-                                        {
-                                            <tr>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.Name)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.Created)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.StartDate)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.EndDate)
-                                                </td>
-                                                <td>
-                                                    @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
-                                                    {
-                                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Edit</a>
-                                                    }
-                                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Details</a>
-                                                    @if (User.IsInRole(nameof(BTRoles.Admin)))
-                                                    {
-                                                        @if (item.Archived == false)
-                                                        {
-                                                            <a asp-action="Archive" asp-route-id="@item.Id" class="btn btn-outline-danger rounded-pill mx-2">Archive</a>
-                                                        }*@
-@* Restore button if project is archived *@
-@*else
-                                                        {
-                                                            <a asp-action="Restore" asp-route-id="@item.Id" class="btn btn-outline-success rounded-pill mx-2">Restore</a>
-                                                        }
-                                                    }
-                                                    @{
-                                                        BTUser? projectManager = await _BTProjectService.GetProjectManagerAsync(item.Id);
-                                                    }
-                                                    @if (projectManager is null && (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager))))
-                                                    {
-                                                        <a class="btn btn-outline-info rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@item.Id">Assign PM</a>
-                                                    }
-                                                    else
-                                                    {
-                                                        @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
-                                                        {
-                                                            <a class="btn btn-outline-secondary rounded-pill mx-2" asp-action="AssignProjectManager" asp-route-id="@item.Id">@(projectManager?.FullName ?? "Unassigned")</a>
-                                                        }
-                                                    }
-                                                    @if (User.IsInRole(nameof(BTRoles.Admin)) || User.IsInRole(nameof(BTRoles.ProjectManager)))
-                                                    {
-                                                        <a asp-action="AddMembers" asp-route-id="@item.Id" class="btn btn-outline-primary rounded-pill mx-2">Add Member(s)</a>
-                                                    }
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                        </div>
-                        <div class="card-footer">
-                        </div>
-                    </div>
-                </div>
-            </div>*@
-@* Tickets Table *@
-@*<div class="col">
-                <div class="">
-                    <div class="card m-1 p-2">
-                        <div class="card-header">
-                            <h2>Tickets</h2>
-                        </div>
-                        <div class="card-body">
-*@
-@* Copy and format table from Unassigned Tickets *@
-@* </div>
-                        <div class="card-footer">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-2 ">
-                <div class="">
-                    <div class="card m-1 p-2">
-                        <div class="card-header">
-                            <h2>Members</h2>
-                            <hr />
-                        </div>
-                        <div class="card-body" style="overflow-y:auto;height:600px;background-color:antiquewhite">*@
-@* Looop over Company members. Display Name and Role *@
-@*</div>
-                    </div>
-                </div>
-            </div>*@
-@*</div>
-    </div>
-</div>*@
-
 @section scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
@@ -638,117 +370,98 @@
     </div>
 
     <!-- *** Begin Chart JS Pie/Donut *** -->
-    
-    <!-- *** End Chart JS Donut *** -->
 
-    <!-- *** Begin AM Charts *** -->
-    <!-- Resources -->
-    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
-    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
-
-    <!-- Chart code -->
     <script>
-        $.ajax({
-            type: "POST",
-            url: "/Home/AmCharts",
-            data: '{}',
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (result) {
-                am4core.ready(function () {
 
-                    // Themes begin
-                    // Themes end
+        var donutChartCanvas = $('#donutChart').get(0).getContext('2d');
+        var donutData = {
+            labels: [
+                '@nameof(BTTicketStatuses.Development)',
+                '@nameof(BTTicketStatuses.New)',
+                '@nameof(BTTicketStatuses.Resolved)',
+                '@nameof(BTTicketStatuses.Testing)'
+            ],
+            datasets: [
+                {
+                    data: [
+        @tickets.Where(t=> t.TicketStatus!.Name == nameof(BTTicketStatuses.Development)).Count(),
+        @tickets.Where(t=> t.TicketStatus!.Name ==nameof(BTTicketStatuses.New)).Count(),
+        @tickets.Where(t=> t.TicketStatus!.Name ==nameof(BTTicketStatuses.Resolved)).Count(),
+        @tickets.Where(t=> t.TicketStatus!.Name ==nameof(BTTicketStatuses.Testing)).Count()
+                        ],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ]
+                }
+            ]
+        };
 
-                    // Create chart instance
-                    var chart = am4core.create("chartdiv", am4charts.XYChart);
-
-
-                    // Add data
-                    chart.data = result;
-
-                    // Create axes
-                    var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
-                    categoryAxis.dataFields.category = "project";
-                    categoryAxis.numberFormatter.numberFormat = "#";
-                    categoryAxis.renderer.inversed = true;
-                    categoryAxis.renderer.grid.template.location = 0;
-                    categoryAxis.renderer.cellStartLocation = 0.1;
-                    categoryAxis.renderer.cellEndLocation = 0.9;
-
-                    var valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
-                    valueAxis.renderer.opposite = true;
-
-                    // Create series
-                    function createSeries(field, name) {
-                        var series = chart.series.push(new am4charts.ColumnSeries());
-                        series.dataFields.valueX = field;
-                        series.dataFields.categoryY = "project";
-                        series.name = name;
-                        series.columns.template.tooltipText = "{name}: [bold]{valueX}[/]";
-                        series.columns.template.height = am4core.percent(100);
-                        series.sequencedInterpolation = true;
-
-                        var valueLabel = series.bullets.push(new am4charts.LabelBullet());
-                        valueLabel.label.text = "{valueX}";
-                        valueLabel.label.horizontalCenter = "left";
-                        valueLabel.label.dx = 10;
-                        valueLabel.label.hideOversized = false;
-                        valueLabel.label.truncate = false;
-
-                        var categoryLabel = series.bullets.push(new am4charts.LabelBullet());
-                        categoryLabel.label.text = "{name}";
-                        categoryLabel.label.horizontalCenter = "right";
-                        categoryLabel.label.dx = -10;
-                        categoryLabel.label.fill = am4core.color("#fff");
-                        categoryLabel.label.hideOversized = false;
-                        categoryLabel.label.truncate = false;
-                    }
-
-                    createSeries("tickets", "Tickets");
-                    //createSeries("developers", "Devs");
-
-                }); // end am4core.ready()
-
-
-            },
-            failure: function (result) {
-                alert(result.d);
-            },
-            error: function (result) {
-                alert(result.d);
-            }
+        var donutOptions = {
+            maintainAspectRatio: false,
+            responsive: true,
+        };
+        //Create pie or douhnut chart
+        // You can switch between pie and douhnut using the method below.
+        new Chart(donutChartCanvas, {
+            type: 'doughnut',
+            data: donutData,
+            options: donutOptions
         });
     </script>
-
-    <!-- *** End AM Charts *** -->
+    <!-- *** End Chart JS Donut *** -->
 
     <!-- Morris Charts -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    @* Morris Donut Chart *@
     <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
-
     <script>
-        new Morris.Line({
-            // ID of the element in which to draw the chart.
-            element: 'myfirstchart',
-            // Chart data records -- each entry in this array corresponds to a point on
-            // the chart.
-            data: [
-                { year: '2008', value: 20 },
-                { year: '2009', value: 10 },
-                { year: '2010', value: 5 },
-                { year: '2011', value: 5 },
-                { year: '2012', value: 20 }
-            ],
-            // The name of the data record attribute that contains x-values.
-            xkey: 'year',
-            // A list of names of data record attributes that contain y-values.
-            ykeys: ['value'],
-            // Labels for the ykeys -- will be displayed when you hover over the
-            // chart.
-            labels: ['Value']
-        });
+
+        var morrisDonutData = [{
+            label: "Low",
+            value: @tickets.Where(t=>t.TicketPriority!.Name == nameof(BTTicketPriorities.Low)).Count()
+            }, {
+            label: "Medium",
+            value: @tickets.Where(t=>t.TicketPriority!.Name == nameof(BTTicketPriorities.Medium)).Count()
+            }, {
+            label: "High",
+            value: @tickets.Where(t=>t.TicketPriority!.Name == nameof(BTTicketPriorities.High)).Count()
+            }, {
+            label: "Urgent",
+            value: @tickets.Where(t=>t.TicketPriority!.Name == nameof(BTTicketPriorities.Urgent)).Count()
+            }];
+
+
+        /*
+        Morris: Donut
+        */
+        if ($('#morrisTicketPriority').get(0)) {
+            var donutChart = Morris.Donut({
+                resize: true,
+                element: 'morrisTicketPriority',
+                data: morrisDonutData,
+                colors: ['#0088cc', '#734ba9', '#E36159', '#ff993b']
+            });
+
+            donutChart.options.data.forEach(function (label, i) {
+                var legendItem = $('<span></span>').text(label['label'] + ": " + label['value']).prepend('<span>&nbsp;</span>');
+                legendItem.find('span')
+                    .css('backgroundColor', donutChart.options.colors[i])
+                    .css('width', '20px')
+                    .css('display', 'inline-block')
+                    .css('margin', '10px');
+                $('#legend').append(legendItem)
+            });
+        };
     </script>
 
     <!--  Plotly Charts  -->

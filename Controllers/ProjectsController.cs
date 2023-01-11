@@ -182,6 +182,97 @@ namespace BugTrackerMVC.Controllers
             return View(model);
         }
 
+        // GET: Projects/RemoveMembers/5
+        //[HttpGet]
+        //[Authorize(Roles = "Admin,ProjectManager")]
+        //public async Task<IActionResult> RemoveMembers(int? id)
+        //{
+        //     validate id
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //     get company id
+        //    int companyId = User.Identity!.GetCompanyId();
+
+        //    Project? project = await _btProjectService.GetProjectByIdAsync(id.Value, companyId);
+
+        //     get developers and submitters from project
+        //    List<BTUser> projectDevelopers = new List<BTUser>();
+        //    List<BTUser> projectSubmitters = new List<BTUser>();
+
+        //    foreach (BTUser member in project.Members)
+        //    {
+        //        if (await _btRolesService.IsUserInRoleAsync(member, nameof(BTRoles.Submitter)))
+        //        {
+        //            projectSubmitters.Add(member);
+        //        }
+        //        else if (await _btRolesService.IsUserInRoleAsync(member, nameof(BTRoles.Developer)))
+        //        {
+        //            projectDevelopers.Add(member);
+        //        }
+        //        else
+        //        {
+        //            continue;
+        //        }
+        //    }
+
+        //     list of developers
+        //    List<BTUser> developers = await _btRolesService.GetUsersInRoleAsync(nameof(BTRoles.Developer), companyId);
+
+        //     list of submitters
+        //    List<BTUser> submitters = await _btRolesService.GetUsersInRoleAsync(nameof(BTRoles.Submitter), companyId);
+
+        //     get and assign Project property of view model
+        //     need member and project id
+        //    AssignPMViewModel viewModel = new()
+        //    {
+        //        Project = await _btProjectService.GetProjectByIdAsync(id.Value, companyId),
+        //        DevList = new SelectList(developers, "Id", "FullName", projectDevelopers.Select(u => u.Id)), // create MultiSelectList of company's Devs
+        //        SubList = new SelectList(submitters, "Id", "FullName", projectSubmitters.Select(u => u.Id)),
+        //        SelectedDevelopers = projectDevelopers.Select(u => u.Id).ToList(),
+        //        SelectedSubmitters = projectSubmitters.Select(u => u.Id).ToList()
+        //    };
+
+        //    return View(viewModel);
+        //}
+
+        // POST: Projects/RemoveMembers/5
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //[Authorize(Roles = "Admin,ProjectManager")]
+        //public async Task<IActionResult> RemoveMembers(AssignPMViewModel model)
+        //{
+        //    // check if project exists
+        //    if (model.Project?.Id != null)
+        //    {
+        //        Project? project = await _btProjectService.GetProjectByIdAsync(model.Project.Id, User.Identity!.GetCompanyId());
+               
+        //        // remove the members
+        //        foreach (BTUser member in project.Members)
+        //        {   
+        //            // if selected developer matches id
+        //            if (model.SelectedDevelopers.FirstOrDefault().Equals(member.Id))
+        //                // remove member
+        //                await _btProjectService.RemoveMemberFromProjectAsync(member, project.Id);
+
+        //            // if selected submitter matches id
+        //            if (model.SelectedSubmitters.FirstOrDefault().Equals(member.Id))
+        //                // remove member
+        //                await _btProjectService.RemoveMemberFromProjectAsync(member, project.Id);
+        //        }
+
+        //        // combine developers and submitters
+        //        //List<string> selectedMembers = model.SelectedDevelopers;
+        //        //selectedMembers.AddRange(model.SelectedSubmitters);
+
+        //        return RedirectToAction(nameof(Details), new { id = model.Project?.Id });
+        //    }
+
+        //    return View(model);
+        //}
+
         // GET: Projects/AssignProjectManager/5
         [HttpGet]
         [Authorize(Roles = "Admin,ProjectManager")]

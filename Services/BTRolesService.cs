@@ -3,6 +3,7 @@ using BugTrackerMVC.Models;
 using BugTrackerMVC.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using BugTrackerMVC.Models.Enums;
 
 namespace BugTrackerMVC.Services
 {
@@ -71,7 +72,7 @@ namespace BugTrackerMVC.Services
             {
                 List<IdentityRole> result = new();
 
-                result = await _context.Roles.ToListAsync();
+                result = await _context.Roles.Where(r => r.Name != nameof(BTRoles.DemoUser)).ToListAsync();
 
                 return result;
 

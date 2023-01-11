@@ -36,6 +36,12 @@ namespace BugTrackerMVC.Services.Interfaces
         // get project manager
         public Task<BTUser> GetProjectManagerAsync(int projectId);
 
+        // get developer
+        public Task<BTUser> GetDeveloperAsync(int projectId);
+
+        // get submitter
+        public Task<BTUser> GetSubmitterAsync(int projectId);
+
         // add project manager
         public Task<bool> AddProjectManagerAsync(string userId, int projectId);
 
@@ -50,5 +56,8 @@ namespace BugTrackerMVC.Services.Interfaces
 
         // get projects by priority
         public Task<List<Project>> GetAllProjectsByPriorityAsync(int companyId, string priority);
+
+        // get projects members by role
+        public Task<List<BTUser>> GetProjectMembersByRoleAsync(int projectId, string roleName);
     }
 }

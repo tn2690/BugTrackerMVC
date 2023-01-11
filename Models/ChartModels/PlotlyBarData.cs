@@ -2,15 +2,15 @@
 {
     public class PlotlyBarData
     {
-        public List<PlotlyBar>? Data { get; set; }
+        public List<PlotlyBar> Data { get; set; }
     }
 
 
     public class PlotlyBar
     {
-        public string[]? X { get; set; }
-        public int[]? Y { get; set; }
-        public string? Name { get; set; }
-        public string? Type { get; set; }
+        public string[] X { get; set; }
+        public int[] Y { get; set; }
+        public string Name { get; set; }
+        public string Type { get; set; }
     }
 }

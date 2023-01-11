@@ -6,12 +6,12 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<body class="wrapper">
+<body>
   <!-- Header Start -->
   <header>
     <nav class="navbar navbar-expand-lg fixed-top navbar-light">
       <div class="container">
-        <a class="navbar-brand" href="index.html"> <i class="fa-solid fa-cubes-stacked navbar-brand-icon"></i> Insect Crusher</a>
+        <a class="navbar-brand" asp-action="Welcome"> <i class="fa-solid fa-cubes-stacked navbar-brand-icon"></i> Insect Crusher</a>
         <button class="navbar-toggler" type="button" id="navbarNavBtn" data-bs-toggle="collapse"
           data-bs-target="navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-line"></span>
@@ -24,7 +24,7 @@
               <a class="nav-link active" aria-current="page" href="index.html">Home</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">the app</a>
+              <a class="nav-link" asp-action="Dashboard">the app</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="https://github.com/tn2690/BugTrackerMVC">the repo</a>
@@ -55,10 +55,10 @@
             Insect Crusher is a bug tracking system. Users can create and manage projects and tickets.
           </p>
 
-          <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-outline-light btn-sm rounded-pill">Demo the App</a>
+          <a asp-action="Dashboard" class="btn btn-outline-light rounded-pill">Demo the App</a>
         </div>
         <div class="hero-img col-lg-6">
-          <img src="./images/hero-img.png" alt="appliction preview" />
+          <img src="~/img/InsectCrusher.png" class="img-fluid" style="max-width: 500px;" alt="appliction preview" />
         </div>
       </div>
     </div>
@@ -87,56 +87,20 @@
     <!--Technologies End-->
 
   <!-- Footer Start -->
-  <footer class="footer pt-5">
-    <div class="container">
-      <div class="row justify-content-between align-items-center">
-        <div class="col-lg-4">
-          <a class="navbar-brand footer-logo" href="index.html">NAME</a>
-          <p class="footer-description">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas
-            quia reiciendis ipsum, harum maiores facilis
-          </p>
+    <footer class="border-top footer container-fluid">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-4 order-last order-md-first text-center text-md-start">
+                <div class="copyright">&copy; 2022 Tom Nguyen All Rights Reserved</div>
+            </div>
+            <div class="col-12 col-md-4 d-flex justify-content-center order-0 order-md-2">
+                <img src="~/img/InsectCrusherLogo_250.png" height="50" />
+            </div>
+            <div class="col-12 col-md-4 d-flex justify-content-center justify-content-md-end order-3">
+                <a href="https://www.linkedin.com/in/txn9517"><i class="bi bi-linkedin px-2 socialIcons"></i></a>
+                <a href="https://github.com/tn2690/"><i class="bi bi-github socialIcons"></i></a>
+            </div>
         </div>
-
-        <div class="col-lg-4">
-          <h3 class="footer-links-title">Important Links</h3>
-          <ul class="list-unstyled">
-            <li class="footer-link">
-              <a href="index.html#yourlink">Home</a>
-            </li>
-            <li class="footer-link">
-              <a href="index.html#yourlink">About</a>
-            </li>
-            <li class="footer-link">
-              <a href="index.html#yourlink">Services</a>
-            </li>
-            <li class="footer-link">
-              <a href="index.html#yourlink">Contact</a>
-            </li>
-          </ul>
-        </div>
-
-        <div class="col-lg-3">
-          <div class="social">
-            <a href="https://www.linkedin.com/in/txn9517"
-              ><i class="bi bi-linkedin socialIcons"></i
-            ></a>
-            <a href="https://www.github.com/tn2690"
-              ><i class="bi bi-github socialIcons"></i
-            ></a>
-          </div>
-        </div>
-
-        <div class="footer-text text-center mt-5 py-3">
-          <p>
-            Site Created by Tom Nguyen | All Rights Reserved &copy; 2022
-          </p>
-        </div>
-      </div>
-    </div>
-  </footer>
-  <!-- Footer End -->
-
+    </footer>
 </body>
 
 </html>
