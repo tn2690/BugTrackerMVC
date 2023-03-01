@@ -245,6 +245,13 @@ namespace BugTrackerMVC.Services
             {
                 Ticket? ticket = await GetTicketByIdAsync(ticketId, companyId);
 
+                // if ticket status is new
+                if (ticket.TicketStatusId == (await GetTicketStatusesAsync()).FirstOrDefault(s => s.Name == nameof(BTTicketStatuses.New))!.Id) {
+
+                    // change to development
+                    ticket.TicketStatusId = (await GetTicketStatusesAsync()).FirstOrDefault(s => s.Name == nameof(BTTicketStatuses.Development))!.Id;
+                }
+
                 ticket.DeveloperUserId = userId;
 
                 await UpdateTicketAsync(ticket);

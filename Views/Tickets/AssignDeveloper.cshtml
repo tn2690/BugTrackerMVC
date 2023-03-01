@@ -7,20 +7,41 @@
 
 <!-- Assign Developer -->
 
+<div class="page-header">
+    <div>
+        <h3>Assign Developer</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a asp-action="Dashboard" asp-controller="Home">Home</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a asp-action="AllTickets">Tickets</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a asp-action="Details" asp-route-id="@Model.Ticket!.Id">Ticket Details</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Assign Developer
+                <li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
 <div class="d-flex justify-content-center mt-5 flex-column align-items-center">
 
-    <h3 class="my-5">Assign Developer</h3>
     <div class="card">
         <div class="card-header">
             <div class="card-title">Ticket: @Model.Ticket!.Title</div>
             <div class="card-title">Project: @Model.Ticket!.Project!.Name</div>
+            <p class="textItalics">Assign a developer for this ticket. Then, click "Save" when you're finished.</p>
         </div>
         <div class="card-body">
             <form asp-action="AssignDeveloper" method="post" class="d-flex flex-column">
                 <input type="hidden" asp-for="Ticket!.Id" />
                 <select asp-items="Model.DevList" asp-for="DevId">
                 </select>
-                <div class="form-group">
+                <div class="form-group my-2">
                     <label asp-for="Ticket!.TicketStatusId" class="control-label">Status</label>
                     <select asp-for="Ticket!.TicketStatusId" class="form-control" disabled asp-items="ViewBag.TicketStatusId"></select>
                 </div>

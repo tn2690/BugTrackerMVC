@@ -120,7 +120,6 @@ namespace BugTrackerMVC.Controllers
 
             List<BTUser> developers = await _btRolesService.GetUsersInRoleAsync(nameof(BTRoles.Developer), companyId);
 
-
             // create/instantiate DevViewModel
             // get and assign Ticket property of view model
             AssignDevViewModel viewModel = new()
@@ -148,19 +147,13 @@ namespace BugTrackerMVC.Controllers
             // sweet alert
             string? swalMessage = string.Empty;
 
-            // get ticket to change status
-            // TODO: check this
-            //ticket = await _btTicketService.GetTicketByIdAsync(ticket.ProjectId, companyId);
-
-            // set ticket status
-            //ticket.TicketStatusId = (await _btTicketService.GetTicketStatusesAsync()).FirstOrDefault(s => s.Name == nameof(BTTicketStatuses.Development))!.Id;
-
-            //await _btTicketService.UpdateTicketAsync(ticket);
-
             if (viewModel.Ticket?.Id != null)
             {
                 // get bt user
                 BTUser btUser = await _userManager.GetUserAsync(User);
+
+                // get old ticket
+                Ticket oldTicket = await _btTicketService.GetTicketAsNoTrackingAsync(viewModel.Ticket.Id, companyId);
 
                 // validate Dev id of viewModel
                 if (!string.IsNullOrEmpty(viewModel.DevId))
@@ -168,9 +161,6 @@ namespace BugTrackerMVC.Controllers
                     // call service to add Dev
                     await _btTicketService.AssignDeveloperAsync(viewModel.Ticket.Id, viewModel.DevId, companyId);
                 }
-
-                // get old ticket
-                Ticket oldTicket = await _btTicketService.GetTicketAsNoTrackingAsync(viewModel.Ticket.Id, companyId);
 
                 // get new ticket
                 Ticket newTicket = await _btTicketService.GetTicketAsNoTrackingAsync(viewModel.Ticket.Id, companyId);
@@ -210,7 +200,7 @@ namespace BugTrackerMVC.Controllers
         // POST: Tickets/AddComment
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddComment([Bind("Id,Comment,TicketId")] TicketComment ticketComment, Ticket ticket)
+        public async Task<IActionResult> AddComment([Bind("Id,Comment,TicketId")] TicketComment ticketComment)
         {
             BTUser btUser = await _userManager.GetUserAsync(User);
 
@@ -231,6 +221,8 @@ namespace BugTrackerMVC.Controllers
 
                 await _btTicketService.AddCommentAsync(ticketComment);
 
+                Ticket ticket = await _btTicketService.GetTicketByIdAsync(ticketComment.TicketId, companyId);
+
                 // ticket notification
                 BTUser? projectManager = await _btProjectService.GetProjectManagerAsync(ticket.ProjectId);
 
@@ -240,7 +232,7 @@ namespace BugTrackerMVC.Controllers
                 Notification notification = new()
                 {
                     NotificationTypeId = (await _btNotificationService.GetNotificationTypesAsync()).FirstOrDefault(n => n.Name == nameof(BTNotificationTypes.Ticket))!.Id,
-                    TicketId = ticket.Id,
+                    TicketId = ticketComment.TicketId,
                     Title = "New Comment Added",
                     Message = $"New Comment For : {ticket.Title} was created by {btUser.FullName}",
                     Created = SetDate.Format(DateTime.Now),
@@ -256,7 +248,6 @@ namespace BugTrackerMVC.Controllers
 
                     swalMessage = "Success: Email Sent to Recipients!";
 
-                    return RedirectToAction("AllTickets", "Tickets", new { swalMessage });
                 }
                 else
                 {
@@ -266,8 +257,9 @@ namespace BugTrackerMVC.Controllers
 
                     swalMessage = "Success: Email Sent to Admins!";
 
-                    return RedirectToAction("AllTickets", "Tickets", new { swalMessage });
                 }
+
+                return RedirectToAction("Details", "Tickets", new { id = ticket.Id });
             }
 
             return RedirectToAction("Details", "Tickets", new { id = ticketComment.TicketId });
@@ -276,7 +268,7 @@ namespace BugTrackerMVC.Controllers
         // POST: Tickets/AddTicketAttachment
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddTicketAttachment([Bind("Id,FormFile,Description,TicketId")] TicketAttachment ticketAttachment, Ticket ticket)
+        public async Task<IActionResult> AddTicketAttachment([Bind("Id,FormFile,Description,TicketId")] TicketAttachment ticketAttachment)
         {
             BTUser btUser = await _userManager.GetUserAsync(User);
 
@@ -299,6 +291,9 @@ namespace BugTrackerMVC.Controllers
                 ticketAttachment.BTUserId = _userManager.GetUserId(User);
 
                 await _btTicketService.AddTicketAttachmentAsync(ticketAttachment);
+
+                Ticket ticket = await _btTicketService.GetTicketByIdAsync(ticketAttachment.TicketId, companyId);
+
                 statusMessage = "Success! New Attachment added to Ticket.";
 
                 // ticket notification
@@ -310,7 +305,7 @@ namespace BugTrackerMVC.Controllers
                 Notification notification = new()
                 {
                     NotificationTypeId = (await _btNotificationService.GetNotificationTypesAsync()).FirstOrDefault(n => n.Name == nameof(BTNotificationTypes.Ticket))!.Id,
-                    TicketId = ticket.Id,
+                    TicketId = ticketAttachment.TicketId,
                     Title = "New Attachment Added",
                     Message = $"New Attachment For : {ticket.Title} was created by {btUser.FullName}",
                     Created = SetDate.Format(DateTime.Now),
@@ -326,7 +321,6 @@ namespace BugTrackerMVC.Controllers
 
                     swalMessage = "Success: Email Sent to Recipients!";
 
-                    return RedirectToAction("AllTickets", "Tickets", new { swalMessage });
                 }
                 else
                 {
@@ -336,8 +330,9 @@ namespace BugTrackerMVC.Controllers
 
                     swalMessage = "Success: Email Sent to Admins!";
 
-                    return RedirectToAction("AllTickets", "Tickets", new { swalMessage });
                 }
+
+                return RedirectToAction("Details", "Tickets", new { id = ticket.Id });
             }
             else
             {
