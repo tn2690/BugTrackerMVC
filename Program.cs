@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using BugTrackerMVC.Extensions;
 using Microsoft.AspNetCore.Identity.UI.Services;
 
+// where the program begins 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
